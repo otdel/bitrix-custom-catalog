@@ -1,0 +1,24 @@
+{
+    "name": "oip/custom",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Ilya Fertikov",
+            "email": "rodeljob@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "wikimedia/composer-merge-plugin": "dev-master"
+    },
+    "extra": {
+        "merge-plugin": {
+            "require": [
+                "bitrix/composer-bx.json"
+            ]
+        }
+    },
+    "config": {
+        "vendor-dir": "vendor"
+    }
+}

@@ -4,3 +4,4 @@ upload
 .htaccess
 *.config
 /**/**/*.log**
+/vendor/
