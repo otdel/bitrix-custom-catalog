@@ -17,7 +17,7 @@ deploy/php_interface.zip > bitrix/php_interface
 * сгенерировать аннотации для ORM-сущностей кастомных модулей (пояснения см. ниже):
 ```
 cd bitrix
-php bitrix.php orm:annotate -c -m oip.iblock
+php bitrix.php orm:annotate -c -m iblock,oip.iblock
 ```
 * вручную зарегистрировать кастомный модуль в системе, выполнив файл ``development/reg.php``
 или код ``RegisterModule("oip.iblock")`` в любом файле.
