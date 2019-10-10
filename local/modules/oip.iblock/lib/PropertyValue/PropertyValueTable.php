@@ -1,10 +1,15 @@
 <?php
 
-namespace Oip\Iblock;
+namespace Oip\Iblock\PropertyValue;
 
 use Bitrix\Main\Entity;
+use Bitrix\Main\ORM\Fields\Relations\Reference;
+use Bitrix\Main\ORM\Query\Join;
 
-class ElementPropertyTable extends Entity\DataManager
+use Oip\Iblock\Property\PropertyTable;
+use Oip\Iblock\Element\ElementTable;
+
+class PropertyValueTable extends Entity\DataManager
 {
 
     /**
@@ -32,9 +37,21 @@ class ElementPropertyTable extends Entity\DataManager
             'IBLOCK_PROPERTY_ID' => new Entity\IntegerField('IBLOCK_PROPERTY_ID', array(
                 'title' => "ID свойства",
             )),
+            (new Reference(
+                "PROPERTY",
+                PropertyTable::class,
+                Join::on('this.IBLOCK_PROPERTY_ID', 'ref.ID')
+            ))->configureJoinType('inner'),
+
             'IBLOCK_ELEMENT_ID' => new Entity\IntegerField('IBLOCK_ELEMENT_ID', array(
                 'title' => "ID элемента инфоблока",
             )),
+            (new Reference(
+                "ELEMENT",
+                ElementTable::class,
+                Join::on('this.IBLOCK_ELEMENT_ID', 'ref.ID')
+            ))->configureJoinType('inner'),
+
             'VALUE' => new Entity\StringField('VALUE', array(
                 'title' => "Значение",
             )),
@@ -52,6 +69,16 @@ class ElementPropertyTable extends Entity\DataManager
             )),
 
         );
+    }
+
+    public static function getObjectClass()
+    {
+        return PropertyValue::class;
+    }
+
+    public static function getCollectionClass()
+    {
+        return PropertyValueCollection::class;
     }
 
 }
