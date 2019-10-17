@@ -8,9 +8,44 @@ class Element
     /** @var array $data */
     private $data;
 
-    public function __construct($data)
+    private $id;
+    private $code;
+    private $iblockId;
+    private $sectionId;
+    private $sort;
+    private $name;
+    private $active;
+    private $activeFrom;
+    private $activeTo;
+    private $listUrl;
+    private $sectionUrl;
+    private $detailUrl;
+    private $previewPicture;
+    private $detailPicture;
+    private $previewText;
+    private $detailText;
+
+    public function __construct(&$data)
     {
-        $this->data = $data;
+
+        $this->id = $data["FIELDS"]["ID"];
+        $this->code = $data["FIELDS"]["CODE"];
+        $this->iblockId = $data["FIELDS"]["IBLOCK_ID"];
+        $this->sectionId = $data["FIELDS"]["SECTION_ID"];
+        $this->sort = $data["FIELDS"]["SORT"];
+        $this->name = $data["FIELDS"]["NAME"];
+        $this->active = $data["FIELDS"]["ACTIVE"];
+        $this->activeFrom = $data["FIELDS"]["ACTIVE_FROM"];
+        $this->activeTo = $data["FIELDS"]["ACTIVE_TO"];
+        $this->listUrl = $data["FIELDS"]["LIST_PAGE_URL"];
+        $this->sectionUrl = $data["FIELDS"]["SECTION_PAGE_URL"];
+        $this->detailUrl = $data["FIELDS"]["DETAIL_PAGE_URL"];
+        $this->previewPicture = $data["FIELDS"]["PREVIEW_PICTURE"];
+        $this->detailPicture = $data["FIELDS"]["DETAIL_PICTURE"];
+        $this->previewText = $data["FIELDS"]["PREVIEW_TEXT"];
+        $this->detailText = $data["FIELDS"]["DETAIL_TEXT"];
+
+        $this->props = $data["PROPS"];
     }
 
     /** @return array */
@@ -20,12 +55,7 @@ class Element
 
     /** @return array */
     private function getProps() {
-        return $this->data["PROPS"];
-    }
-
-    /** @return array */
-    public function getRawData() {
-        return $this->data;
+        return $this->props;
     }
 
     /**
@@ -33,7 +63,7 @@ class Element
      */
     public function getId()
     {
-        return $this->getFields()["ID"];
+        return $this->id;
     }
 
     /**
@@ -41,7 +71,7 @@ class Element
      */
     public function getCode()
     {
-        return $this->getFields()["CODE"];
+        return $this->code;
     }
 
     /**
@@ -49,7 +79,7 @@ class Element
      */
     public function getIblockId()
     {
-        return $this->getFields()["IBLOCK_ID"];
+        return $this->iblockId;
     }
 
     /**
@@ -57,7 +87,7 @@ class Element
      */
     public function getSectionId()
     {
-        return $this->getFields()["IBLOCK_SECTION_ID"];
+        return $this->sectionId;
     }
 
     /**
@@ -65,7 +95,7 @@ class Element
      */
     public function getSort()
     {
-        return $this->getFields()["SORT"];
+        return $this->sort;
     }
 
     /**
@@ -73,7 +103,7 @@ class Element
      */
     public function getName()
     {
-        return $this->getFields()["NAME"];
+        return $this->name;
     }
 
     /**
@@ -81,7 +111,7 @@ class Element
      */
     public function getActive()
     {
-        return $this->getFields()["ACTIVE"];
+        return $this->active;
     }
 
     /**
@@ -89,7 +119,7 @@ class Element
      */
     public function isActive()
     {
-        return ($this->getFields()["ACTIVE"] === "Y");
+        return ($this->getActive() === "Y");
     }
 
     /**
@@ -97,7 +127,7 @@ class Element
      */
     public function getActiveFrom()
     {
-        return $this->getFields()["ACTIVE_FROM"];
+        return $this->activeFrom;
     }
 
     /**
@@ -105,7 +135,7 @@ class Element
      */
     public function getActiveTo()
     {
-        return $this->getFields()["ACTIVE_TO"];
+        return $this->activeTo;
     }
 
 
@@ -114,7 +144,7 @@ class Element
      */
     public function getListUrl()
     {
-        return $this->getFields()["LIST_PAGE_URL"];
+        return $this->listUrl;
     }
 
     /**
@@ -122,7 +152,7 @@ class Element
      */
     public function getSectionUrl()
     {
-        return $this->getFields()["SECTION_PAGE_URL"];
+        return $this->sectionUrl;
     }
 
     /**
@@ -130,7 +160,7 @@ class Element
      */
     public function getDetailUrl()
     {
-        return $this->getFields()["DETAIL_PAGE_URL"];
+        return $this->detailUrl;
     }
 
     /**
@@ -138,7 +168,7 @@ class Element
      */
     public function getPreviewPicture()
     {
-        return $this->getPicture("PREVIEW_PICTURE");
+        return $this->getPicture($this->previewPicture);
     }
 
     /**
@@ -146,7 +176,7 @@ class Element
      */
     public function getPreviewPictureDescription()
     {
-        return $this->getPictureDescription("PREVIEW_PICTURE");
+        return $this->previewPicture["DESCRIPTION"];
     }
 
     /**
@@ -154,7 +184,7 @@ class Element
      */
     public function getDetailPicture()
     {
-        return $this->getPicture("DETAIL_PICTURE");
+        return $this->getPicture($this->detailPicture);
     }
 
     /**
@@ -162,52 +192,33 @@ class Element
      */
     public function getDetailPictureDescription()
     {
-        return $this->getPictureDescription("DETAIL_PICTURE");
+        return $this->detailPicture["DESCRIPTION"];
     }
 
     /**
      * @return string
      */
-    private function getPicture($pictureType) {
-        $pic = $this->getFields()[$pictureType];
-        return ($pic) ? "/upload/".$pic["SUBDIR"]."/".$pic["FILE_NAME"] : "";
-    }
-
-    /**
-     * @return string
-     */
-    private function getPictureDescription($pictureType) {
-        return $this->getFields()[$pictureType]["DESCRIPTION"];
+    private function getPicture(&$picture) {
+        return ($picture) ? "/upload/".$picture["SUBDIR"]."/".$picture["FILE_NAME"] : "";
     }
 
     /**
      * @return string
      */
     public function getPreviewText() {
-        return $this->getText("PREVIEW_TEXT");
+        return $this->previewText;
     }
 
     /**
      * @return string
      */
     public function getDetailText() {
-        return $this->getText("DETAIL_TEXT");
+        return $this->detailText;
     }
 
-    /**
-     * @param string $textType
-     * @return string
-     */
-    private function getText($textType) {
-        return $this->getFields()[$textType];
-    }
-
-    /**
-     * @param string $fieldName
-     * @return string
-     */
-    public function getField($fieldName) {
-        return $this->getFields()[$fieldName];
+    /** @return array */
+    public function getProp($propCode) {
+        return $this->getProps()[$propCode];
     }
 
     /**
