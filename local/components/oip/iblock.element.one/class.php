@@ -1,6 +1,8 @@
 <?php
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
+use Oip\Custom\Component\Iblock\Element;
+
 \CBitrixComponent::includeComponentClass("oip:iblock.element.list");
 
 /**
@@ -9,12 +11,27 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
     "IBLOCK_ID" => 2,
     "ELEMENT_ID" => 4,
     "PROPERTIES" => [9,8,13,14],
-     "RESIZE_FILE_PROPS" => [600,600]
+    "SHOW_INACTIVE" => "Y"
+    "RESIZE_FILE_PROPS" => [600,600]
     ])?>
 */
 
 
 class COipIblockElementOne extends COipIblockElementList {
+
+    public function executeComponent()
+    {
+        $this->execute();
+
+        if(empty($this->rawData)) {
+            $this->arResult["ERRORS"][] = "Ошибка: элемент не найден";
+        }
+        else {
+            $this->arResult["ELEMENT"] = new Element(reset($this->rawData));
+        }
+
+        $this->includeComponentTemplate();
+    }
 
     /**
      * @inheritdoc
@@ -53,12 +70,4 @@ class COipIblockElementOne extends COipIblockElementList {
 
         return $filter;
     }
-
-    protected function execute()
-    {
-        parent::execute();
-
-        $this->arResult = reset($this->arResult);
-    }
-
 }

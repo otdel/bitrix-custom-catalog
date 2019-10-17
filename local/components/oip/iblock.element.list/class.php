@@ -1,22 +1,34 @@
 <?php
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
+require_once(__DIR__."/../Element.php");
+require_once(__DIR__."/../ElementCollection.php");
+
 use \Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\ArgumentTypeException;
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
+
+use Oip\Custom\Component\Iblock\Element;
+use Oip\Custom\Component\Iblock\ElementCollection;
 
 /**
  *
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",[
     "IBLOCK_ID" => 2,
     "SECTION_ID" => 8,
+    "SHOW_INACTIVE" => "Y"
     "PROPERTIES" => [9,8,13,14],
-    ])?>
+    "RESIZE_FILE_PROPS" => [600,600]
+])?>
  */
 
 class COipIblockElementList extends \CBitrixComponent
 {
+
+
+    /** @var array */
+    protected $rawData = [];
 
     public function onPrepareComponentParams($arParams)
     {
@@ -27,28 +39,42 @@ class COipIblockElementList extends \CBitrixComponent
 
     public function executeComponent()
     {
-        if(empty($this->arResult["EXCEPTION"])) {
-            try {
+        $this->execute();
 
-                if (!\Bitrix\Main\Loader::includeModule("iblock")) {
-                    throw new \Bitrix\Main\SystemException("Module iblock is not installed");
-                }
+        $elements = [];
+        foreach($this->rawData as $item) {
+            $elements[$item["FIELDS"]["ID"]] = new Element($item);
+        }
 
-                $this->execute();
-
-            } catch (LoaderException $e) {
-                $this->arResult["EXCEPTION"] = $e->getMessage();
-            }
-            catch (SystemException $e) {
-                $this->arResult["EXCEPTION"] = $e->getMessage();
-            }
+        if(!count($elements)) {
+            $this->arResult["ERRORS"][] = "Ошибка: элементы не найдены";
+        }
+        else {
+            $this->arResult["COLLECTION"] = new ElementCollection($elements);
         }
 
         $this->includeComponentTemplate();
     }
 
     protected function execute() {
-        $this->fetchCommonData()->fetchCommonPictures()->getComplicatedProps();
+
+    if(empty($this->arResult["EXCEPTION"])) {
+        try {
+
+                if (!\Bitrix\Main\Loader::includeModule("iblock")) {
+                    throw new \Bitrix\Main\SystemException("Module iblock is not installed");
+                }
+
+                $this->fetchCommonData()->fetchCommonPictures()->getComplicatedProps();
+
+            }
+            catch (LoaderException $e) {
+                $this->arResult["EXCEPTION"] = $e->getMessage();
+            }
+            catch (SystemException $e) {
+                $this->arResult["EXCEPTION"] = $e->getMessage();
+            }
+        }
     }
 
     /**
@@ -59,11 +85,11 @@ class COipIblockElementList extends \CBitrixComponent
 
         try {
             if(!is_set($arParams["IBLOCK_ID"])) {
-                throw new \Bitrix\Main\ArgumentNullException("IBLOCK_ID");
+                throw new ArgumentNullException("IBLOCK_ID");
             }
 
             if(!intval($arParams["IBLOCK_ID"])) {
-                throw new \Bitrix\Main\ArgumentTypeException("IBLOCK_ID");
+                throw new ArgumentTypeException("IBLOCK_ID");
             }
         }
         catch (\Bitrix\Main\ArgumentException $e) {
@@ -82,6 +108,10 @@ class COipIblockElementList extends \CBitrixComponent
             $arParams["RESIZE_FILE_PROPS"] = ["width" => 600, "height" => 600];
         }
 
+        if(!is_set($arParams["SHOW_INACTIVE"])) {
+            $arParams["SHOW_INACTIVE"] = "N";
+        }
+
         return $arParams;
     }
 
@@ -94,6 +124,10 @@ class COipIblockElementList extends \CBitrixComponent
 
         if (intval($this->arParams["SECTION_ID"])) {
             $filter["SECTION_ID"] = $this->arParams["SECTION_ID"];
+        }
+
+        if ($this->arParams["SHOW_INACTIVE"] !== "Y") {
+            $filter["ACTIVE"] = "Y";
         }
 
         return $filter;
@@ -110,10 +144,10 @@ class COipIblockElementList extends \CBitrixComponent
 
         $group = false;
         $navStartParams = false;
-        $select = ["ID", "IBLOCK_ID", "NAME","PREVIEW_PICTURE", "DETAIL_PICTURE", "PREVIEW_TEXT",
-            /*"DETAIL_TEXT",*/ "LIST_PAGE_URL", "SECTION_PAGE_URL", "DETAIL_PAGE_URL"];
+        $select = ["ID", "IBLOCK_ID", "SECTION_ID", "NAME", "ACTIVE", "ACTIVE_FROM", "ACTIVE_TO", "SORT", "PREVIEW_PICTURE", "DETAIL_PICTURE", "PREVIEW_TEXT",
+            "DETAIL_TEXT", "LIST_PAGE_URL", "SECTION_PAGE_URL", "DETAIL_PAGE_URL"];
 
-        $this->arResult = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
+        $this->rawData = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
             $arParams["PROPERTIES"]);
 
        return $this;
@@ -124,7 +158,7 @@ class COipIblockElementList extends \CBitrixComponent
 
         $pictureIDs = "";
 
-        foreach ($this->arResult as $key => $item) {
+        foreach ($this->rawData as $key => $item) {
            if($item["FIELDS"]["DETAIL_PICTURE"]) {
                $pictureIDs .= $item["FIELDS"]["DETAIL_PICTURE"].",";
            }
@@ -140,16 +174,16 @@ class COipIblockElementList extends \CBitrixComponent
             $files[$file["ID"]] = $file;
         }
 
-        foreach ($this->arResult as $key => $item) {
+        foreach ($this->rawData as $key => $item) {
 
-            $previewPictureID = $this->arResult[$key]["FIELDS"]["PREVIEW_PICTURE"];
-            $detailPictureID = $this->arResult[$key]["FIELDS"]["DETAIL_PICTURE"];
+            $previewPictureID = $this->rawData[$key]["FIELDS"]["PREVIEW_PICTURE"];
+            $detailPictureID = $this->rawData[$key]["FIELDS"]["DETAIL_PICTURE"];
 
             if($previewPictureID) {
-                $this->arResult[$key]["FIELDS"]["PREVIEW_PICTURE"] =  $files[$previewPictureID];
+                $this->rawData[$key]["FIELDS"]["PREVIEW_PICTURE"] =  $files[$previewPictureID];
             }
             if($detailPictureID) {
-                $this->arResult[$key]["FIELDS"]["DETAIL_PICTURE"] =  $files[$detailPictureID];
+                $this->rawData[$key]["FIELDS"]["DETAIL_PICTURE"] =  $files[$detailPictureID];
             }
         }
 
@@ -180,7 +214,7 @@ class COipIblockElementList extends \CBitrixComponent
 
         $fileProps = [];
 
-        foreach ($this->arResult as $key => $item) {
+        foreach ($this->rawData as $key => $item) {
             foreach ($item["PROPS"] as $propCode => $prop) {
                 if($prop["PROPERTY_TYPE"] == "F" && $prop["VALUE"]) {
                     $fileProps[$item["FIELDS"]["ID"]][$prop["ID"]] = $prop["VALUE"];
@@ -207,10 +241,10 @@ class COipIblockElementList extends \CBitrixComponent
             }
         }
 
-        foreach ($this->arResult as $key => $item) {
+        foreach ($this->rawData as $key => $item) {
             foreach ($item["PROPS"] as $propCode => $prop) {
                 if($prop["PROPERTY_TYPE"] == "F" && $prop["VALUE"]) {
-                    $this->arResult[$key]["PROPS"][$propCode]["VALUE"] =  $fileProps[$item["FIELDS"]["ID"]][$prop["ID"]];
+                    $this->rawData[$key]["PROPS"][$propCode]["VALUE"] =  $fileProps[$item["FIELDS"]["ID"]][$prop["ID"]];
                 }
             }
         }
