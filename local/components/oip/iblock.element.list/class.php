@@ -10,7 +10,6 @@ use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
 
 use Oip\Custom\Component\Iblock\Element;
-use Oip\Custom\Component\Iblock\ElementCollection;
 
 /**
  *
@@ -50,7 +49,7 @@ class COipIblockElementList extends \CBitrixComponent
             $this->arResult["ERRORS"][] = "Ошибка: элементы не найдены";
         }
         else {
-            $this->arResult["COLLECTION"] = new ElementCollection($elements);
+            $this->arResult["ELEMENTS"] = $elements;
         }
 
         $this->includeComponentTemplate();

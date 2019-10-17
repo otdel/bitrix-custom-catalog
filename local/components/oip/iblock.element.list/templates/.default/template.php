@@ -13,11 +13,11 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
  */
 
 /** @var array $arResult */
-/** @var \Oip\Custom\Component\Iblock\ElementCollection $collection */
 /** @var \Oip\Custom\Component\Iblock\Element $element */
+/** @var \Oip\Custom\Component\Iblock\Element[] $element */
 $exception = $arResult["EXCEPTION"];
 $errors = $arResult["ERRORS"];
-$collection = $arResult["COLLECTION"];
+$elements = $arResult["ELEMENTS"];
 ?>
 
 <?if($exception):?>
@@ -30,9 +30,9 @@ $collection = $arResult["COLLECTION"];
         <?endforeach?>
     <?endif?>
 
-    <?if($collection):?>
+    <?if($elements):?>
 
-        <?foreach($collection->getElements() as $element):?>
+        <?foreach($elements as $element):?>
             <h2><?=$element->getName()?></h2>
 
             <img src="<?=$element->getDetailPicture()?>" width="200" alt="<?=$element->getDetailPictureDescription()?>">
