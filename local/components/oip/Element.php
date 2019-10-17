@@ -5,25 +5,40 @@ namespace Oip\Custom\Component\Iblock;
 class Element
 {
 
-    /** @var array $data */
-    private $data;
-
+    /** @var int $id */
     private $id;
+    /** @var string $code */
     private $code;
+    /** @var int $iblockId */
     private $iblockId;
+    /** @var int $sectionId */
     private $sectionId;
+    /** @var int $sort */
     private $sort;
+    /** @var string $name */
     private $name;
+    /** @var string $active */
     private $active;
+    /** @var string $activeFrom */
     private $activeFrom;
+    /** @var string $activeFrom */
     private $activeTo;
+    /** @var string $listUrl */
     private $listUrl;
+    /** @var string $sectionUrl */
     private $sectionUrl;
+    /** @var string $detailUrl */
     private $detailUrl;
+    /** @var string $previewPicture */
     private $previewPicture;
+    /** @var string $detailPicture */
     private $detailPicture;
+    /** @var string $previewText */
     private $previewText;
+    /** @var string $detailText */
     private $detailText;
+    /** @var Property[] $props */
+    private $props;
 
     public function __construct(&$data)
     {
@@ -45,17 +60,13 @@ class Element
         $this->previewText = $data["FIELDS"]["PREVIEW_TEXT"];
         $this->detailText = $data["FIELDS"]["DETAIL_TEXT"];
 
-        $this->props = $data["PROPS"];
-    }
 
-    /** @return array */
-    private function getFields(){
-        return $this->data["FIELDS"];
-    }
+        $props = [];
+        foreach($data["PROPS"] as $propCode => $arProp) {
+            $props[$propCode] = new Property($arProp);
+        }
 
-    /** @return array */
-    private function getProps() {
-        return $this->props;
+        $this->props = $props;
     }
 
     /**
@@ -216,7 +227,12 @@ class Element
         return $this->detailText;
     }
 
-    /** @return array */
+    /** @return Property[] */
+    public function getProps() {
+        return $this->props;
+    }
+
+    /** @return Property|null */
     public function getProp($propCode) {
         return $this->getProps()[$propCode];
     }
@@ -226,10 +242,14 @@ class Element
      * @return mixed
      */
     public function getPropValue($propCode) {
-        return $this->getProps()[$propCode]["VALUE"];
+        return ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getValue() : null;
     }
 
+    /**
+     * @param string $propCode
+     * @return string
+     */
     public function getPropName($propCode) {
-        return $this->getProps()[$propCode]["NAME"];
+        return  ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getName() : null;
     }
 }

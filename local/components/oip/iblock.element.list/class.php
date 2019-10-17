@@ -2,7 +2,7 @@
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 require_once(__DIR__."/../Element.php");
-require_once(__DIR__."/../ElementCollection.php");
+require_once(__DIR__."/../Property.php");
 
 use \Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\ArgumentTypeException;
