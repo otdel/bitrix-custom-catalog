@@ -239,10 +239,43 @@ class Element
 
     /**
      * @param string $propCode
-     * @return mixed
+     * @return string
      */
     public function getPropValue($propCode) {
-        return ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getValue() : null;
+        return ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getValue() : "";
+    }
+
+    /**
+     * @param string $propCode
+     * @param int|null $key
+     * @return string
+     */
+    public function getPropValueFromMultiple($propCode, $key = 0) {
+        return ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getValueFromMultiple($key) : "";
+    }
+
+    /**
+     * @param string $propCode
+     * @return string
+     */
+    public function getPropValueDescription($propCode) {
+        return ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getDescription() : "";
+    }
+
+    /**
+     * @param string $propCode
+     * @param int $key
+     * @return string
+     */
+    public function getPropValueDescriptionFromMultiple($propCode, $key = 0) {
+        return ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getDescriptionFromMultiple($key) : "";
+    }
+
+    /**
+     * @return int
+     */
+    public function getPropValueCount($propCode) {
+        return  ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getValueCount() : 0;
     }
 
     /**
@@ -250,6 +283,6 @@ class Element
      * @return string
      */
     public function getPropName($propCode) {
-        return  ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getName() : null;
+        return  ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getName() : "";
     }
 }
