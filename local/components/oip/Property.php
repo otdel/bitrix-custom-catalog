@@ -20,7 +20,7 @@ class Property
     private $value;
 
     /** @param array $data */
-    public function __construct(&$data)
+    public function __construct($data)
     {
         $this->id = $data["ID"];
         $this->iblockId =  $data["IBLOCK_ID"];
