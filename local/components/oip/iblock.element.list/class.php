@@ -17,7 +17,12 @@ use Oip\Custom\Component\Iblock\Element;
     "IBLOCK_ID" => 2,
     "SECTION_ID" => 8,
     "SHOW_INACTIVE" => "Y"
-    "PROPERTIES" => [9,8,13,14],
+    "PROPERTIES" => [
+        "PICS_NEWS",
+        "TEST_STRING",
+        "TEST_FILE",
+        "TEST_LIST",
+    ],
     "RESIZE_FILE_PROPS" => [600,600]
 ])?>
  */
@@ -146,8 +151,10 @@ class COipIblockElementList extends \CBitrixComponent
         $select = ["ID", "IBLOCK_ID", "SECTION_ID", "NAME", "ACTIVE", "ACTIVE_FROM", "ACTIVE_TO", "SORT", "PREVIEW_PICTURE", "DETAIL_PICTURE", "PREVIEW_TEXT",
             "DETAIL_TEXT", "LIST_PAGE_URL", "SECTION_PAGE_URL", "DETAIL_PAGE_URL"];
 
+        $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
+
         $this->rawData = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
-            $arParams["PROPERTIES"]);
+            $propIDs);
 
        return $this;
     }
@@ -249,6 +256,23 @@ class COipIblockElementList extends \CBitrixComponent
         }
 
         return $this;
+    }
+
+    /**
+     * @param array
+     * @return array
+     */
+    protected function fetchPropIDs($propCodes) {
+        $propIDs = [];
+
+        $dbProps = \CIBlockProperty::GetList([],["IBLOCK_ID" => $this->arParams["IBLOCK_ID"]]);
+        while($prop = $dbProps->GetNext()) {
+            if(in_array($prop["CODE"],$propCodes)) {
+                $propIDs[$prop["CODE"]] = $prop["ID"];
+            }
+        }
+
+        return $propIDs;
     }
 
     /**

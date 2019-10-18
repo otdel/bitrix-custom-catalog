@@ -10,7 +10,12 @@ use Oip\Custom\Component\Iblock\Element;
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.one","",[
     "IBLOCK_ID" => 2,
     "ELEMENT_ID" => 4,
-    "PROPERTIES" => [9,8,13,14],
+    "PROPERTIES" => [
+        "PICS_NEWS",
+        "TEST_STRING",
+        "TEST_FILE",
+        "TEST_LIST",
+    ],
     "SHOW_INACTIVE" => "Y"
     "RESIZE_FILE_PROPS" => [600,600]
     ])?>
