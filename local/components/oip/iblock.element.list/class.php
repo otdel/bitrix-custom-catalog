@@ -16,13 +16,14 @@ use Oip\Custom\Component\Iblock\Element;
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",[
     "IBLOCK_ID" => 2,
     "SECTION_ID" => 8,
-    "SHOW_INACTIVE" => "Y"
+    "SHOW_INACTIVE" => "Y" - показать и неактивные
     "PROPERTIES" => [
         "PICS_NEWS",
         "TEST_STRING",
         "TEST_FILE",
         "TEST_LIST",
     ],
+ * "PROPERTIES" => "all" - все свойства
     "RESIZE_FILE_PROPS" => [600,600]
 ])?>
  */
@@ -103,7 +104,7 @@ class COipIblockElementList extends \CBitrixComponent
         if(!is_set($arParams["PROPERTIES"])) {
             $arParams["PROPERTIES"] = [];
         }
-        else {
+        elseif(is_array($arParams["PROPERTIES"])) {
             $arParams["PROPERTIES"] = $this->trimPropCodes($arParams["PROPERTIES"]);
         }
 
@@ -164,7 +165,13 @@ class COipIblockElementList extends \CBitrixComponent
         $select = ["ID", "IBLOCK_ID", "SECTION_ID", "NAME", "ACTIVE", "ACTIVE_FROM", "ACTIVE_TO", "SORT", "PREVIEW_PICTURE", "DETAIL_PICTURE", "PREVIEW_TEXT",
             "DETAIL_TEXT", "LIST_PAGE_URL", "SECTION_PAGE_URL", "DETAIL_PAGE_URL"];
 
-        $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
+        $propIDs = [];
+        if($arParams["PROPERTIES"] === "all") {
+            $propIDs = "all";
+        }
+        elseif(is_array($arParams["PROPERTIES"])) {
+            $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
+        }
 
         $this->rawData = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
             $propIDs);
@@ -290,7 +297,7 @@ class COipIblockElementList extends \CBitrixComponent
 
     /**
      * @param \CIblockResult $iblockResult
-     * @param array $propIds
+     * @param string|array $propIds
      * @return array
      */
     protected function getRows($iblockResult, $propIds) {
@@ -300,7 +307,12 @@ class COipIblockElementList extends \CBitrixComponent
             $result["FIELDS"] = $object->GetFields();
 
             if(!empty($propIds)) {
-                $result["PROPS"] = $object->GetProperties([],["ID" => $propIds]);
+                if(is_string($propIds)) {
+                    $result["PROPS"] = $object->GetProperties();
+                }
+                else {
+                    $result["PROPS"] = $object->GetProperties([],["ID" => $propIds]);
+                }
             }
 
             $arResult[] = $result;

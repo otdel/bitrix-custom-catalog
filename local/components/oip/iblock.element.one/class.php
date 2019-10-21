@@ -16,7 +16,7 @@ use Oip\Custom\Component\Iblock\Element;
         "TEST_FILE",
         "TEST_LIST",
     ],
-    "SHOW_INACTIVE" => "Y"
+ * "PROPERTIES" => "all" - все свойства
     "RESIZE_FILE_PROPS" => [600,600]
     ])?>
 */
