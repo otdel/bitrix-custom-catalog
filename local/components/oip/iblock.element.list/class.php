@@ -103,6 +103,9 @@ class COipIblockElementList extends \CBitrixComponent
         if(!is_set($arParams["PROPERTIES"])) {
             $arParams["PROPERTIES"] = [];
         }
+        else {
+            $arParams["PROPERTIES"] = $this->trimPropCodes($arParams["PROPERTIES"]);
+        }
 
         if(!is_set($arParams["SECTION_ID"])) {
             $arParams["SECTION_ID"] = 0;
@@ -117,6 +120,16 @@ class COipIblockElementList extends \CBitrixComponent
         }
 
         return $arParams;
+    }
+
+    /**
+     * @param array $propCodes
+     * @return array
+     */
+    protected function trimPropCodes($propCodes) {
+        return array_map(function ($propCode) {
+            return trim($propCode);
+        }, $propCodes);
     }
 
     /** @return array */
