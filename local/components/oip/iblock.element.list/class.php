@@ -14,17 +14,76 @@ use Oip\Custom\Component\Iblock\Element;
 /**
  *
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",[
-    "IBLOCK_ID" => 2,
-    "SECTION_ID" => 8,
-    "SHOW_INACTIVE" => "Y" - показать и неактивные
-    "PROPERTIES" => [
-        "PICS_NEWS",
-        "TEST_STRING",
-        "TEST_FILE",
-        "TEST_LIST",
+ *  "BASE" => [
+        "IBLOCK_ID" => 2,
+        "SECTION_ID" => 8,
+        "SHOW_INACTIVE" => "Y" - показать и неактивные
+        "PROPERTIES" => [
+            "PICS_NEWS",
+            "TEST_STRING",
+            "TEST_FILE",
+            "TEST_LIST",
+        ],
+        "PROPERTIES" => "all" - все свойства
+        "RESIZE_FILE_PROPS" => [600,600]
+ *
+ *      "COUNT" => "",
+        "SHOW_INACTIVE" => "Y",
+        "FILTER" => "",
+        "SORT_1" => "BY_1",
+        "SORT_2" => "BY_2",
+        "SHOW_META" => "",
+        "INCLUDE_IBLOCK_CHAIN" => "",
+        "SHOW_SORT" => "",
+        "SHOW_404" => "",
+        "SHOW_PAGER" => "",
+        "SHOW_SIDEBAR" => "",
+ *  ],
+ *
+ * "LIST_VIEW" => [
+        "SHOW_SIDEBAR" => "Y",
+
+        "TITLE" => [
+            "TEXT" => "",
+            "TAG" => "",
+            "CSS" => "",
+            "ICON_CSS" => "",
+            "ALIGN" => "",
+        ],
+
+        "WRAP" => [
+            "COLOR" => "",
+            "SIZE" => "",
+            "ADD_CSS" => "",
+        ],
+        "CONTAINER" => [
+            "WIDTH_CSS" => "",
+            "TYPE" => "",
+            "MARGIN_CSS" => "",
+            "VERTICAL_ALIGN" => ""
+        ]
     ],
- * "PROPERTIES" => "all" - все свойства
-    "RESIZE_FILE_PROPS" => [600,600]
+
+
+    "TILE" => [
+        "TYPE" => "",
+        "PARALLAX" => "",
+        "VERTICAL_ALIGN" => "",
+        "HORIZONTAL_MARGIN" => "",
+        "VERTICAL_MARGIN" => "",
+    ],
+
+    "SLIDER" => [
+        "SHOW" => "",
+        "SHOW_BULLETS" => "",
+        "AUTOPLAY" => "",
+        "AUTOPLAY_INTERVAL" => "",
+        "CENTERED" => "",
+        "MOVE_SETS" => "",
+        "HIDE_CONTENT" => "",
+        "CONTENT_ON_PICTURE" => "",
+    ]
+
 ])?>
  */
 
@@ -89,11 +148,11 @@ class COipIblockElementList extends \CBitrixComponent
     protected function initParams($arParams) {
 
         try {
-            if(!is_set($arParams["IBLOCK_ID"])) {
+            if(!is_set($arParams["BASE"]["IBLOCK_ID"])) {
                 throw new ArgumentNullException("IBLOCK_ID");
             }
 
-            if(!intval($arParams["IBLOCK_ID"])) {
+            if(!intval($arParams["BASE"]["IBLOCK_ID"])) {
                 throw new ArgumentTypeException("IBLOCK_ID");
             }
         }
@@ -101,23 +160,23 @@ class COipIblockElementList extends \CBitrixComponent
             $this->arResult["EXCEPTION"] = $e->getMessage();
         }
 
-        if(!is_set($arParams["PROPERTIES"])) {
-            $arParams["PROPERTIES"] = [];
+        if(!is_set($arParams["BASE"]["PROPERTIES"])) {
+            $arParams["BASE"]["PROPERTIES"] = [];
         }
-        elseif(is_array($arParams["PROPERTIES"])) {
-            $arParams["PROPERTIES"] = $this->trimPropCodes($arParams["PROPERTIES"]);
-        }
-
-        if(!is_set($arParams["SECTION_ID"])) {
-            $arParams["SECTION_ID"] = 0;
+        elseif(is_array($arParams["BASE"]["PROPERTIES"])) {
+            $arParams["BASE"]["PROPERTIES"] = $this->trimPropCodes($arParams["BASE"]["PROPERTIES"]);
         }
 
-        if(!is_set($arParams["RESIZE_FILE_PROPS"])) {
-            $arParams["RESIZE_FILE_PROPS"] = ["width" => 600, "height" => 600];
+        if(!is_set($arParams["BASE"]["SECTION_ID"])) {
+            $arParams["BASE"]["SECTION_ID"] = 0;
         }
 
-        if(!is_set($arParams["SHOW_INACTIVE"])) {
-            $arParams["SHOW_INACTIVE"] = "N";
+        if(!is_set($arParams["BASE"]["RESIZE_FILE_PROPS"])) {
+            $arParams["BASE"]["RESIZE_FILE_PROPS"] = ["width" => 600, "height" => 600];
+        }
+
+        if(!is_set($arParams["BASE"]["SHOW_INACTIVE"])) {
+            $arParams["BASE"]["SHOW_INACTIVE"] = "N";
         }
 
         return $arParams;
@@ -137,14 +196,14 @@ class COipIblockElementList extends \CBitrixComponent
     protected function consistFilter()
     {
         $filter = [
-            "IBLOCK_ID" => $this->arParams["IBLOCK_ID"]
+            "IBLOCK_ID" => $this->arParams["BASE"]["IBLOCK_ID"]
         ];
 
-        if (intval($this->arParams["SECTION_ID"])) {
-            $filter["SECTION_ID"] = $this->arParams["SECTION_ID"];
+        if (intval($this->arParams["BASE"]["SECTION_ID"])) {
+            $filter["SECTION_ID"] = $this->arParams["BASE"]["SECTION_ID"];
         }
 
-        if ($this->arParams["SHOW_INACTIVE"] !== "Y") {
+        if ($this->arParams["BASE"]["SHOW_INACTIVE"] !== "Y") {
             $filter["ACTIVE"] = "Y";
         }
 
@@ -166,11 +225,11 @@ class COipIblockElementList extends \CBitrixComponent
             "DETAIL_TEXT", "LIST_PAGE_URL", "SECTION_PAGE_URL", "DETAIL_PAGE_URL"];
 
         $propIDs = [];
-        if($arParams["PROPERTIES"] === "all") {
+        if($arParams["BASE"]["PROPERTIES"] === "all") {
             $propIDs = "all";
         }
-        elseif(is_array($arParams["PROPERTIES"])) {
-            $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
+        elseif(is_array($arParams["BASE"]["PROPERTIES"])) {
+            $propIDs = $this->fetchPropIDs($arParams["BASE"]["PROPERTIES"]);
         }
 
         $this->rawData = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
@@ -221,7 +280,7 @@ class COipIblockElementList extends \CBitrixComponent
 
         return \CFile::ResizeImageGet(
             $fileID,
-            $this->arParams["RESIZE_FILE_PROPS"],
+            $this->arParams["BASE"]["RESIZE_FILE_PROPS"],
             BX_RESIZE_IMAGE_PROPORTIONAL,
             true
         );
@@ -285,7 +344,7 @@ class COipIblockElementList extends \CBitrixComponent
     protected function fetchPropIDs($propCodes) {
         $propIDs = [];
 
-        $dbProps = \CIBlockProperty::GetList([],["IBLOCK_ID" => $this->arParams["IBLOCK_ID"]]);
+        $dbProps = \CIBlockProperty::GetList([],["IBLOCK_ID" => $this->arParams["BASE"]["IBLOCK_ID"]]);
         while($prop = $dbProps->GetNext()) {
             if(in_array($prop["CODE"],$propCodes)) {
                 $propIDs[$prop["CODE"]] = $prop["ID"];

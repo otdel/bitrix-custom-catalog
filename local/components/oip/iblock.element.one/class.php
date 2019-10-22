@@ -8,17 +8,58 @@ use Oip\Custom\Component\Iblock\Element;
 /**
  *
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.one","",[
-    "IBLOCK_ID" => 2,
-    "ELEMENT_ID" => 4,
-    "PROPERTIES" => [
-        "PICS_NEWS",
-        "TEST_STRING",
-        "TEST_FILE",
-        "TEST_LIST",
+ * "BASE" => [
+        "IBLOCK_ID" => 2,
+        "ELEMENT_ID" => 4,
+        "PROPERTIES" => [
+            "PICS_NEWS",
+            "TEST_STRING",
+            "TEST_FILE",
+            "TEST_LIST",
+        ],
+     *  "PROPERTIES" => "all" - все свойства
+        "RESIZE_FILE_PROPS" => [600,600],
+ *
+ *      "COUNT" => "",
+        "SHOW_INACTIVE" => "Y",
+        "FILTER" => "",
+        "SORT_1" => "BY_1",
+        "SORT_2" => "BY_2",
+        "SHOW_META" => "",
+        "INCLUDE_IBLOCK_CHAIN" => "",
+        "SHOW_SORT" => "",
+        "SHOW_404" => "",
+        "SHOW_PAGER" => "",
+        "SHOW_SIDEBAR" => "",
+*   ],
+ *
+ *  "ELEMENT_VIEW" => [
+        "PICTURE" => [
+            "TYPE" => "",
+            "HEIGHT" => "",
+            "POSITION" => ""
+        ],
+        "BLOCK" => [
+            "COLOR" => "",
+            "SIZE" => "",
+        ],
+        "TITLE" => [
+            "ALIGN" => "",
+            "CSS" => "",
+        ],
+
+        "SHOW_CATEGORY_NAME" => "",
+        "SHOW_TAG_LIST" => "",
+        "SHOW_BRAND" => "",
+        "SHOW_REVIEWS_NUMBER" => "",
+
+        "READ_MORE_BUTTON" => [
+            "SHOW" => "",
+            "TEXT" => "",
+            "SHOW_HOVER_EFFECT" => "",
+        ],
     ],
- * "PROPERTIES" => "all" - все свойства
-    "RESIZE_FILE_PROPS" => [600,600]
-    ])?>
+])?>
 */
 
 
@@ -46,11 +87,11 @@ class COipIblockElementOne extends COipIblockElementList {
         $arParams = parent::initParams($arParams);
 
         try {
-            if(!is_set($arParams["ELEMENT_ID"])) {
+            if(!is_set($arParams["BASE"]["ELEMENT_ID"])) {
                 throw new \Bitrix\Main\ArgumentNullException("ELEMENT_ID");
             }
 
-            if(!intval($arParams["ELEMENT_ID"])) {
+            if(!intval($arParams["BASE"]["ELEMENT_ID"])) {
                 throw new \Bitrix\Main\ArgumentTypeException("ELEMENT_ID");
             }
         }
@@ -67,9 +108,9 @@ class COipIblockElementOne extends COipIblockElementList {
     protected function consistFilter() {
         $filter = parent::consistFilter();
 
-        $filter["ID"] = $this->arParams["ELEMENT_ID"];
+        $filter["ID"] = $this->arParams["BASE"]["ELEMENT_ID"];
 
-        if($this->arParams["SECTION_ID"]) {
+        if($this->arParams["BASE"]["SECTION_ID"]) {
            unset($filter["SECTION_ID"]);
         }
 

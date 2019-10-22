@@ -4,13 +4,59 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 /**
  *
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.one","",[
-    "IBLOCK_ID" => 2,
-    "ELEMENT_ID" => 4,
-    "PROPERTIES" => [9,8,13,14],
-    "SHOW_INACTIVE" => "Y"
-    "RESIZE_FILE_PROPS" => [600,600]
-    ])?>
- */
+ * "BASE" => [
+        "IBLOCK_ID" => 2,
+        "ELEMENT_ID" => 4,
+        "PROPERTIES" => [
+            "PICS_NEWS",
+            "TEST_STRING",
+            "TEST_FILE",
+            "TEST_LIST",
+        ],
+     *  "PROPERTIES" => "all" - все свойства
+        "RESIZE_FILE_PROPS" => [600,600],
+ *
+ *      "COUNT" => "",
+        "SHOW_INACTIVE" => "Y",
+        "FILTER" => "",
+        "SORT_1" => "BY_1",
+        "SORT_2" => "BY_2",
+        "SHOW_META" => "",
+        "INCLUDE_IBLOCK_CHAIN" => "",
+        "SHOW_SORT" => "",
+        "SHOW_404" => "",
+        "SHOW_PAGER" => "",
+        "SHOW_SIDEBAR" => "",
+*   ],
+ *
+ *  "ELEMENT_VIEW" => [
+        "PICTURE" => [
+            "TYPE" => "",
+            "HEIGHT" => "",
+            "POSITION" => ""
+        ],
+        "BLOCK" => [
+            "COLOR" => "",
+            "SIZE" => "",
+        ],
+        "TITLE" => [
+            "ALIGN" => "",
+            "CSS" => "",
+        ],
+
+        "SHOW_CATEGORY_NAME" => "",
+        "SHOW_TAG_LIST" => "",
+        "SHOW_BRAND" => "",
+        "SHOW_REVIEWS_NUMBER" => "",
+
+        "READ_MORE_BUTTON" => [
+            "SHOW" => "",
+            "TEXT" => "",
+            "SHOW_HOVER_EFFECT" => "",
+        ],
+    ],
+])?>
+*/
 
 /** @var array $arResult */
 /** @var \Oip\Custom\Component\Iblock\Element $element */

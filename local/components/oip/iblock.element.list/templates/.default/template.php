@@ -4,13 +4,77 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 /**
  *
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",[
-    "IBLOCK_ID" => 2,
-    "SECTION_ID" => 8,
-    "SHOW_INACTIVE" => "Y"
-    "PROPERTIES" => [9,8,13,14],
-    "RESIZE_FILE_PROPS" => [600,600]
-    ])?>
- */
+ *  "BASE" => [
+        "IBLOCK_ID" => 2,
+        "SECTION_ID" => 8,
+        "SHOW_INACTIVE" => "Y" - показать и неактивные
+        "PROPERTIES" => [
+            "PICS_NEWS",
+            "TEST_STRING",
+            "TEST_FILE",
+            "TEST_LIST",
+        ],
+        "PROPERTIES" => "all" - все свойства
+        "RESIZE_FILE_PROPS" => [600,600]
+ *
+ *      "COUNT" => "",
+        "SHOW_INACTIVE" => "Y",
+        "FILTER" => "",
+        "SORT_1" => "BY_1",
+        "SORT_2" => "BY_2",
+        "SHOW_META" => "",
+        "INCLUDE_IBLOCK_CHAIN" => "",
+        "SHOW_SORT" => "",
+        "SHOW_404" => "",
+        "SHOW_PAGER" => "",
+        "SHOW_SIDEBAR" => "",
+ *  ],
+ *
+ * "LIST_VIEW" => [
+        "SHOW_SIDEBAR" => "Y",
+
+        "TITLE" => [
+            "TEXT" => "",
+            "TAG" => "",
+            "CSS" => "",
+            "ICON_CSS" => "",
+            "ALIGN" => "",
+        ],
+
+        "WRAP" => [
+            "COLOR" => "",
+            "SIZE" => "",
+            "ADD_CSS" => "",
+        ],
+        "CONTAINER" => [
+            "WIDTH_CSS" => "",
+            "TYPE" => "",
+            "MARGIN_CSS" => "",
+            "VERTICAL_ALIGN" => ""
+        ]
+    ],
+
+
+    "TILE" => [
+        "TYPE" => "",
+        "PARALLAX" => "",
+        "VERTICAL_ALIGN" => "",
+        "HORIZONTAL_MARGIN" => "",
+        "VERTICAL_MARGIN" => "",
+    ],
+
+    "SLIDER" => [
+        "SHOW" => "",
+        "SHOW_BULLETS" => "",
+        "AUTOPLAY" => "",
+        "AUTOPLAY_INTERVAL" => "",
+        "CENTERED" => "",
+        "MOVE_SETS" => "",
+        "HIDE_CONTENT" => "",
+        "CONTENT_ON_PICTURE" => "",
+    ]
+
+])?>
 
 /** @var array $arResult */
 /** @var \Oip\Custom\Component\Iblock\Element $element */
