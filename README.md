@@ -14,6 +14,8 @@ deploy/settings.php.source > bitrix/.settings.php
 deploy/php_interface.zip > bitrix/php_interface
 ```
 * установить зависимости composer-а
+* выполнить ``php migrator install`` - для создания таблицы миграций
+* выполнить ``php migrator migrate`` - для применения миграций
 * сгенерировать аннотации для ORM-сущностей кастомных модулей (пояснения см. ниже):
 ```
 cd bitrix
