@@ -1,10 +1,14 @@
 <?php
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
+require_once(__DIR__."/../Section.php");
+require_once(__DIR__."/../UFProperty.php");
+
 use \Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\ArgumentTypeException;
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
+use Oip\Custom\Component\Iblock\Section;
 
 /**
  * <?$APPLICATION->IncludeComponent("oip:iblock.section.list","",[
@@ -17,7 +21,9 @@ use \Bitrix\Main\SystemException;
  */
 class COipIblockSectionList extends \CBitrixComponent
 {
-    /** @var array $arSections Массив с разделами */
+    /** @var array $arSectionsRaw "Сырой" массив с разделами */
+    private $arSectionsRaw = array();
+    /** @var Section[] $arSections Массив с разделами */
     private $arSections = array();
     /** @var array $arUserFields Массив типов пользовательских полей */
     private $arUserFields;
@@ -29,12 +35,10 @@ class COipIblockSectionList extends \CBitrixComponent
     private $arFieldsWithEnumerationValues = array();
     /** @var array $arFileFields Массив с ссылками на UF_ поля типа "Файл" */
     private $arFieldsWithFileValues = array();
-    /** @var array $arFileFields Массив с ссылками на UF_ поля типа "Привязка к элементам инф. блока" */
-    private $arFieldsWithIBlockElementValues = array();
 
     public function onPrepareComponentParams($arParams)
     {
-        return  $this->initParams($arParams);
+        return $this->initParams($arParams);
     }
 
     public function executeComponent()
@@ -58,17 +62,16 @@ class COipIblockSectionList extends \CBitrixComponent
     }
 
     protected function execute() {
-
         // Получение разделов
-        $this->arSections = $this->getSectionList();
+        $this->arSectionsRaw = $this->getSectionList();
 
-        // Если $baseSection пришел пустым - значит выводить нужно относительно самого верхнего уровня
+        // Если BASE_SECTION пришел пустым - значит выводить нужно относительно самого верхнего уровня
         if (!isset($this->arParams["BASE_SECTION"]) || ($this->arParams["BASE_SECTION"] == 0)) {
-            $sectionArray = $this->arSections;
+            $sectionArray = $this->arSectionsRaw;
         }
         else {
             $sectionArray = $this->extractSectionFromArray(
-                $this->arSections,
+                $this->arSectionsRaw,
                 $this->arParams["FILTER_FIELD_NAME"],
                 $this->arParams["BASE_SECTION"]
             );
@@ -79,9 +82,9 @@ class COipIblockSectionList extends \CBitrixComponent
 
         // Получение значений для полей типа "список"
         // 1. Получим все значения, которые могут принимать пользовательские поля с типом "список"
-        $this->getUserTypeListValues();
+        $this->getListValues();
         // 2. Проставляем значения для полей с типом "список"
-        $this->updateEnumerationValues();
+        $this->updateListValues();
 
         // Получение значений для полей типа "файл"
         // 1. Запрашиваем информацию по файлам
@@ -89,11 +92,29 @@ class COipIblockSectionList extends \CBitrixComponent
         // 2. Проставляем значения для полей с типом "file"
         $this->updateFileValues();
 
-        $this->arResult["SECTIONS"] = $sectionArray;
+        // Отдаем дерево разделов в результирующий массив
+        $this->arSectionsRaw = $sectionArray;
+
+        // Строим массив Section
+        $this->buildSectionObjectsArray();
+
+        // Передаем массив разделов в arResult для вывода в шаблон
+        $this->arResult["SECTIONS"] = $this->arSections;
+
     }
 
     /**
-     * @return array $arParams
+     * Построение объектов Section из получившегося массива разделов
+     */
+    protected function buildSectionObjectsArray() {
+        foreach ($this->arSectionsRaw["CHILDS"] as $sectionRaw) {
+            $section = new Section($sectionRaw);
+            $this->arSections[] = $section;
+        }
+    }
+
+    /**
+     * @param array $arParams
      * @throws ArgumentNullException | ArgumentTypeException
      * @return array
      */
@@ -149,7 +170,6 @@ class COipIblockSectionList extends \CBitrixComponent
         $filter = [
             "IBLOCK_ID" => $this->arParams["IBLOCK_ID"]
         ];
-
         return $filter;
     }
 
@@ -182,8 +202,6 @@ class COipIblockSectionList extends \CBitrixComponent
 
         // Список полей с файловыми значениями (эти поля нужно будет обновить, получив инфу о файлах)
         $this->arFieldsWithFileValues = array();
-        // Список полей с привязками к элементам инф. блоков (эти поля нужно будет обновить, получив инфу о файлах)
-        $this->arFieldsWithIBlockElementValues = array();
 
         // Формируем фильтр для выборки разделов
         $filter = $this->consistFilter();
@@ -217,9 +235,37 @@ class COipIblockSectionList extends \CBitrixComponent
                     }
                     // Для поля типа "файл" - запоминаем ссылку на данный элемент массива,
                     // чтобы позже получить инфу о файле и проставить ее данному элементу (разделу)
-                    else if ($arSection[$key]["USER_TYPE_ID"] == "file" && $arSection[$key]["VALUE"] != 0) {
-                        $this->arFieldsWithFileValues[] = &$arSection[$key];
-                        $this->arFiles[$arSection[$key]["VALUE"]] = array();
+                    else if ($arSection[$key]["USER_TYPE_ID"] == "file") {
+                        // Если тип поля - файл (множественный) и файлы в поле заданы
+                        if ($arSection[$key]["MULTIPLE"] == "Y" && $arSection[$key]["VALUE"]) {
+                            // Добавляем поле в список тех, для которых потом нужно проапдейтить инфу о файлах
+                            $this->arFieldsWithFileValues[] = &$arSection[$key];
+                            // Пробегаемся по каждому файлу
+                            foreach ($arSection[$key]["VALUE"] as $file) {
+                                $this->arFiles[$file] = array();
+                            }
+                        }
+                        // Если тип поля - файл (единичный) и файл в поле задан
+                        else if ($arSection[$key]["MULTIPLE"] == "N" && $arSection[$key]["VALUE"] != 0) {
+                            $this->arFieldsWithFileValues[] = &$arSection[$key];
+                            $this->arFiles[$arSection[$key]["VALUE"]] = array();
+                        }
+                    }
+                    // Для поля типа "привязка к элементу инфоблока" - если привязан один эелемент,
+                    // формируем массив из одного элемента с ключом - айди элемента инфоблока
+                    else if ($arSection[$key]["USER_TYPE_ID"] == "iblock_element") {
+                        // Сбрасываем старое значение "VALUE", которое являлось строкой
+                        $arSection[$key]["VALUE"] = array();
+                        if ($arSection[$key]["MULTIPLE"] == "Y") {
+                            foreach ($arSection[$key]["RAW_VALUE"] as $value) {
+                                $arSection[$key]["VALUE"][$value] = array();
+                            }
+                        }
+                        // Если поле принимает только одна значение и оно установлено
+                        else if ($arSection[$key]["MULTIPLE"] == "N" && $arSection[$key]["RAW_VALUE"] != 0) {
+                            // Cоздаем единственный элемент в виде пустого массива с ключом - id привязанного элемента инфоблока
+                            $arSection[$key]["VALUE"][$arSection[$key]["RAW_VALUE"]] = array();
+                        }
                     }
                 }
             }
@@ -236,12 +282,18 @@ class COipIblockSectionList extends \CBitrixComponent
      */
     private function updateFileValues() {
         foreach ($this->arFieldsWithFileValues as &$field) {
-            $field["VALUE"] =
-                "upload/" .
-                $this->arFiles[$field["RAW_VALUE"]]["SUBDIR"] .
-                "/" .
-                $this->arFiles[$field["RAW_VALUE"]]["FILE_NAME"];
-            $field["FILE"] = $this->arFiles[$field["RAW_VALUE"]];
+            // Обнуляем массив VALUE
+            $field["VALUE"] = array();
+            // Если это множественное поле
+            if ($field["MULTIPLE"] == "Y" && is_array($field["VALUE"])) {
+                // Заполняем новый массив VALUE файлами с ключами - id файлов
+                foreach ($field["RAW_VALUE"] as $file) {
+                    $field["VALUE"][$file] = $this->arFiles[$file];
+                }
+            }
+            else {
+                $field["VALUE"][$field["RAW_VALUE"]] = $this->arFiles[$field["RAW_VALUE"]];
+            }
         }
         return $this;
     }
@@ -251,9 +303,22 @@ class COipIblockSectionList extends \CBitrixComponent
      *
      * @return self
      */
-    private function updateEnumerationValues() {
+    private function updateListValues() {
         foreach ($this->arFieldsWithEnumerationValues as &$field) {
-            $field["VALUE"] = $this->arUFListValues[$field["RAW_VALUE"]]["VALUE"];
+            // Сбрасываем поле "VALUE"
+            $field["VALUE"] = array();
+
+            // Если это поле с единственным значением
+            if ($field["MULTIPLE"] == "N") {
+                $field["VALUE"][$field["RAW_VALUE"]] = $this->arUFListValues[$field["RAW_VALUE"]];
+            }
+            // Если это поле с множественным значением
+            else if ($field["MULTIPLE"] == "Y" && $field["RAW_VALUE"] !== 0) {
+                foreach ($field["RAW_VALUE"] as $value) {
+                    $field["VALUE"][$value] = $this->arUFListValues[$value];
+                }
+                $field["VALUE"][$field["RAW_VALUE"]] = $this->arUFListValues[$field["RAW_VALUE"]];
+            }
         }
         return $this;
     }
@@ -279,7 +344,7 @@ class COipIblockSectionList extends \CBitrixComponent
      *
      * @return self
      */
-    protected function getUserTypeListValues() {
+    protected function getListValues() {
         $this->arUFListValues = array();
         $obEnum = new CUserFieldEnum;
         $rsEnum = $obEnum->GetList(array(), array());
@@ -287,7 +352,7 @@ class COipIblockSectionList extends \CBitrixComponent
             $this->arUFListValues[$arEnum["ID"]] = $arEnum;
         }
         // Передадим все значения в результирующий массив
-        $this->arResult["UF_LIST_VALUES"] = $this->arUFListValues;
+        //$this->arResult["UF_LIST_VALUES"] = $this->arUFListValues;
         return $this;
     }
 
