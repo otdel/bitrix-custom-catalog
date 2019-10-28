@@ -6,6 +6,7 @@ use Oip\Custom\Component\Iblock\Element;
 \CBitrixComponent::includeComponentClass("oip:iblock.element.list");
 
 /**
+ * это старый пример структуры - массив параметров плоский (кроме properties), вызывать, соединяя детей с родителями через _
  *
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.one","",[
  * "BASE" => [
@@ -82,16 +83,16 @@ class COipIblockElementOne extends COipIblockElementList {
     /**
      * @inheritdoc
     */
-    protected function initParams($arParams)
+    protected function initCommonParams($arParams)
     {
-        $arParams = parent::initParams($arParams);
+        $arParams = parent::initCommonParams($arParams);
 
         try {
-            if(!is_set($arParams["BASE"]["ELEMENT_ID"])) {
+            if(!is_set($arParams["ELEMENT_ID"])) {
                 throw new \Bitrix\Main\ArgumentNullException("ELEMENT_ID");
             }
 
-            if(!intval($arParams["BASE"]["ELEMENT_ID"])) {
+            if(!intval($arParams["ELEMENT_ID"])) {
                 throw new \Bitrix\Main\ArgumentTypeException("ELEMENT_ID");
             }
         }
@@ -105,12 +106,47 @@ class COipIblockElementOne extends COipIblockElementList {
     /**
      * @inheritdoc
      */
+    protected function initPersonalParams($arParams) {
+
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_PICTURE_TYPE"],
+            "uk-background-contain");
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_PICTURE_HEIGHT"],
+            "uk-height-small");
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_PICTURE_POSITION"],
+            "uk-card-media-top");
+
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_BLOCK_COLOR"],
+            "uk-card-default");
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_BLOCK_SIZE"],
+            "uk-card-medium");
+
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_TITLE_ALIGN"],
+            "uk-text-left");
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_TITLE_CSS"],
+            "");
+
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_CATEGORY_NAME"],true);
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_TAG_LIST"]);
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_BRAND"],true);
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_REVIEWS_NUMBER"],true);
+
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_READ_MORE_BUTTON_SHOW"]);
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_READ_MORE_BUTTON_SHOW_HOVER_EFFECT"],true);
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_READ_MORE_BUTTON_TEXT"],
+            "подробнее");
+
+        return $arParams;
+    }
+
+    /**
+     * @inheritdoc
+     */
     protected function consistFilter() {
         $filter = parent::consistFilter();
 
-        $filter["ID"] = $this->arParams["BASE"]["ELEMENT_ID"];
+        $filter["ID"] = $this->arParams["ELEMENT_ID"];
 
-        if($this->arParams["BASE"]["SECTION_ID"]) {
+        if($this->arParams["SECTION_ID"]) {
            unset($filter["SECTION_ID"]);
         }
 

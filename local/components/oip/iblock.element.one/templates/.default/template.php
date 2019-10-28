@@ -2,6 +2,7 @@
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 /**
+ * это старый пример структуры - массив параметров плоский (кроме properties), вызывать, соединяя детей с родителями через _
  *
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.one","",[
  * "BASE" => [
@@ -59,7 +60,11 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 */
 
 /** @var array $arResult */
+/** @var array $arParams */
+/** @var $this \CBitrixComponentTemplate */
+/** @var $component \COipIblockElementOne */
 /** @var \Oip\Custom\Component\Iblock\Element $element */
+$component = $this->getComponent();
 $exception = $arResult["EXCEPTION"];
 $errors = $arResult["ERRORS"];
 $element = $arResult["ELEMENT"];
@@ -85,7 +90,5 @@ $element = $arResult["ELEMENT"];
             <?=$element->getDetailText()?>
         </div>
     <?endif?>
-
-
 
 <?endif?>

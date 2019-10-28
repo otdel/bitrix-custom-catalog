@@ -12,6 +12,7 @@ use \Bitrix\Main\SystemException;
 use Oip\Custom\Component\Iblock\Element;
 
 /**
+ * это старый пример структуры - массив параметров плоский (кроме properties), вызывать, соединяя детей с родителями через _
  *
  * <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",[
  *  "BASE" => [
@@ -59,6 +60,7 @@ use Oip\Custom\Component\Iblock\Element;
         "CONTAINER" => [
             "WIDTH_CSS" => "",
             "TYPE" => "",
+            "ELEMENT_WIDTH_CSS" => "",
             "MARGIN_CSS" => "",
             "VERTICAL_ALIGN" => ""
         ]
@@ -74,7 +76,7 @@ use Oip\Custom\Component\Iblock\Element;
     ],
 
     "SLIDER" => [
-        "SHOW" => "",
+        "SHOW_ARROWS" => "",
         "SHOW_BULLETS" => "",
         "AUTOPLAY" => "",
         "AUTOPLAY_INTERVAL" => "",
@@ -96,8 +98,8 @@ class COipIblockElementList extends \CBitrixComponent
 
     public function onPrepareComponentParams($arParams)
     {
-
-        return  $this->initParams($arParams);
+        $arParams = $this->initCommonParams($arParams);
+        return $this->initPersonalParams($arParams);
     }
 
 
@@ -143,16 +145,17 @@ class COipIblockElementList extends \CBitrixComponent
 
     /**
      * @return array
+     * @param  $arParams
      * @throws ArgumentNullException | ArgumentTypeException
      */
-    protected function initParams($arParams) {
+    protected function initCommonParams($arParams) {
 
         try {
-            if(!is_set($arParams["BASE"]["IBLOCK_ID"])) {
+            if(!is_set($arParams["IBLOCK_ID"])) {
                 throw new ArgumentNullException("IBLOCK_ID");
             }
 
-            if(!intval($arParams["BASE"]["IBLOCK_ID"])) {
+            if(!intval($arParams["IBLOCK_ID"])) {
                 throw new ArgumentTypeException("IBLOCK_ID");
             }
         }
@@ -160,26 +163,107 @@ class COipIblockElementList extends \CBitrixComponent
             $this->arResult["EXCEPTION"] = $e->getMessage();
         }
 
-        if(!is_set($arParams["BASE"]["PROPERTIES"])) {
-            $arParams["BASE"]["PROPERTIES"] = [];
-        }
-        elseif(is_array($arParams["BASE"]["PROPERTIES"])) {
-            $arParams["BASE"]["PROPERTIES"] = $this->trimPropCodes($arParams["BASE"]["PROPERTIES"]);
-        }
+        $this->setDefaultParam($arParams["SECTION_ID"],0);
+        $this->setDefaultParam($arParams["RESIZE_FILE_PROPS"],["width" => 600, "height" => 600]);
+        $this->setDefaultBooleanParam($arParams["SHOW_INACTIVE"]);
+        $this->setDefaultParam( $arParams["PROPERTIES"],[]);
+        
+        $this->setDefaultParam( $arParams["COUNT"],24);
+        $this->setDefaultParam( $arParams["FILTER"],"");
+        $this->setDefaultParam( $arParams["SORT_1"],"");
+        $this->setDefaultParam( $arParams["SORT_2"],"");
+        $this->setDefaultBooleanParam( $arParams["SHOW_META"]);
+        $this->setDefaultBooleanParam( $arParams["INCLUDE_IBLOCK_CHAIN"],"");
 
-        if(!is_set($arParams["BASE"]["SECTION_ID"])) {
-            $arParams["BASE"]["SECTION_ID"] = 0;
-        }
+        $this->setDefaultBooleanParam( $arParams["SHOW_404"],true);
+        $this->setDefaultBooleanParam( $arParams["SHOW_PAGER"],true);
+        $this->setDefaultBooleanParam( $arParams["SHOW_SIDEBAR"]);
 
-        if(!is_set($arParams["BASE"]["RESIZE_FILE_PROPS"])) {
-            $arParams["BASE"]["RESIZE_FILE_PROPS"] = ["width" => 600, "height" => 600];
-        }
 
-        if(!is_set($arParams["BASE"]["SHOW_INACTIVE"])) {
-            $arParams["BASE"]["SHOW_INACTIVE"] = "N";
+        if(is_array($arParams["PROPERTIES"])) {
+            $arParams["PROPERTIES"] = $this->trimPropCodes($arParams["PROPERTIES"]);
         }
 
         return $arParams;
+    }
+
+    /**
+     * @param  $arParams
+     * @return array
+     * @throws ArgumentNullException | ArgumentTypeException
+     */
+    protected function initPersonalParams($arParams) {
+       $this->setDefaultParam($arParams["LIST_VIEW_TITLE_TEXT"],"");
+       $this->setDefaultParam($arParams["LIST_VIEW_TITLE_TAG"],"div");
+       $this->setDefaultParam($arParams["LIST_VIEW_TITLE_CSS"],"uk-h1");
+       $this->setDefaultParam($arParams["LIST_VIEW_TITLE_ICON_CSS"],"");
+       $this->setDefaultParam($arParams["LIST_VIEW_TITLE_ALIGN"],"uk-text-left");
+
+       $this->setDefaultParam($arParams["LIST_VIEW_WRAP_COLOR"],"uk-section-default");
+       $this->setDefaultParam($arParams["LIST_VIEW_WRAP_SIZE"],"uk-section-small");
+       $this->setDefaultParam($arParams["LIST_VIEW_WRAP_ADD_CSS"],"");
+
+       $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_WIDTH_CSS"],"uk-container-expand");
+       $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_TYPE"],"TILE");
+       $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_ELEMENT_WIDTH_CSS"],
+           "uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-child-width-1-4@xl");
+        $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_MARGIN_CSS"],"uk-grid-medium");
+        $this->setDefaultBooleanParam($arParams["LIST_VIEW_CONTAINER_VERTICAL_ALIGN"],true);
+
+        $this->setDefaultParam($arParams["TILE_DYNAMIC"], "false");
+        $this->setDefaultParam($arParams["TILE_PARALLAX"],0);
+        $this->setDefaultParam($arParams["TILE_VERTICAL_ALIGN"],"uk-flex-left@m");
+        $this->setDefaultParam($arParams["TILE_HORIZONTAL_MARGIN"],
+            "uk-grid-column-medium-left@m");
+        $this->setDefaultParam($arParams["TILE_VERTICAL_MARGIN"],
+            "uk-grid-row-medium");
+
+        $this->setDefaultBooleanParam($arParams["SLIDER_SHOW_ARROWS"],true);
+        $this->setDefaultBooleanParam($arParams["SLIDER_SHOW_BULLETS"]);
+        $this->setDefaultParam($arParams["SLIDER_AUTOPLAY"],"true");
+        $this->setDefaultParam($arParams["SLIDER_AUTOPLAY_INTERVAL"],6000);
+        $this->setDefaultParam($arParams["SLIDER_CENTERED"],"false");
+        $this->setDefaultParam($arParams["SLIDER_MOVE_SETS"],"false");
+        $this->setDefaultBooleanParam($arParams["SLIDER_HIDE_CONTENT"]);
+        $this->setDefaultBooleanParam($arParams["SLIDER_CONTENT_ON_PICTURE"]);
+
+        return $arParams;
+    }
+
+    /**
+     * @param mixed $param
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    protected function setDefaultParam(&$param, $defaultValue) {
+
+        if(!is_set($param)) {
+            $param = $defaultValue;
+        }
+
+    }
+
+    /**
+     * @param mixed $param
+     * @param boolean $defaultValue
+     * @return mixed
+     */
+    protected function  setDefaultBooleanParam(&$param, $defaultValue = false) {
+
+        switch($defaultValue) {
+            case true:
+            if(!is_set($param) || $param !== "N") {
+                $param = "Y";
+            }
+            break;
+
+            default:
+                if(!is_set($param) || $param !== "Y") {
+                    $param = "N";
+                }
+            break;
+        }
+
     }
 
     /**
@@ -196,14 +280,14 @@ class COipIblockElementList extends \CBitrixComponent
     protected function consistFilter()
     {
         $filter = [
-            "IBLOCK_ID" => $this->arParams["BASE"]["IBLOCK_ID"]
+            "IBLOCK_ID" => $this->arParams["IBLOCK_ID"]
         ];
 
-        if (intval($this->arParams["BASE"]["SECTION_ID"])) {
-            $filter["SECTION_ID"] = $this->arParams["BASE"]["SECTION_ID"];
+        if (intval($this->arParams["SECTION_ID"])) {
+            $filter["SECTION_ID"] = $this->arParams["SECTION_ID"];
         }
 
-        if ($this->arParams["BASE"]["SHOW_INACTIVE"] !== "Y") {
+        if ($this->arParams["SHOW_INACTIVE"] !== "Y") {
             $filter["ACTIVE"] = "Y";
         }
 
@@ -225,11 +309,11 @@ class COipIblockElementList extends \CBitrixComponent
             "DETAIL_TEXT", "LIST_PAGE_URL", "SECTION_PAGE_URL", "DETAIL_PAGE_URL"];
 
         $propIDs = [];
-        if($arParams["BASE"]["PROPERTIES"] === "all") {
+        if($arParams["PROPERTIES"] === "all") {
             $propIDs = "all";
         }
-        elseif(is_array($arParams["BASE"]["PROPERTIES"])) {
-            $propIDs = $this->fetchPropIDs($arParams["BASE"]["PROPERTIES"]);
+        elseif(is_array($arParams["PROPERTIES"])) {
+            $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
         }
 
         $this->rawData = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
@@ -280,7 +364,7 @@ class COipIblockElementList extends \CBitrixComponent
 
         return \CFile::ResizeImageGet(
             $fileID,
-            $this->arParams["BASE"]["RESIZE_FILE_PROPS"],
+            $this->arParams["RESIZE_FILE_PROPS"],
             BX_RESIZE_IMAGE_PROPORTIONAL,
             true
         );
@@ -344,7 +428,7 @@ class COipIblockElementList extends \CBitrixComponent
     protected function fetchPropIDs($propCodes) {
         $propIDs = [];
 
-        $dbProps = \CIBlockProperty::GetList([],["IBLOCK_ID" => $this->arParams["BASE"]["IBLOCK_ID"]]);
+        $dbProps = \CIBlockProperty::GetList([],["IBLOCK_ID" => $this->arParams["IBLOCK_ID"]]);
         while($prop = $dbProps->GetNext()) {
             if(in_array($prop["CODE"],$propCodes)) {
                 $propIDs[$prop["CODE"]] = $prop["ID"];
@@ -379,4 +463,46 @@ class COipIblockElementList extends \CBitrixComponent
 
         return $arResult;
     }
+
+    /**
+     * @param string $paramCode
+     * @return mixed
+     */
+    public function getParam($paramCode) {
+       return $this->getParamRecursive($paramCode, $this->arParams);
+
+    }
+
+    /**
+     * @param string $paramCode
+     * @param array $arParams
+     * @return mixed
+     */
+    protected function getParamRecursive($paramCode, $arParams) {
+
+        $param = null;
+
+        foreach ($arParams as $paramName => $paramValue) {
+
+            if($paramName === $paramCode) {
+                $param = $paramValue;
+                break;
+            }
+            elseif(is_array($paramValue)) {
+                $param = $this->getParamRecursive($paramCode, $paramValue);
+
+                if($param) break;
+            }
+        }
+
+
+        return $param;
+    }
+
+    /** @return  boolean */
+    public function isContainerSlider() {
+        return ($this->arParams["LIST_VIEW_CONTAINER_TYPE"]
+            && $this->arParams["LIST_VIEW_CONTAINER_TYPE"]  === "SLIDER");
+    }
+
 }
