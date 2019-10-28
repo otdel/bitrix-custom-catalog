@@ -409,7 +409,6 @@ class COipIblockSectionList extends \CBitrixComponent
     /**
      * @param mixed $param
      * @param mixed $defaultValue
-     * @return mixed
      */
     protected function setDefaultParam(&$param, $defaultValue) {
         if(!is_set($param)) {
@@ -420,16 +419,10 @@ class COipIblockSectionList extends \CBitrixComponent
     /**
      * @param mixed $param
      * @param boolean $defaultValue
-     * @return mixed
      */
     protected function setDefaultBooleanParam(&$param, $defaultValue) {
-        if(!is_set($param)) {
-            return $defaultValue;
-        }
-        else {
-            if(!is_bool($param)) {
-                return $defaultValue;
-            }
+        if(!is_set($param) || !is_bool($param)) {
+            $param = $defaultValue;
         }
     }
 
