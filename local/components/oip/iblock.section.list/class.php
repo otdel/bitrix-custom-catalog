@@ -4,6 +4,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 require_once(__DIR__."/../Section.php");
 require_once(__DIR__."/../UFProperty.php");
 
+use Bitrix\Main\ArgumentException;
 use \Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\ArgumentTypeException;
 use \Bitrix\Main\LoaderException;
@@ -69,6 +70,7 @@ class COipIblockSectionList extends \CBitrixComponent
         if (!isset($this->arParams["BASE_SECTION"]) || ($this->arParams["BASE_SECTION"] == 0)) {
             $sectionArray = $this->arSectionsRaw;
         }
+        // Иначе строим относительно выбранного раздела
         else {
             $sectionArray = $this->extractSectionFromArray(
                 $this->arSectionsRaw,
@@ -77,7 +79,7 @@ class COipIblockSectionList extends \CBitrixComponent
             );
         }
 
-        // Строим дерево, относительно указанного раздела с указанной глубиной вложенности
+        // Убираем лишние элементы, которые выходят за заданную глубину вложенности
         $this->buildSectionArray($sectionArray, 0, $this->arParams["DEPTH"]);
 
         // Получение значений для полей типа "список"
@@ -100,14 +102,13 @@ class COipIblockSectionList extends \CBitrixComponent
 
         // Передаем массив разделов в arResult для вывода в шаблон
         $this->arResult["SECTIONS"] = $this->arSections;
-
     }
 
     /**
      * Построение объектов Section из получившегося массива разделов
      */
     protected function buildSectionObjectsArray() {
-        foreach ($this->arSectionsRaw["CHILDS"] as $sectionRaw) {
+        foreach ($this->arSectionsRaw as $sectionRaw) {
             $section = new Section($sectionRaw);
             $this->arSections[] = $section;
         }
@@ -115,7 +116,7 @@ class COipIblockSectionList extends \CBitrixComponent
 
     /**
      * @param array $arParams
-     * @throws ArgumentNullException | ArgumentTypeException
+     * @throws ArgumentNullException | ArgumentTypeException | ArgumentException
      * @return array
      */
     protected function initParams($arParams) {
@@ -133,32 +134,41 @@ class COipIblockSectionList extends \CBitrixComponent
         }
 
         // ID или код раздела, относительно которого начнется построение дерева
-        if(!is_set($arParams["BASE_SECTION"])) {
-            $arParams["BASE_SECTION"] = 0;
-        }
-
+        $this->setDefaultParam($arParams["BASE_SECTION"], 0);
         // Поля для выборки
-        if(!is_set($arParams["SELECT"])) {
-            $arParams["SELECT"] = array("*");
-        }
-
+        $this->setDefaultParam($arParams["SELECT"], array("*"));
         // UF_ поля для выборки
-        if(!is_set($arParams["USER_FIELDS"])) {
-            $arParams["USER_FIELDS"] = array();
-        }
-
+        $this->setDefaultParam($arParams["USER_FIELDS"], array());
         // Поле, по которому производится выборка раздела
         $arParams["FILTER_FIELD_NAME"] = is_int($arParams["BASE_SECTION"]) ? "ID": "CODE";
-
         // Флаг - показывать или скрывать количество элементов в категории
-        if(!is_set($arParams["SHOW_ELEMENTS_CNT"])) {
-            $arParams["SHOW_ELEMENTS_CNT"] = false;
-            $arResult["SHOW_ELEMENTS_CNT"] = $arParams["SHOW_ELEMENTS_CNT"];
-        }
-
+        $this->setDefaultParam($arParams["SHOW_ELEMENTS_CNT"], false);
         // Максимальная глубина вложенности дерева
-        if(!is_set($arParams["DEPTH"])) {
-            $arParams["DEPTH"] = 100;
+        $this->setDefaultParam($arParams["DEPTH"], 1);
+        // Текст заголовка. По умолчанию ""
+        $this->setDefaultParam($arParams["TITLE_TEXT"], "");
+        // Класс заголовка. По умолчанию ""
+        $this->setDefaultParam($arParams["TITLE_CLASS"], "");
+        // Скрывать/показывать превью. По умолчанию скрывать.
+        $this->setDefaultBooleanParam($arParams["SHOW_PREVIEW"], false);
+        // Тип списка, строка. По умолчанию .uk-nav.
+        $this->setDefaultParam($arParams["LIST_TYPE"], ".uk-nav");
+        // Стиль списка, строка. По умолчанию .uk-nav-default
+        $this->setDefaultParam($arParams["LIST_CLASS"], ".uk-nav-default");
+        // Дополнительный класс списка, строка. По умолчанию ""
+        $this->setDefaultParam($arParams["LIST_ADDITIONAL_CLASS"], "");
+        // Атрибут списка, строка. По умолчанию ""
+        $this->setDefaultParam($arParams["LIST_ATTRIBUTE"], "");
+
+        // Список/слайдер. По умолчанию список
+        $viewTypes = ["LIST", "SLIDER"];
+        if(!is_set($arParams["VIEW_TYPE"])) {
+            $arParams["VIEW_TYPE"] = "LIST";
+        }
+        else {
+            if (in_array($arParams["VIEW_TYPE"], $viewTypes)) {
+                throw new ArgumentException("VIEW_TYPE может принимать только следующие значения: " . implode(", ", $viewTypes));
+            }
         }
 
         return $arParams;
@@ -176,16 +186,18 @@ class COipIblockSectionList extends \CBitrixComponent
     /**
      * Построение массива раздела с определенной глубиной вложенности
      *
-     * @param array &$sectionArray Массив с разделом, с которого начинается вывод
+     * @param array &$sectionsArray Массив с разделом, с которого начинается вывод
      * @param int $currentDepth Текущий уровень вложенности (для рекурсии)
      * @param int $maxDepth Максимальный уровень вложенности
      */
-    protected function buildSectionArray(&$sectionArray, $currentDepth, $maxDepth) {
-        // Если есть дочерние категории и они не выходят за глубину вложенности
-        if ($currentDepth + 1 > $maxDepth) unset($sectionArray["CHILDS"]);
-        if (isset($sectionArray["CHILDS"])) {
-            foreach ($sectionArray["CHILDS"] as $key => $childSection) {
-                $this->buildSectionArray($childSection, $currentDepth + 1, $maxDepth);
+    protected function buildSectionArray(&$sectionsArray, $currentDepth, $maxDepth) {
+        foreach ($sectionsArray as &$sectionArray) {
+            // Если есть дочерние категории и они не выходят за глубину вложенности
+            if ($maxDepth != -1 && $currentDepth + 1 > $maxDepth) {
+                unset($sectionArray["CHILDS"]);
+            }
+            if (isset($sectionArray["CHILDS"])) {
+                $this->buildSectionArray($sectionArray["CHILDS"], $currentDepth + 1, $maxDepth);
             }
         }
     }
@@ -272,7 +284,7 @@ class COipIblockSectionList extends \CBitrixComponent
             $arSections[$parentSectionId]['CHILDS'][$sectionId] = $arSection;
             $arSections[$sectionId] = &$arSections[$parentSectionId]['CHILDS'][$sectionId];
         }
-        return array_shift($arSections);
+        return array_shift($arSections)["CHILDS"];
     }
 
     /**
@@ -351,8 +363,6 @@ class COipIblockSectionList extends \CBitrixComponent
         while($arEnum = $rsEnum->GetNext()){
             $this->arUFListValues[$arEnum["ID"]] = $arEnum;
         }
-        // Передадим все значения в результирующий массив
-        //$this->arResult["UF_LIST_VALUES"] = $this->arUFListValues;
         return $this;
     }
 
@@ -373,26 +383,84 @@ class COipIblockSectionList extends \CBitrixComponent
     /**
      * Извлечение искомого раздела в массиве разделов
      *
-     * @param array $sectionArray
+     * @param array $sectionsArray
      * @param string $fieldName
-     * @param string|int $sectorValue
+     * @param string|int $sectionValue
      * @return array|null
      */
-    protected function extractSectionFromArray($sectionArray, $fieldName, $sectorValue) {
-        if (isset($sectionArray[$fieldName]) && $sectionArray[$fieldName] == $sectorValue) {
-            return $sectionArray;
-        }
-        // Если есть дочерние категории
-        if (isset($sectionArray["CHILDS"])) {
-            foreach ($sectionArray["CHILDS"] as $childSection) {
-                $foundSection = $this->extractSectionFromArray($childSection, $fieldName, $sectorValue);
-                // Если раздел был найден - возвращаем его
-                if (isset($foundSection)) {
+    protected function extractSectionFromArray($sectionsArray, $fieldName, $sectionValue) {
+        $foundSection = null;
+        foreach ($sectionsArray as $sectionArray) {
+            // Если ключевое поле совпадает по искомому значению - мы нашли раздел
+            if ($sectionArray[$fieldName] == $sectionValue) {
+                return array($sectionArray);
+                break;
+            }
+            // Дошли до сюда - искомый раздел еще не встретился. Пробегаемся по подразделам
+            else if (isset($sectionArray["CHILDS"])) {
+                $foundSection = $this->extractSectionFromArray($sectionArray["CHILDS"], $fieldName, $sectionValue);
+                if (isset($foundSection))
                     return $foundSection;
-                }
             }
         }
         return null;
+    }
+
+    /**
+     * @param mixed $param
+     * @param mixed $defaultValue
+     * @return mixed
+     */
+    protected function setDefaultParam(&$param, $defaultValue) {
+        if(!is_set($param)) {
+            $param = $defaultValue;
+        }
+    }
+
+    /**
+     * @param mixed $param
+     * @param boolean $defaultValue
+     * @return mixed
+     */
+    protected function setDefaultBooleanParam(&$param, $defaultValue) {
+        if(!is_set($param)) {
+            return $defaultValue;
+        }
+        else {
+            if(!is_bool($param)) {
+                return $defaultValue;
+            }
+        }
+    }
+
+    /**
+     *
+     * @param string $paramCode
+     * @return mixed
+     */
+    public function getParam($paramCode) {
+        return $this->getParamRecursive($paramCode, $this->arParams);
+    }
+
+    /**
+     * @param string $paramCode
+     * @param array $arParams
+     * @return mixed
+     */
+    protected function getParamRecursive($paramCode, $arParams) {
+        $param = null;
+        foreach ($arParams as $paramName => $paramValue) {
+            if($paramName === $paramCode) {
+                $param = $paramValue;
+                break;
+            }
+            elseif(is_array($paramValue)) {
+                $param = $this->getParamRecursive($paramCode, $paramValue);
+
+                if($param) break;
+            }
+        }
+        return $param;
     }
 
 }

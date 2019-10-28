@@ -97,14 +97,6 @@ class UFProperty
     }
 
     /**
-     * @param int $key
-     * @return string
-     */
-    public function getDescriptionFromMultiple($key = 0) {
-        return ($this->isMultiple()) ? $this->getDescription()[$key] : $this->getDescription();
-    }
-
-    /**
      * Получение данных из поля value в зависимости от типа поля
      *
      * @return mixed
@@ -112,7 +104,7 @@ class UFProperty
     public function getValue()
     {
         $getSrc = function ($value) {
-            return 'upload/' . $value["SUBDIR"] . '/' . $value["FILE_NAME"];;
+            return 'upload/' . $value["SUBDIR"] . '/' . $value["FILE_NAME"];
         };
 
         $getText = function ($value) {
@@ -128,15 +120,19 @@ class UFProperty
         };
 
         switch($this->getUserTypeId()) {
+
+            // Тип поля - "Файл"
             case self::TYPE_FILE:
                 // Если файл задан
                 if ($this->value != 0 && is_array($this->value)) {
+                    // Если поле множественное
                     if ($this->isMultiple()) {
                         return array_map($getSrc, $this->value);
                     }
+                    // Если поле единичное
                     else {
                         $value = array_shift($this->value);
-                        return 'upload/' . $value["SUBDIR"] . '/' . $value["FILE_NAME"];
+                        return $getSrc($value);
                     }
                 }
                 else {
@@ -144,14 +140,17 @@ class UFProperty
                 }
             break;
 
+            // Тип поля - "Строка"
             case self::TYPE_STRING:
                 if($this->getUserTypeId() == self::TYPE_HTML) {
+                    // Если поле множественное
                     if ($this->isMultiple()) {
                         $result = array_map($getText, $this->value);
                         return count($result) > 0 ? $result : null;
                     }
+                    // Если поле единичное
                     else {
-                        return $this->value["TEXT"];;
+                        return $this->value["TEXT"];
                     }
                 }
                 else {
@@ -159,6 +158,7 @@ class UFProperty
                 }
             break;
 
+            // Тип поля - "Список"
             case self::TYPE_ENUMERATION:
                 if ($this->isMultiple()) {
                     return count($this->value) > 0 ? array_map($getEnumerationText, $this->value): null;
@@ -169,6 +169,7 @@ class UFProperty
                 }
             break;
 
+            // Тип поля - "Привязка к элементу инфоблока"
             case self::TYPE_IBLOCK_ELEMENT:
                 if ($this->isMultiple()) {
                     return count($this->value) > 0 ? array_map($getIblockElement, $this->value): null;
@@ -178,6 +179,7 @@ class UFProperty
                 }
             break;
 
+            // Тип поля - "Число"
             case self::TYPE_DOUBLE:
                 return $this->value ? $this->value : null;
             break;

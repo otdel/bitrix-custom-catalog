@@ -2,7 +2,7 @@
 
 use Oip\Custom\Component\Iblock\Section;
 
-if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
+if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 
 /** @var array $arResult */
 /** @var Section[] $sections */
@@ -16,7 +16,7 @@ function printSection($sections) {
     /** @var Section $section */
     // Для каждого раздела выводим определенные поля, а также подразделы
     foreach ($sections as $section) {
-        echo "<li style='background: " . rand_color() . "55;'>" . $section->getName() . "<br>";
+        echo "<li style='background: " . rand_color() . "55;'>" . $section->getName() . " (ID: " . $section->getId() . ")<br>";
 
         // Пример вывода файла (изображения)
         $backgroundImage = $section->getPropValue("UF_BACKGROUND_IMAGE");
@@ -93,7 +93,7 @@ function printSection($sections) {
         // Запросим подразделы
         $subSections = $section->getSubSections();
 
-        // Если есть подразделы - выводим и их структуру
+        // Если есть подразделы - выводим их
         if (isset($subSections)) {
             printSection($subSections);
         }
@@ -114,3 +114,4 @@ function rand_color() {
 printSection($sections);
 
 ?>
+
