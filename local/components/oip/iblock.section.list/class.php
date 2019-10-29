@@ -7,6 +7,7 @@ require_once(__DIR__."/../UFProperty.php");
 use Bitrix\Main\ArgumentException;
 use \Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\ArgumentTypeException;
+use Bitrix\Main\Data\Cache;
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
 use Oip\Custom\Component\Iblock\Section;
@@ -36,6 +37,12 @@ class COipIblockSectionList extends \CBitrixComponent
     private $arFieldsWithEnumerationValues = array();
     /** @var array $arFileFields Массив с ссылками на UF_ поля типа "Файл" */
     private $arFieldsWithFileValues = array();
+    /** @var string $cacheKey Главная часть ключа кеша (название компонента + md5 массива arParams) */
+    private $cacheKey;
+    /** @var int $cacheLifeTime Время жизни кеша */
+    private $cacheLifeTime = 300;
+    /** @var boolean $isCacheActual Флаг - актуальный кеш или нет. Нужен для одновременного обновления всех кешей, если один "просрочился" */
+    private $isCacheActual;
 
     public function onPrepareComponentParams($arParams)
     {
@@ -171,6 +178,13 @@ class COipIblockSectionList extends \CBitrixComponent
             }
         }
 
+        // Формируем часть ключа кеша, основанную на параметрах
+        // Отсортируем массив параметров по ключу в алфавитном порядке
+        // (Чтобы при перестановке ключей, но одинаковых значениях, создавался одинаковый ключ)
+        ksort($arParams);
+        // Формируем ключ кеша для текущего набора данных (arParams)
+        $this->cacheKey = "section.list." . md5(serialize($arParams));
+
         return $arParams;
     }
 
@@ -218,19 +232,48 @@ class COipIblockSectionList extends \CBitrixComponent
         // Формируем фильтр для выборки разделов
         $filter = $this->consistFilter();
 
-        // Получаем список разделов
-        $dbSection = CIBlockSection::GetList(
-            Array(),
-            $filter,
-            true,
-            array_merge($this->arParams["SELECT"], $this->arParams["USER_FIELDS"])
-        );
+        // "Сырые" данные о разделах. Получаются либо из кеша, либо из CIBlockSection::GetList
+        $arRawSections = array();
 
-        while($arSection = $dbSection->GetNext(true, false)) {
+        // Формируем ключ для кеша сырых данных о разделах
+        $cacheKey = $this->cacheKey . ".arRawSections";
+
+        // Получаем экземпляр класса
+        $cache = Cache::createInstance();
+        // Проверяем кеш. TTL задается в секундах
+        // Если кеш есть
+        if ($cache->initCache($this->cacheLifeTime, $cacheKey)) {
+            // Устанавливаем флаг что кеш неактуален
+            $this->isCacheActual = true;
+            $startTime = microtime(true);
+            // Достаем переменные из кеша
+            $vars = $cache->getVars();
+            $arRawSections = unserialize($vars["arRawSections"]);
+        }
+        // Если кеша нет или он неактуален
+        elseif ($cache->startDataCache()) {
+            // Устанавливаем флаг что кеш неактуален
+            $this->isCacheActual = false;
+            // Получаем список разделов
+            $dbSection = CIBlockSection::GetList(
+                Array(),
+                $filter,
+                true,
+                array_merge($this->arParams["SELECT"], $this->arParams["USER_FIELDS"])
+            );
+            // Переносим все данные из GetList в массив сырых данных
+            while ($arSection = $dbSection->GetNext(true, false)) {
+                $arRawSections[] = $arSection;
+            }
+            // Записываем в кеш
+            $cache->endDataCache(array("arRawSections" => serialize($arRawSections)));
+        }
+
+        foreach ($arRawSections as $arSection) {
             $sectionId = $arSection['ID'];
-            $parentSectionId = (int) $arSection['IBLOCK_SECTION_ID'];
+            $parentSectionId = (int)$arSection['IBLOCK_SECTION_ID'];
 
-            foreach($arSection as $key => $sectionField){
+            foreach ($arSection as $key => $sectionField) {
                 if (substr($key, 0, 3) == "UF_") {
                     // Добавляем подмассив с пользовательским полем
                     $arSection[$key] = $this->arUserFields[$key];
@@ -256,11 +299,13 @@ class COipIblockSectionList extends \CBitrixComponent
                             foreach ($arSection[$key]["VALUE"] as $file) {
                                 $this->arFiles[$file] = array();
                             }
-                        }
-                        // Если тип поля - файл (единичный) и файл в поле задан
+                        } // Если тип поля - файл (единичный) и файл в поле задан
                         else if ($arSection[$key]["MULTIPLE"] == "N" && $arSection[$key]["VALUE"] != 0) {
+                            // Сбрасываем старое значение "VALUE", которое являлось строкой с id файла
+                            $arSection[$key]["VALUE"] = array();
+                            $arSection[$key]["VALUE"][$arSection[$key]["RAW_VALUE"]] = array();
                             $this->arFieldsWithFileValues[] = &$arSection[$key];
-                            $this->arFiles[$arSection[$key]["VALUE"]] = array();
+                            $this->arFiles[$arSection[$key]["RAW_VALUE"]] = array();
                         }
                     }
                     // Для поля типа "привязка к элементу инфоблока" - если привязан один эелемент,
@@ -272,18 +317,18 @@ class COipIblockSectionList extends \CBitrixComponent
                             foreach ($arSection[$key]["RAW_VALUE"] as $value) {
                                 $arSection[$key]["VALUE"][$value] = array();
                             }
-                        }
-                        // Если поле принимает только одна значение и оно установлено
+                        } // Если поле принимает только одна значение и оно установлено
                         else if ($arSection[$key]["MULTIPLE"] == "N" && $arSection[$key]["RAW_VALUE"] != 0) {
                             // Cоздаем единственный элемент в виде пустого массива с ключом - id привязанного элемента инфоблока
                             $arSection[$key]["VALUE"][$arSection[$key]["RAW_VALUE"]] = array();
                         }
                     }
                 }
+                $arSections[$parentSectionId]['CHILDS'][$sectionId] = $arSection;
+                $arSections[$sectionId] = &$arSections[$parentSectionId]['CHILDS'][$sectionId];
             }
-            $arSections[$parentSectionId]['CHILDS'][$sectionId] = $arSection;
-            $arSections[$sectionId] = &$arSections[$parentSectionId]['CHILDS'][$sectionId];
         }
+
         return array_shift($arSections)["CHILDS"];
     }
 
@@ -341,13 +386,33 @@ class COipIblockSectionList extends \CBitrixComponent
      * @return self
      */
     protected function getFileValues() {
-        // Получаем информацию о файлах
-        $dbRes = \CFile::GetList([],["@ID" => implode(',', array_keys($this->arFiles))]);
-        // Формируем массив с инфо о файлах (ключ = id файла)
-        $this->arFiles = array();
-        while($file = $dbRes->GetNext(true, false)) {
-            $this->arFiles[$file["ID"]] = $file;
+
+        // Формируем ключ кеша
+        $cacheKey = $this->cacheKey . ".arFiles";
+
+        // Получаем экземпляр класса кеша
+        $cache = Cache::createInstance();
+        // Проверяем кеш. TTL задается в секундах
+        // Если кеш есть и он актуальный у основного набора данных (массива разделов)
+        if ($cache->initCache($this->cacheLifeTime, $cacheKey) && $this->isCacheActual) {
+            $startTime = microtime(true);
+            // Достаем переменные из кеша
+            $vars = $cache->getVars();
+            $this->arFiles = unserialize($vars["arFiles"]);
         }
+        // Если кеша нет или он неактуален
+        elseif ($cache->startDataCache()) {
+            // Получаем информацию о файлах
+            $dbRes = \CFile::GetList([],["@ID" => implode(',', array_keys($this->arFiles))]);
+            // Формируем массив с инфо о файлах (ключ = id файла)
+            $this->arFiles = array();
+            while($file = $dbRes->GetNext(true, false)) {
+                $this->arFiles[$file["ID"]] = $file;
+            }
+            // Записываем в кеш
+            $cache->endDataCache(array("arFiles" => serialize($this->arFiles)));
+        }
+
         return $this;
     }
 
@@ -356,13 +421,33 @@ class COipIblockSectionList extends \CBitrixComponent
      *
      * @return self
      */
-    protected function getListValues() {
+    protected function getListValues()
+    {
         $this->arUFListValues = array();
-        $obEnum = new CUserFieldEnum;
-        $rsEnum = $obEnum->GetList(array(), array());
-        while($arEnum = $rsEnum->GetNext()){
-            $this->arUFListValues[$arEnum["ID"]] = $arEnum;
+
+        // Формируем ключ кеша
+        $cacheKey = $this->cacheKey . ".arListValues";
+
+        // Получаем экземпляр класса кеша
+        $cache = Cache::createInstance();
+        // Проверяем кеш. TTL задается в секундах
+        // Если кеш есть и он актуальный у основного набора данных (массива разделов)
+        if ($cache->initCache($this->cacheLifeTime, $cacheKey) && $this->isCacheActual) {
+            // Достаем переменные из кеша
+            $vars = $cache->getVars();
+            $this->arUFListValues = unserialize($vars["arUFListValues"]);
         }
+        // Если кеша нет или он неактуален
+        elseif ($cache->startDataCache()) {
+            $obEnum = new CUserFieldEnum;
+            $rsEnum = $obEnum->GetList(array(), array());
+            while($arEnum = $rsEnum->GetNext()){
+                $this->arUFListValues[$arEnum["ID"]] = $arEnum;
+            }
+            // Записываем в кеш
+            $cache->endDataCache(array("arUFListValues" => serialize($this->arUFListValues)));
+        }
+
         return $this;
     }
 

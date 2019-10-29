@@ -181,7 +181,7 @@ class UFProperty
 
             // Тип поля - "Число"
             case self::TYPE_DOUBLE:
-                return $this->value ? $this->value : null;
+                return $this->value ? array_key_first($this->value)  : null;
             break;
 
             default:
