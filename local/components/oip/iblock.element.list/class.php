@@ -146,7 +146,6 @@ class COipIblockElementList extends \CBitrixComponent
         $this->setDefaultParam($arParams["SLIDER_AUTOPLAY_INTERVAL"],6000);
         $this->setDefaultParam($arParams["SLIDER_CENTERED"],"false");
         $this->setDefaultParam($arParams["SLIDER_MOVE_SETS"],"false");
-        $this->setDefaultBooleanParam($arParams["SLIDER_HIDE_CONTENT"]);
         $this->setDefaultBooleanParam($arParams["SLIDER_CONTENT_ON_PICTURE"]);
 
         $this->setDefaultParam($arParams["ELEMENT_VIEW_PICTURE_TYPE"],
@@ -162,7 +161,7 @@ class COipIblockElementList extends \CBitrixComponent
             "medium");
 
         $this->setDefaultParam($arParams["ELEMENT_VIEW_TITLE_ALIGN"],
-            "left");
+            "center");
         $this->setDefaultParam($arParams["ELEMENT_VIEW_TITLE_CSS"],
             "");
         $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_HOVER_EFFECT"],true);
@@ -173,7 +172,7 @@ class COipIblockElementList extends \CBitrixComponent
         $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_BRAND"],true);
         $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_REVIEWS_NUMBER"],true);
 
-        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_READ_MORE_BUTTON_SHOW"]);
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_READ_MORE_BUTTON"]);
         $this->setDefaultParam($arParams["ELEMENT_VIEW_READ_MORE_BUTTON_TEXT"],
             "подробнее");
 
