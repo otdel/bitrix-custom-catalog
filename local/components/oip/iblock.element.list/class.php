@@ -168,17 +168,10 @@ class COipIblockElementList extends \CBitrixComponent
         $this->setDefaultBooleanParam($arParams["SHOW_INACTIVE"]);
         $this->setDefaultParam( $arParams["PROPERTIES"],[]);
         
-        $this->setDefaultParam( $arParams["COUNT"],24);
-        $this->setDefaultParam( $arParams["FILTER"],"");
-        $this->setDefaultParam( $arParams["SORT_1"],"");
-        $this->setDefaultParam( $arParams["SORT_2"],"");
         $this->setDefaultBooleanParam( $arParams["SHOW_META"]);
         $this->setDefaultBooleanParam( $arParams["INCLUDE_IBLOCK_CHAIN"],"");
 
         $this->setDefaultBooleanParam( $arParams["SHOW_404"],true);
-        $this->setDefaultBooleanParam( $arParams["SHOW_PAGER"],true);
-        $this->setDefaultBooleanParam( $arParams["SHOW_SIDEBAR"]);
-
 
         if(is_array($arParams["PROPERTIES"])) {
             $arParams["PROPERTIES"] = $this->trimPropCodes($arParams["PROPERTIES"]);
@@ -193,30 +186,36 @@ class COipIblockElementList extends \CBitrixComponent
      * @throws ArgumentNullException | ArgumentTypeException
      */
     protected function initPersonalParams($arParams) {
+        $this->setDefaultParam( $arParams["COUNT"],24);
+
+        $this->setDefaultParam( $arParams["FILTER"],"");
+        $this->setDefaultParam( $arParams["SORT_1"],"");
+        $this->setDefaultParam( $arParams["SORT_2"],"");
+
        $this->setDefaultParam($arParams["LIST_VIEW_TITLE_TEXT"],"");
        $this->setDefaultParam($arParams["LIST_VIEW_TITLE_TAG"],"div");
        $this->setDefaultParam($arParams["LIST_VIEW_TITLE_CSS"],"uk-h1");
        $this->setDefaultParam($arParams["LIST_VIEW_TITLE_ICON_CSS"],"");
-       $this->setDefaultParam($arParams["LIST_VIEW_TITLE_ALIGN"],"uk-text-left");
+       $this->setDefaultParam($arParams["LIST_VIEW_TITLE_ALIGN"],"left");
 
-       $this->setDefaultParam($arParams["LIST_VIEW_WRAP_COLOR"],"uk-section-default");
-       $this->setDefaultParam($arParams["LIST_VIEW_WRAP_SIZE"],"uk-section-small");
+       $this->setDefaultParam($arParams["LIST_VIEW_WRAP_COLOR"],"default");
+       $this->setDefaultParam($arParams["LIST_VIEW_WRAP_SIZE"],"small");
        $this->setDefaultParam($arParams["LIST_VIEW_WRAP_ADD_CSS"],"");
 
-       $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_WIDTH_CSS"],"uk-container-expand");
+       $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_WIDTH_CSS"],"expand");
        $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_TYPE"],"TILE");
        $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_ELEMENT_WIDTH_CSS"],
            "uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-child-width-1-4@xl");
-        $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_MARGIN_CSS"],"uk-grid-medium");
+        $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_MARGIN_CSS"],"medium");
         $this->setDefaultBooleanParam($arParams["LIST_VIEW_CONTAINER_VERTICAL_ALIGN"],true);
 
         $this->setDefaultParam($arParams["TILE_DYNAMIC"], "false");
         $this->setDefaultParam($arParams["TILE_PARALLAX"],0);
-        $this->setDefaultParam($arParams["TILE_VERTICAL_ALIGN"],"uk-flex-left@m");
+        $this->setDefaultParam($arParams["TILE_VERTICAL_ALIGN"],"left@m");
         $this->setDefaultParam($arParams["TILE_HORIZONTAL_MARGIN"],
-            "uk-grid-column-medium-left@m");
+            "medium");
         $this->setDefaultParam($arParams["TILE_VERTICAL_MARGIN"],
-            "uk-grid-row-medium");
+            "medium");
 
         $this->setDefaultBooleanParam($arParams["SLIDER_SHOW_ARROWS"],true);
         $this->setDefaultBooleanParam($arParams["SLIDER_SHOW_BULLETS"]);
@@ -226,6 +225,34 @@ class COipIblockElementList extends \CBitrixComponent
         $this->setDefaultParam($arParams["SLIDER_MOVE_SETS"],"false");
         $this->setDefaultBooleanParam($arParams["SLIDER_HIDE_CONTENT"]);
         $this->setDefaultBooleanParam($arParams["SLIDER_CONTENT_ON_PICTURE"]);
+
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_PICTURE_TYPE"],
+            "contain");
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_PICTURE_HEIGHT"],
+            "small");
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_PICTURE_POSITION"],
+            "top");
+
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_BLOCK_COLOR"],
+            "default");
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_BLOCK_SIZE"],
+            "medium");
+
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_TITLE_ALIGN"],
+            "left");
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_TITLE_CSS"],
+            "");
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_HOVER_EFFECT"],true);
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_HOVER_EFFECT_CSS"],"scale-down");
+
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_CATEGORY_NAME"],true);
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_TAG_LIST"]);
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_BRAND"],true);
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_SHOW_REVIEWS_NUMBER"],true);
+
+        $this->setDefaultBooleanParam($arParams["ELEMENT_VIEW_READ_MORE_BUTTON_SHOW"]);
+        $this->setDefaultParam($arParams["ELEMENT_VIEW_READ_MORE_BUTTON_TEXT"],
+            "подробнее");
 
         return $arParams;
     }
