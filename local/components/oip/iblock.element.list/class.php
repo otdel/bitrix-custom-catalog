@@ -464,6 +464,11 @@ class COipIblockElementList extends \CBitrixComponent
         return $arResult;
     }
 
+    /** @return  array */
+    public function getParams() {
+        return $this->arParams;
+    }
+
     /**
      * @param string $paramCode
      * @return mixed
@@ -471,6 +476,14 @@ class COipIblockElementList extends \CBitrixComponent
     public function getParam($paramCode) {
        return $this->getParamRecursive($paramCode, $this->arParams);
 
+    }
+
+    /**
+     * @param string $paramCode
+     * @return boolean
+     */
+    public function isParam($paramCode) {
+        return ($this->getParam($paramCode) === "Y") ? true : false;
     }
 
     /**
@@ -503,6 +516,41 @@ class COipIblockElementList extends \CBitrixComponent
     public function isContainerSlider() {
         return ($this->arParams["LIST_VIEW_CONTAINER_TYPE"]
             && $this->arParams["LIST_VIEW_CONTAINER_TYPE"]  === "SLIDER");
+    }
+
+    public function getCardPositionCss() {
+       $picPosition = $this->getParam("ELEMENT_VIEW_PICTURE_POSITION");
+
+       $result = "";
+
+       switch($picPosition) {
+
+           case "bottom":
+               $result = "uk-flex-column uk-flex-column-reverse";
+           break;
+
+           case "left":
+               $result = "uk-flex-row uk-flex-middle uk-child-width-1-2";
+           break;
+
+           case "right":
+               $result = "uk-flex-row uk-flex-row-reverse uk-flex-middle uk-child-width-1-2";
+           break;
+
+           default:
+               $result = "uk-flex-column";
+           break;
+       }
+
+       return $result;
+    }
+
+    /**
+     * @param string $videoLink
+     * @return mixed
+     */
+    public function getConvertedVideo($videoLink) {
+        return str_replace("watch?v=", "embed/", $videoLink);
     }
 
 }
