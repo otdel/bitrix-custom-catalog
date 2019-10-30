@@ -11,84 +11,6 @@ use \Bitrix\Main\SystemException;
 
 use Oip\Custom\Component\Iblock\Element;
 
-/**
- * это старый пример структуры - массив параметров плоский (кроме properties), вызывать, соединяя детей с родителями через _
- *
- * <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",[
- *  "BASE" => [
-        "IBLOCK_ID" => 2,
-        "SECTION_ID" => 8,
-        "SHOW_INACTIVE" => "Y" - показать и неактивные
-        "PROPERTIES" => [
-            "PICS_NEWS",
-            "TEST_STRING",
-            "TEST_FILE",
-            "TEST_LIST",
-        ],
-        "PROPERTIES" => "all" - все свойства
-        "RESIZE_FILE_PROPS" => [600,600]
- *
- *      "COUNT" => "",
-        "SHOW_INACTIVE" => "Y",
-        "FILTER" => "",
-        "SORT_1" => "BY_1",
-        "SORT_2" => "BY_2",
-        "SHOW_META" => "",
-        "INCLUDE_IBLOCK_CHAIN" => "",
-        "SHOW_SORT" => "",
-        "SHOW_404" => "",
-        "SHOW_PAGER" => "",
-        "SHOW_SIDEBAR" => "",
- *  ],
- *
- * "LIST_VIEW" => [
-        "SHOW_SIDEBAR" => "Y",
-
-        "TITLE" => [
-            "TEXT" => "",
-            "TAG" => "",
-            "CSS" => "",
-            "ICON_CSS" => "",
-            "ALIGN" => "",
-        ],
-
-        "WRAP" => [
-            "COLOR" => "",
-            "SIZE" => "",
-            "ADD_CSS" => "",
-        ],
-        "CONTAINER" => [
-            "WIDTH_CSS" => "",
-            "TYPE" => "",
-            "ELEMENT_WIDTH_CSS" => "",
-            "MARGIN_CSS" => "",
-            "VERTICAL_ALIGN" => ""
-        ]
-    ],
-
-
-    "TILE" => [
-        "TYPE" => "",
-        "PARALLAX" => "",
-        "VERTICAL_ALIGN" => "",
-        "HORIZONTAL_MARGIN" => "",
-        "VERTICAL_MARGIN" => "",
-    ],
-
-    "SLIDER" => [
-        "SHOW_ARROWS" => "",
-        "SHOW_BULLETS" => "",
-        "AUTOPLAY" => "",
-        "AUTOPLAY_INTERVAL" => "",
-        "CENTERED" => "",
-        "MOVE_SETS" => "",
-        "HIDE_CONTENT" => "",
-        "CONTENT_ON_PICTURE" => "",
-    ]
-
-])?>
- */
-
 class COipIblockElementList extends \CBitrixComponent
 {
 
@@ -98,8 +20,15 @@ class COipIblockElementList extends \CBitrixComponent
 
     public function onPrepareComponentParams($arParams)
     {
-        $arParams = $this->initCommonParams($arParams);
-        return $this->initPersonalParams($arParams);
+        try {
+            $arParams = $this->initCommonParams($arParams);
+            return $this->initPersonalParams($arParams);
+        }
+        catch (\Bitrix\Main\ArgumentException $e) {
+            $this->arResult["EXCEPTION"] = $e->getMessage();
+        }
+
+        return $arParams;
     }
 
 
@@ -150,17 +79,12 @@ class COipIblockElementList extends \CBitrixComponent
      */
     protected function initCommonParams($arParams) {
 
-        try {
-            if(!is_set($arParams["IBLOCK_ID"])) {
-                throw new ArgumentNullException("IBLOCK_ID");
-            }
-
-            if(!intval($arParams["IBLOCK_ID"])) {
-                throw new ArgumentTypeException("IBLOCK_ID");
-            }
+        if(!is_set($arParams["IBLOCK_ID"])) {
+            throw new ArgumentNullException("IBLOCK_ID");
         }
-        catch (\Bitrix\Main\ArgumentException $e) {
-            $this->arResult["EXCEPTION"] = $e->getMessage();
+
+        if(!intval($arParams["IBLOCK_ID"])) {
+            throw new ArgumentTypeException("IBLOCK_ID");
         }
 
         $this->setDefaultParam($arParams["SECTION_ID"],0);
@@ -183,7 +107,6 @@ class COipIblockElementList extends \CBitrixComponent
     /**
      * @param  $arParams
      * @return array
-     * @throws ArgumentNullException | ArgumentTypeException
      */
     protected function initPersonalParams($arParams) {
         $this->setDefaultParam( $arParams["COUNT"],24);
@@ -260,7 +183,6 @@ class COipIblockElementList extends \CBitrixComponent
     /**
      * @param mixed $param
      * @param mixed $defaultValue
-     * @return mixed
      */
     protected function setDefaultParam(&$param, $defaultValue) {
 
@@ -273,7 +195,6 @@ class COipIblockElementList extends \CBitrixComponent
     /**
      * @param mixed $param
      * @param boolean $defaultValue
-     * @return mixed
      */
     protected function  setDefaultBooleanParam(&$param, $defaultValue = false) {
 
@@ -386,7 +307,10 @@ class COipIblockElementList extends \CBitrixComponent
         return $this;
     }
 
-    /** @param string $fileID  */
+    /**
+     * @param string $fileID
+     * @return array
+     */
     protected function fetchPicture($fileID) {
 
         return \CFile::ResizeImageGet(
@@ -547,8 +471,6 @@ class COipIblockElementList extends \CBitrixComponent
 
     public function getCardPositionCss() {
        $picPosition = $this->getParam("ELEMENT_VIEW_PICTURE_POSITION");
-
-       $result = "";
 
        switch($picPosition) {
 
