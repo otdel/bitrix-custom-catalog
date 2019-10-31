@@ -112,8 +112,10 @@ class COipIblockElementList extends \CBitrixComponent
         $this->setDefaultParam( $arParams["COUNT"],24);
 
         $this->setDefaultParam( $arParams["FILTER"],"");
-        $this->setDefaultParam( $arParams["SORT_1"],"");
-        $this->setDefaultParam( $arParams["SORT_2"],"");
+        $this->setDefaultParam( $arParams["SORT_1"],"sort");
+        $this->setDefaultParam( $arParams["BY_1"],"asc");
+        $this->setDefaultParam( $arParams["SORT_2"],"active_from");
+        $this->setDefaultParam( $arParams["BY_2"],"desc");
 
        $this->setDefaultParam($arParams["LIST_VIEW_TITLE_TEXT"],"");
        $this->setDefaultParam($arParams["LIST_VIEW_TITLE_TAG"],"div");
@@ -247,7 +249,10 @@ class COipIblockElementList extends \CBitrixComponent
 
         $arParams = $this->arParams;
 
-        $order = [];
+        $order = [
+            $this->getParam("SORT_1") => $this->getParam("BY_1"),
+            $this->getParam("SORT_2") => $this->getParam("SORT_2")
+        ];
         $filter = $this->consistFilter();
 
         $group = false;
