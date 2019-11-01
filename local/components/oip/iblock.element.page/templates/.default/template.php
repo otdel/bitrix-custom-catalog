@@ -4,7 +4,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 /** @var array $arResult */
 /** @var array $arParams */
 /** @var $this \CBitrixComponentTemplate */
-/** @var $component \COipIblockElementListPage */
+/** @var $component \COipIblockElementPage */
 ?>
 
 <div class="uk-section uk-section-<?=$component->getParam("LIST_VIEW_WRAP_COLOR")?>
