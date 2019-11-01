@@ -5,7 +5,6 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 /** @var array $arParams */
 /** @var $this \CBitrixComponentTemplate */
 /** @var $component \COipIblockElementListPage */
-//var_dump($component->getParams());
 ?>
 
 <div class="uk-section uk-section-<?=$component->getParam("LIST_VIEW_WRAP_COLOR")?>
@@ -29,8 +28,16 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
                 <?include_once (__DIR__."/include/top.php")?>
 
-                <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",
-                    $component->getParams());?>
+                <?$pagination = $APPLICATION->IncludeComponent("oip:iblock.element.list","",
+                    $component->getParams(), $component);?>
+
+                <?if($pagination["PAGES"] > 1):?>
+                    <?$APPLICATION->IncludeComponent("oip:page.navigation","",[
+                        "NAV_ID" => $pagination["NAV_ID"],
+                        "PAGES" => $pagination["PAGES"],
+                        "PAGE" => $pagination["PAGE"],
+                    ])?>
+                <?endif?>
 
             </div>
 
