@@ -243,9 +243,8 @@ class COipIblockSectionList extends \CBitrixComponent
         // Проверяем кеш. TTL задается в секундах
         // Если кеш есть
         if ($cache->initCache($this->cacheLifeTime, $cacheKey)) {
-            // Устанавливаем флаг что кеш неактуален
+            // Устанавливаем флаг что кеш актуален
             $this->isCacheActual = true;
-            $startTime = microtime(true);
             // Достаем переменные из кеша
             $vars = $cache->getVars();
             $arRawSections = unserialize($vars["arRawSections"]);
@@ -395,7 +394,6 @@ class COipIblockSectionList extends \CBitrixComponent
         // Проверяем кеш. TTL задается в секундах
         // Если кеш есть и он актуальный у основного набора данных (массива разделов)
         if ($cache->initCache($this->cacheLifeTime, $cacheKey) && $this->isCacheActual) {
-            $startTime = microtime(true);
             // Достаем переменные из кеша
             $vars = $cache->getVars();
             $this->arFiles = unserialize($vars["arFiles"]);
