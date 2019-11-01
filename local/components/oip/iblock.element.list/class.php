@@ -8,9 +8,9 @@ use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
 use Oip\Custom\Component\Iblock\Element;
 
-\CBitrixComponent::includeComponentClass("oip:iblock.element.page");
+\CBitrixComponent::includeComponentClass("oip:iblock.element");
 
-class COipIblockElementList extends \COipIblockElementPage
+class COipIblockElementList extends \COipIblockElement
 {
 
     /** @var array */
