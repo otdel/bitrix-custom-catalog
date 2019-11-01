@@ -4,44 +4,22 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 require_once(__DIR__."/../Element.php");
 require_once(__DIR__."/../Property.php");
 
-use \Bitrix\Main\ArgumentNullException;
-use \Bitrix\Main\ArgumentTypeException;
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
-
 use Oip\Custom\Component\Iblock\Element;
 
-/**
- *
- * <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",[
-    "IBLOCK_ID" => 2,
-    "SECTION_ID" => 8,
-    "SHOW_INACTIVE" => "Y" - показать и неактивные
-    "PROPERTIES" => [
-        "PICS_NEWS",
-        "TEST_STRING",
-        "TEST_FILE",
-        "TEST_LIST",
-    ],
- * "PROPERTIES" => "all" - все свойства
-    "RESIZE_FILE_PROPS" => [600,600]
-])?>
- */
+\CBitrixComponent::includeComponentClass("oip:iblock.element");
 
-class COipIblockElementList extends \CBitrixComponent
+class COipIblockElementList extends \COipIblockElement
 {
-
 
     /** @var array */
     protected $rawData = [];
 
-    public function onPrepareComponentParams($arParams)
-    {
+    /** @var array */
+    protected $pagination = [];
 
-        return  $this->initParams($arParams);
-    }
-
-
+    /** @return array */
     public function executeComponent()
     {
         $this->execute();
@@ -59,6 +37,8 @@ class COipIblockElementList extends \CBitrixComponent
         }
 
         $this->includeComponentTemplate();
+
+        return $this->pagination;
     }
 
     protected function execute() {
@@ -80,57 +60,6 @@ class COipIblockElementList extends \CBitrixComponent
                 $this->arResult["EXCEPTION"] = $e->getMessage();
             }
         }
-    }
-
-    /**
-     * @return array
-     * @throws ArgumentNullException | ArgumentTypeException
-     */
-    protected function initParams($arParams) {
-
-        try {
-            if(!is_set($arParams["IBLOCK_ID"])) {
-                throw new ArgumentNullException("IBLOCK_ID");
-            }
-
-            if(!intval($arParams["IBLOCK_ID"])) {
-                throw new ArgumentTypeException("IBLOCK_ID");
-            }
-        }
-        catch (\Bitrix\Main\ArgumentException $e) {
-            $this->arResult["EXCEPTION"] = $e->getMessage();
-        }
-
-        if(!is_set($arParams["PROPERTIES"])) {
-            $arParams["PROPERTIES"] = [];
-        }
-        elseif(is_array($arParams["PROPERTIES"])) {
-            $arParams["PROPERTIES"] = $this->trimPropCodes($arParams["PROPERTIES"]);
-        }
-
-        if(!is_set($arParams["SECTION_ID"])) {
-            $arParams["SECTION_ID"] = 0;
-        }
-
-        if(!is_set($arParams["RESIZE_FILE_PROPS"])) {
-            $arParams["RESIZE_FILE_PROPS"] = ["width" => 600, "height" => 600];
-        }
-
-        if(!is_set($arParams["SHOW_INACTIVE"])) {
-            $arParams["SHOW_INACTIVE"] = "N";
-        }
-
-        return $arParams;
-    }
-
-    /**
-     * @param array $propCodes
-     * @return array
-     */
-    protected function trimPropCodes($propCodes) {
-        return array_map(function ($propCode) {
-            return trim($propCode);
-        }, $propCodes);
     }
 
     /** @return array */
@@ -157,11 +86,21 @@ class COipIblockElementList extends \CBitrixComponent
 
         $arParams = $this->arParams;
 
-        $order = [];
+        $order = [
+            $this->getParam("SORT_1") => $this->getParam("BY_1"),
+            $this->getParam("SORT_2") => $this->getParam("SORT_2")
+        ];
         $filter = $this->consistFilter();
 
         $group = false;
-        $navStartParams = false;
+        $pageNumber = $this->getPageNumber($this->componentId);
+
+        $navStartParams = [
+            "iNumPage" =>  ($pageNumber) ? $pageNumber : 1,
+            "bShowAll" => false,
+            "nPageSize" => $this->getParam("COUNT")
+        ];
+
         $select = ["ID", "IBLOCK_ID", "SECTION_ID", "NAME", "ACTIVE", "ACTIVE_FROM", "ACTIVE_TO", "SORT", "PREVIEW_PICTURE", "DETAIL_PICTURE", "PREVIEW_TEXT",
             "DETAIL_TEXT", "LIST_PAGE_URL", "SECTION_PAGE_URL", "DETAIL_PAGE_URL"];
 
@@ -173,10 +112,26 @@ class COipIblockElementList extends \CBitrixComponent
             $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
         }
 
-        $this->rawData = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
+        $arResult = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
             $propIDs);
 
-       return $this;
+        $this->rawData = $arResult["ITEMS"];
+        $this->pagination = $arResult["PAGINATION"];
+
+        return $this;
+    }
+
+    /**
+     * @param int $navId
+     * @param int $navId
+     * @return int
+     *
+     * @throws SystemException
+     */
+    protected function getPageNumber($navId) {
+        $pageUrl = \Bitrix\Main\Application::getInstance()->getContext()->getRequest()->get("page_".$navId);
+
+        return (int)$pageUrl;
     }
 
     /** @return self */
@@ -216,7 +171,10 @@ class COipIblockElementList extends \CBitrixComponent
         return $this;
     }
 
-    /** @param string $fileID  */
+    /**
+     * @param string $fileID
+     * @return array
+     */
     protected function fetchPicture($fileID) {
 
         return \CFile::ResizeImageGet(
@@ -315,9 +273,55 @@ class COipIblockElementList extends \CBitrixComponent
                 }
             }
 
-            $arResult[] = $result;
+            $arResult["ITEMS"][] = $result;
         }
+
+        $arResult["PAGINATION"]["NAV_ID"] = $this->componentId;
+        $arResult["PAGINATION"]["PAGES"] = $iblockResult->NavPageCount;
+        $arResult["PAGINATION"]["PAGE"] = $iblockResult->NavPageNomer;
+        $arResult["PAGINATION"]["PAGE_SIZE"] = $iblockResult->NavPageSize;
+        $arResult["PAGINATION"]["RECORDS_COUNT"] = (float) $iblockResult->NavRecordCount;
 
         return $arResult;
     }
+
+    /** @return  boolean */
+    public function isContainerSlider() {
+        return ($this->arParams["LIST_VIEW_CONTAINER_TYPE"]
+            && $this->arParams["LIST_VIEW_CONTAINER_TYPE"]  === "SLIDER");
+    }
+
+    public function getCardPositionCss() {
+       $picPosition = $this->getParam("ELEMENT_VIEW_PICTURE_POSITION");
+
+       switch($picPosition) {
+
+           case "bottom":
+               $result = "uk-flex-column uk-flex-column-reverse";
+           break;
+
+           case "left":
+               $result = "uk-flex-row uk-flex-middle uk-child-width-1-2";
+           break;
+
+           case "right":
+               $result = "uk-flex-row uk-flex-row-reverse uk-flex-middle uk-child-width-1-2";
+           break;
+
+           default:
+               $result = "uk-flex-column";
+           break;
+       }
+
+       return $result;
+    }
+
+    /**
+     * @param string $videoLink
+     * @return mixed
+     */
+    public function getConvertedVideo($videoLink) {
+        return str_replace("watch?v=", "embed/", $videoLink);
+    }
+
 }
