@@ -2,11 +2,22 @@
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 use \Bitrix\Main\SystemException;
+use Bitrix\Main\Data\Cache;
 
 abstract class COipComponent extends \CBitrixComponent
 {
 
     protected $componentId;
+
+    /** @var Cache $cache */
+    protected $cache;
+
+    public function __construct(?CBitrixComponent $component = null)
+    {
+        parent::__construct($component);
+
+        $this->cache = Cache::createInstance();
+    }
 
     public function onPrepareComponentParams($arParams)
     {
@@ -88,6 +99,13 @@ abstract class COipComponent extends \CBitrixComponent
     }
 
     /**
+     * @return boolean
+     */
+    public function isCache() {
+        return ($this->getParam("IS_CACHE") === "N") ? false : true;
+    }
+
+    /**
      * @param string $paramCode
      * @param array $arParams
      * @return mixed
@@ -120,6 +138,8 @@ abstract class COipComponent extends \CBitrixComponent
     protected function initParams($arParams) {
         $this->initComponentId();
 
+        $this->setDefaultParam($arParams["CACHE_TIME"],300);
+        $this->setDefaultBooleanParam( $arParams["IS_CACHE"],true);
         return $arParams;
     }
 
@@ -127,5 +147,25 @@ abstract class COipComponent extends \CBitrixComponent
 
     public function executeComponent() {
         return parent::executeComponent();
+    }
+
+    /**
+     * @param callable $fetchFunction
+     * @param string $addCahceId
+     * @return mixed
+     */
+    public function cacheService(callable $fetchFunction, $cacheId) {
+
+        $result = null;
+
+        if($this->cache->initCache($this->getParam("CACHE_TIME"), $cacheId)) {
+            $result = $this->cache->getVars();
+        }
+        elseif($this->cache->startDataCache()) {
+            $result = $fetchFunction();
+            $this->cache->endDataCache($result);
+        }
+
+        return $result;
     }
 }
