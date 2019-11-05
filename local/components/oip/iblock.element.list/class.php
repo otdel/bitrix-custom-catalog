@@ -112,8 +112,19 @@ class COipIblockElementList extends \COipIblockElement
             $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
         }
 
-        $arResult = $this->getRows(\CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select),
-            $propIDs);
+        $fetchFunction = function () use($order, $filter, $group, $navStartParams, $select) {
+           return \CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select);
+        };
+
+        if($this->isCache()) {
+            $cacheId = $this->getCacheId().$pageNumber;
+            $dbResult = $this->cacheService($fetchFunction, $cacheId);
+        }
+        else {
+            $dbResult = $fetchFunction();
+        }
+
+        $arResult = $this->getRows($dbResult, $propIDs);
 
         $this->rawData = $arResult["ITEMS"];
         $this->pagination = $arResult["PAGINATION"];
@@ -129,9 +140,9 @@ class COipIblockElementList extends \COipIblockElement
      * @throws SystemException
      */
     protected function getPageNumber($navId) {
-        $pageUrl = \Bitrix\Main\Application::getInstance()->getContext()->getRequest()->get("page_".$navId);
+        $pageNumber = \Bitrix\Main\Application::getInstance()->getContext()->getRequest()->get("page_".$navId);
 
-        return (int)$pageUrl;
+        return (int) ($pageNumber) ? $pageNumber : 1;
     }
 
     /** @return self */
@@ -149,10 +160,22 @@ class COipIblockElementList extends \COipIblockElement
            }
         }
 
-        $files = [];
-        $dbRes = \CFile::GetList([],["@ID" => $pictureIDs]);
-        while($file = $dbRes->GetNext()) {
-            $files[$file["ID"]] = $file;
+        $fetchFunction = function () use($pictureIDs) {
+            $files = [];
+            $dbRes = \CFile::GetList([],["@ID" => $pictureIDs]);
+            while($file = $dbRes->GetNext()) {
+                $files[$file["ID"]] = $file;
+            }
+
+            return $files;
+        };
+
+        if($pictureIDs && $this->isCache()) {
+            $cacheId = $this->getCacheId().$pictureIDs;
+            $files = $this->cacheService($fetchFunction, $cacheId);
+        }
+        else {
+            $files = $fetchFunction();
         }
 
         foreach ($this->rawData as $key => $item) {
