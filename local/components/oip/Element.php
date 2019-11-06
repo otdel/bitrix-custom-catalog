@@ -13,6 +13,8 @@ class Element
     private $iblockId;
     /** @var int $sectionId */
     private $sectionId;
+    /** @var int $sectionName */
+    private $sectionName;
     /** @var int $sort */
     private $sort;
     /** @var string $name */
@@ -47,6 +49,7 @@ class Element
         $this->code = $data["FIELDS"]["CODE"];
         $this->iblockId = $data["FIELDS"]["IBLOCK_ID"];
         $this->sectionId = $data["FIELDS"]["SECTION_ID"];
+        $this->sectionName = $data["FIELDS"]["SECTION_NAME"];
         $this->sort = $data["FIELDS"]["SORT"];
         $this->name = $data["FIELDS"]["NAME"];
         $this->active = $data["FIELDS"]["ACTIVE"];
@@ -99,6 +102,14 @@ class Element
     public function getSectionId()
     {
         return $this->sectionId;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getSectionName()
+    {
+        return $this->sectionName;
     }
 
     /**
@@ -239,7 +250,7 @@ class Element
 
     /**
      * @param string $propCode
-     * @return string
+     * @return mixed
      */
     public function getPropValue($propCode) {
         return ($this->getProps()[$propCode]) ? $this->getProps()[$propCode]->getValue() : "";

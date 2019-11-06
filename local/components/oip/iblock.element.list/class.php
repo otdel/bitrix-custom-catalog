@@ -50,7 +50,7 @@ class COipIblockElementList extends \COipIblockElement
                     throw new \Bitrix\Main\SystemException("Module iblock is not installed");
                 }
 
-                $this->fetchCommonData()->fetchCommonPictures()->getComplicatedProps();
+                $this->fetchCommonData()->fetchCommonPictures()->getAddData();
 
             }
             catch (LoaderException $e) {
@@ -209,9 +209,9 @@ class COipIblockElementList extends \COipIblockElement
     }
 
     /** @return self */
-    protected function getComplicatedProps() {
+    protected function getAddData() {
 
-        $this->getFileProps();
+        $this->getFileProps()->getSectionName();
 
         return $this;
     }
@@ -252,6 +252,63 @@ class COipIblockElementList extends \COipIblockElement
             foreach ($item["PROPS"] as $propCode => $prop) {
                 if($prop["PROPERTY_TYPE"] == "F" && $prop["VALUE"]) {
                     $this->rawData[$key]["PROPS"][$propCode]["VALUE"] =  $fileProps[$item["FIELDS"]["ID"]][$prop["ID"]];
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    protected function getSectionName() {
+
+        // если имя категории пришло из параметра компонента
+        if($this->getParam("SECTION_NAME")) {
+            $this->arResult["SECTION_NAME"] = $this->getParam("SECTION_NAME");
+        }
+        // если есть id категории из параметра компонента
+        elseif($this->getParam("SECTION_ID")) {
+
+            global $APPLICATION;
+            $sectionName = $APPLICATION->IncludeComponent(
+                "oip:iblock.section.one.name",
+                "",
+                [
+                    "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
+                    "BASE_SECTION" => $this->getParam("SECTION_ID"),
+                    "DEPTH" => 0
+                ]
+            );
+
+            $this->arResult["SECTION_NAME"] = $sectionName;
+        }
+        // смотрим id раздела в каждом элементе
+        else {
+
+            global $APPLICATION;
+            $sections = [];
+
+            foreach ($this->rawData as $item) {
+                if($item["FIELDS"]["IBLOCK_SECTION_ID"]) {
+                    $sections[$item["FIELDS"]["IBLOCK_SECTION_ID"]] = $item["FIELDS"]["IBLOCK_SECTION_ID"];
+                }
+            }
+
+            foreach ($sections as $idKey => $idValue) {
+
+                $sections[$idKey] =  $APPLICATION->IncludeComponent(
+                    "oip:iblock.section.one.name",
+                    "",
+                    [
+                        "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
+                        "BASE_SECTION" => (int)$idValue,
+                        "DEPTH" => 0
+                    ]
+                );
+            }
+
+            foreach ($this->rawData as $key => $item) {
+                if(array_key_exists($item["FIELDS"]["IBLOCK_SECTION_ID"], $sections)) {
+                    $this->rawData[$key]["FIELDS"]["SECTION_NAME"] = $sections[$item["FIELDS"]["IBLOCK_SECTION_ID"]];
                 }
             }
         }
