@@ -70,6 +70,7 @@ class COipIblockElementList extends \COipIblockElement
         $arParams =  parent::initParams($arParams);
 
         $this->setDefaultParam($arParams["FILTER"],[]);
+        $this->setDefaultBooleanParam($arParams["SHOW_ALL"]);
 
         return $arParams;
     }
@@ -109,13 +110,19 @@ class COipIblockElementList extends \COipIblockElement
         $filter = $this->consistFilter();
 
         $group = false;
-        $pageNumber = $this->getPageNumber($this->componentId);
 
-        $navStartParams = [
-            "iNumPage" =>  ($pageNumber) ? $pageNumber : 1,
-            "bShowAll" => false,
-            "nPageSize" => $this->getParam("COUNT")
-        ];
+        $pageNumber = $this->getPageNumber($this->componentId);
+        if($this->isParam("SHOW_ALL")) {
+            $navStartParams = false;
+        }
+        else {
+
+            $navStartParams = [
+                "iNumPage" =>  ($pageNumber) ? $pageNumber : 1,
+                "bShowAll" => false,
+                "nPageSize" => $this->getParam("COUNT")
+            ];
+        }
 
         $select = ["ID", "IBLOCK_ID", "SECTION_ID", "NAME", "ACTIVE", "ACTIVE_FROM", "ACTIVE_TO", "SORT", "PREVIEW_PICTURE", "DETAIL_PICTURE", "PREVIEW_TEXT",
             "DETAIL_TEXT", "LIST_PAGE_URL", "SECTION_PAGE_URL", "DETAIL_PAGE_URL"];
