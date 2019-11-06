@@ -62,6 +62,18 @@ class COipIblockElementList extends \COipIblockElement
         }
     }
 
+    /**
+     * @inheritdoc
+    */
+    protected function initParams($arParams)
+    {
+        $arParams =  parent::initParams($arParams);
+
+        $this->setDefaultParam($arParams["FILTER"],[]);
+
+        return $arParams;
+    }
+
     /** @return array */
     protected function consistFilter()
     {
@@ -75,6 +87,10 @@ class COipIblockElementList extends \COipIblockElement
 
         if ($this->arParams["SHOW_INACTIVE"] !== "Y") {
             $filter["ACTIVE"] = "Y";
+        }
+
+        if(!empty($this->arParams["FILTER"])) {
+            $filter = array_merge($filter, $this->arParams["FILTER"]);
         }
 
         return $filter;
