@@ -13,6 +13,8 @@ class Property
     private $id;
     /** @var int $iblockId */
     private $iblockId;
+    /** @var int $linkIblockId */
+    private $linkIblockId;
     /** @var string $name */
     private $name;
     /** @var string $code */
@@ -33,6 +35,7 @@ class Property
     {
         $this->id = $data["ID"];
         $this->iblockId =  $data["IBLOCK_ID"];
+        $this->linkIblockId =  ($data["PROPERTY_TYPE"]) ? (int)$data["LINK_IBLOCK_ID"] : 0;
         $this->name = $data["NAME"];
         $this->code = $data["CODE"];
         $this->type = $data["PROPERTY_TYPE"];
@@ -57,6 +60,14 @@ class Property
     public function getIblockId()
     {
         return $this->iblockId;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLinkIblockId()
+    {
+        return $this->linkIblockId;
     }
 
     /**
