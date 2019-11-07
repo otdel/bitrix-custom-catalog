@@ -18,14 +18,12 @@
 
         <ul class="uk-subnav uk-subnav-divider uk-margin-small-top uk-text-small uk-flex-center">
             <?if($component->isParam("ELEMENT_VIEW_SHOW_CATEGORY_NAME")):?>
-                <li>
-                    холодильники
-                </li>
+                <?include(__DIR__."/section.php")?>
             <?endif?>
 
             <?if($component->isParam("ELEMENT_VIEW_SHOW_BRAND")):?>
                 <li>
-                    Саратов
+                    <?include(__DIR__."/brands.php")?>
                 </li>
             <?endif?>
         </ul>
@@ -40,21 +38,26 @@
     <?endif?>
 
     <?if($component->isParam("ELEMENT_VIEW_SHOW_TAG_LIST")
-        || $component->isParam("ELEMENT_VIEW_SHOW_REVIEWS_NUMBER")):?>
+        && $element->getPropValueCount("TAGS")
+        || $component->isParam("ELEMENT_VIEW_SHOW_REVIEWS_NUMBER")
+        &&  $element->getPropValueCount("REVIEWS")
+    ):?>
         <div class="uk-card uk-card-footer uk-text-meta">
             <div class="uk-grid-small uk-flex-middle" uk-grid>
 
-                <?if($component->isParam("ELEMENT_VIEW_SHOW_TAG_LIST")):?>
+                <?if($component->isParam("ELEMENT_VIEW_SHOW_TAG_LIST")
+                    &&  $element->getPropValueCount("TAGS")
+                ):?>
                     <div class="uk-width-expand">
-                        <div class="uk-panel">
-                            <span class="uk-margin-small-right" uk-icon="tag"></span>Розовый холодильник, красивый холодильник
-                        </div>
+                        <?include(__DIR__."/tags.php")?>
                     </div>
                 <?endif?>
 
-                <?if($component->isParam("ELEMENT_VIEW_SHOW_REVIEWS_NUMBER")):?>
+                <?if($component->isParam("ELEMENT_VIEW_SHOW_REVIEWS_NUMBER")
+                    && $element->getPropValueCount("REVIEWS")
+                ):?>
                     <div class="uk-width-auto">
-                        <span class="uk-margin-small-right" uk-icon="comment"></span>5
+                        <span class="uk-margin-small-right" uk-icon="comment"></span><?=$element->getPropValueCount("REVIEWS")?>
                     </div>
                 <?endif?>
 

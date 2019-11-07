@@ -35,7 +35,7 @@ class Property
     {
         $this->id = $data["ID"];
         $this->iblockId =  $data["IBLOCK_ID"];
-        $this->linkIblockId =  ($data["PROPERTY_TYPE"]) ? (int)$data["LINK_IBLOCK_ID"] : 0;
+        $this->linkIblockId =  ($data["PROPERTY_TYPE"] == "E") ? (int)$data["LINK_IBLOCK_ID"] : 0;
         $this->name = $data["NAME"];
         $this->code = $data["CODE"];
         $this->type = $data["PROPERTY_TYPE"];
@@ -179,7 +179,7 @@ class Property
      * @return int
      */
     public function getValueCount() {
-        return count($this->getValue());
+        return (!$this->getValue()) ? 0 : count($this->getValue());
     }
 
 }
