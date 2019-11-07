@@ -171,14 +171,14 @@ class COipIblockSectionList extends \CBitrixComponent
         $this->isCacheEnabled = $arParams["CACHE"] =="Y";
         // ID или код раздела, относительно которого начнется построение дерева
         $this->setDefaultParam($arParams["BASE_SECTION"], 0);
+        // Массив с критериями фильтра
+        $this->setDefaultParam($arParams["FILTER"], array());
         // Массив с критериями сортировки
         $this->setDefaultParam($arParams["ORDER"], array("ID" => SORT_ASC));
         // Поля для выборки
         $this->setDefaultParam($arParams["SELECT"], array("*"));
         // UF_ поля для выборки
         $this->setDefaultParam($arParams["USER_FIELDS"], array());
-        // Поле, по которому производится выборка раздела
-        $arParams["FILTER_FIELD_NAME"] = is_int($arParams["BASE_SECTION"]) ? "ID": "CODE";
         // Флаг - показывать или скрывать количество элементов в категории
         $this->setDefaultParam($arParams["SHOW_ELEMENTS_CNT"], false);
         // Максимальная глубина вложенности дерева
@@ -199,6 +199,8 @@ class COipIblockSectionList extends \CBitrixComponent
         $this->setDefaultParam($arParams["LIST_ATTRIBUTE"], "");
         // Класс(ы) для превью картинки. По умолчанию ""
         $this->setDefaultParam($arParams["PREVIEW_PICTURE_CLASS"], "");
+        // Поле, по которому производится выборка раздела
+        $arParams["FILTER_FIELD_NAME"] = is_int($arParams["BASE_SECTION"]) ? "ID": "CODE";
 
         // Список/слайдер. По умолчанию список
         $viewTypes = ["LIST", "SLIDER"];
@@ -214,9 +216,10 @@ class COipIblockSectionList extends \CBitrixComponent
         // Формируем часть ключа кеша, основанную на параметрах
         // Отсортируем массив параметров по ключу в алфавитном порядке
         // (Чтобы при перестановке ключей, но одинаковых значениях, создавался одинаковый ключ)
-        ksort($arParams);
+        // ksort($arParams);
         // Формируем ключ кеша для текущего набора данных (arParams)
-        $this->cacheKey = "section.list." . md5(serialize($arParams));
+        //$this->cacheKey = "section.list." . md5(serialize($arParams));
+        $this->cacheKey = $this->getCacheId();
 
         return $arParams;
     }
@@ -224,9 +227,10 @@ class COipIblockSectionList extends \CBitrixComponent
     /** @return array */
     protected function consistFilter()
     {
-        $filter = [
-            "IBLOCK_ID" => $this->arParams["IBLOCK_ID"]
-        ];
+        $filter = array_merge(
+            array("IBLOCK_ID" => $this->arParams["IBLOCK_ID"]),
+            $this->arParams["FILTER"]
+        );
         return $filter;
     }
 
