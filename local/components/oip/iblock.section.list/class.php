@@ -168,6 +168,8 @@ class COipIblockSectionList extends \CBitrixComponent
 
         // Кешировать выборки из БД. По умолчанию - "Y"
         $this->setDefaultParam($arParams["CACHE"], "Y");
+        // Проверка прав пользователя. По умолчанию - "Y"
+        $this->setDefaultParam($arParams["CHECK_PERMISSIONS"], "Y");
         $this->isCacheEnabled = $arParams["CACHE"] =="Y";
         // ID или код раздела, относительно которого начнется построение дерева
         $this->setDefaultParam($arParams["BASE_SECTION"], 0);
@@ -228,7 +230,10 @@ class COipIblockSectionList extends \CBitrixComponent
     protected function consistFilter()
     {
         $filter = array_merge(
-            array("IBLOCK_ID" => $this->arParams["IBLOCK_ID"]),
+            array(
+                "IBLOCK_ID" => $this->arParams["IBLOCK_ID"],
+                "CHECK_PERMISSIONS" => $this->arParams["CHECK_PERMISSIONS"]
+            ),
             $this->arParams["FILTER"]
         );
         return $filter;
