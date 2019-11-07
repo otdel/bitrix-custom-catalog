@@ -32,7 +32,9 @@ abstract class COipIblockElement extends \COipComponent
         $this->setDefaultParam( $arParams["PROPERTIES"],[]);
 
         $this->setDefaultBooleanParam( $arParams["SHOW_META"]);
-        $this->setDefaultBooleanParam( $arParams["INCLUDE_IBLOCK_CHAIN"],"");
+        $this->setDefaultBooleanParam( $arParams["INCLUDE_IBLOCK_CHAIN"]);
+
+        $this->setDefaultBooleanParam( $arParams["CHECK_PERMISSIONS"],true);
 
         $this->setDefaultBooleanParam( $arParams["SHOW_404"],true);
 

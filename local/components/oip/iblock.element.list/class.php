@@ -79,6 +79,7 @@ class COipIblockElementList extends \COipIblockElement
     protected function consistFilter()
     {
         $filter = [
+            "CHECK_PERMISSIONS" => $this->getParam("CHECK_PERMISSIONS"),
             "IBLOCK_ID" => $this->arParams["IBLOCK_ID"]
         ];
 
