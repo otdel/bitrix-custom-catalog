@@ -18,7 +18,8 @@ use Oip\Custom\Component\Iblock\Section;
  *   "BASE_SECTION" => 8,
  *   "DEPTH" => 3,
  *   "SHOW_ELEMENTS_CNT" => false,
- *   "USER_FIELDS" => array("UF_*")
+ *   "USER_FIELDS" => array("UF_*"),
+ *   "CACHE" => "Y"
  *   ])?>
  */
 class COipIblockSectionList extends \CBitrixComponent
@@ -41,6 +42,8 @@ class COipIblockSectionList extends \CBitrixComponent
     private $cacheKey;
     /** @var int $cacheLifeTime Время жизни кеша */
     private $cacheLifeTime = 300;
+    /** @var boolean $isCacheActual Флаг - включено ли кеширование */
+    private $isCacheEnabled;
     /** @var boolean $isCacheActual Флаг - актуальный кеш или нет. Нужен для одновременного обновления всех кешей, если один "просрочился" */
     private $isCacheActual;
 
@@ -67,6 +70,25 @@ class COipIblockSectionList extends \CBitrixComponent
         }
 
         $this->includeComponentTemplate();
+
+        // Если компонент вызван для вывода деталки раздела - отдаем массив
+        // значений некоторых полей, для использования в других компонентах
+        if ($this->isSingleSection()) {
+            /** @var Section $section */
+            $section = array_shift($this->arResult["SECTIONS"]);
+            return array(
+                "SECTION_NAME" => $section->getName(),
+                "UF_ELEMENTS_NUMBER" => $section->getPropValue("UF_ELEMENTS_NUMBER"),
+                "UF_COLUMNS_COUNT" => $section->getPropValue("UF_COLUMNS_COUNT"),
+                "UF_SIDEBAR_WIDTH" => $section->getPropValue("UF_SIDEBAR_WIDTH"),
+                "UF_ELEMENT_TITLE_CSS" => $section->getPropValue("UF_ELEMENT_TITLE_CSS"),
+                "UF_SIDEBAR_LIST" => $section->getPropValue("UF_SIDEBAR_LIST"),
+                "UF_SIDEBAR_ELEMENT" => $section->getPropValue("UF_SIDEBAR_ELEMENT"),
+                "UF_SAME_ELEMENT" => $section->getPropValue("UF_SAME_ELEMENT"),
+                "UF_POPULAR_WITH_THIS" => $section->getPropValue("UF_POPULAR_WITH_THIS")
+            );
+        }
+
     }
 
     protected function execute() {
@@ -135,13 +157,22 @@ class COipIblockSectionList extends \CBitrixComponent
             if(!intval($arParams["IBLOCK_ID"])) {
                 throw new \Bitrix\Main\ArgumentTypeException("IBLOCK_ID");
             }
+
+            // Время жизни кеша
+            $this->setDefaultParam($arParams["CACHE_TIME"], 300);
+            $this->cacheLifeTime = $arParams["CACHE_TIME"];
         }
         catch (\Bitrix\Main\ArgumentException $e) {
             $this->arResult["EXCEPTION"] = $e->getMessage();
         }
 
+        // Кешировать выборки из БД. По умолчанию - "Y"
+        $this->setDefaultParam($arParams["CACHE"], "Y");
+        $this->isCacheEnabled = $arParams["CACHE"] =="Y";
         // ID или код раздела, относительно которого начнется построение дерева
         $this->setDefaultParam($arParams["BASE_SECTION"], 0);
+        // Массив с критериями сортировки
+        $this->setDefaultParam($arParams["ORDER"], array("ID" => SORT_ASC));
         // Поля для выборки
         $this->setDefaultParam($arParams["SELECT"], array("*"));
         // UF_ поля для выборки
@@ -151,7 +182,7 @@ class COipIblockSectionList extends \CBitrixComponent
         // Флаг - показывать или скрывать количество элементов в категории
         $this->setDefaultParam($arParams["SHOW_ELEMENTS_CNT"], false);
         // Максимальная глубина вложенности дерева
-        $this->setDefaultParam($arParams["DEPTH"], 1);
+        $this->setDefaultParam($arParams["DEPTH"], -1);
         // Текст заголовка. По умолчанию ""
         $this->setDefaultParam($arParams["TITLE_TEXT"], "");
         // Класс заголовка. По умолчанию ""
@@ -173,7 +204,7 @@ class COipIblockSectionList extends \CBitrixComponent
             $arParams["VIEW_TYPE"] = "LIST";
         }
         else {
-            if (in_array($arParams["VIEW_TYPE"], $viewTypes)) {
+            if (!in_array($arParams["VIEW_TYPE"], $viewTypes)) {
                 throw new ArgumentException("VIEW_TYPE может принимать только следующие значения: " . implode(", ", $viewTypes));
             }
         }
@@ -240,22 +271,23 @@ class COipIblockSectionList extends \CBitrixComponent
 
         // Получаем экземпляр класса
         $cache = Cache::createInstance();
+
         // Проверяем кеш. TTL задается в секундах
-        // Если кеш есть
-        if ($cache->initCache($this->cacheLifeTime, $cacheKey)) {
+        // Если кеш есть и он включен
+        if ($this->isCacheEnabled && $cache->initCache($this->cacheLifeTime, $cacheKey)) {
             // Устанавливаем флаг что кеш актуален
             $this->isCacheActual = true;
             // Достаем переменные из кеша
             $vars = $cache->getVars();
             $arRawSections = unserialize($vars["arRawSections"]);
         }
-        // Если кеша нет или он неактуален
+        // Если кеша нет или он неактуален (или выключен)
         elseif ($cache->startDataCache()) {
             // Устанавливаем флаг что кеш неактуален
             $this->isCacheActual = false;
             // Получаем список разделов
             $dbSection = CIBlockSection::GetList(
-                Array(),
+                array("LEFT_MARGIN" => "ASC"),
                 $filter,
                 true,
                 array_merge($this->arParams["SELECT"], $this->arParams["USER_FIELDS"])
@@ -271,6 +303,30 @@ class COipIblockSectionList extends \CBitrixComponent
         foreach ($arRawSections as $arSection) {
             $sectionId = $arSection['ID'];
             $parentSectionId = (int)$arSection['IBLOCK_SECTION_ID'];
+
+            // Если установлено изображение
+            if ($arSection["PICTURE"] > 0) {
+                // Запоминаем id файла (картинки)
+                $fileId = $arSection["PICTURE"];
+                $arSection["PICTURE"] = array();
+                $arSection["PICTURE"]["RAW_VALUE"] = $fileId;
+                $arSection["PICTURE"]["VALUE"] = array();
+                $this->arFieldsWithFileValues[] = &$arSection["PICTURE"];
+                // Добавим изображение в массив файлов с ключом, равным id файла
+                $this->arFiles[$fileId] = array();
+            }
+
+            // Если установлено детальное изображение
+            if ($arSection["DETAIL_PICTURE"] > 0) {
+                // Запоминаем id файла (картинки)
+                $fileId = $arSection["DETAIL_PICTURE"];
+                $arSection["DETAIL_PICTURE"] = array();
+                $arSection["DETAIL_PICTURE"]["RAW_VALUE"] = $fileId;
+                $arSection["DETAIL_PICTURE"]["VALUE"] = array();
+                $this->arFieldsWithFileValues[] = &$arSection["DETAIL_PICTURE"];
+                // Добавим изображение в массив файлов с ключом, равным id файла
+                $this->arFiles[$fileId] = array();
+            }
 
             foreach ($arSection as $key => $sectionField) {
                 if (substr($key, 0, 3) == "UF_") {
@@ -323,12 +379,76 @@ class COipIblockSectionList extends \CBitrixComponent
                         }
                     }
                 }
-                $arSections[$parentSectionId]['CHILDS'][$sectionId] = $arSection;
-                $arSections[$sectionId] = &$arSections[$parentSectionId]['CHILDS'][$sectionId];
             }
+
+            $arSections[$parentSectionId]['CHILDS'][$sectionId] = $arSection;
+
+            $arSections[$sectionId] = &$arSections[$parentSectionId]['CHILDS'][$sectionId];
+
         }
 
-        return array_shift($arSections)["CHILDS"];
+        // Сортируем массив по заданным критериям
+        $this->sortSectionsArray($arSections[0]["CHILDS"], $this->arParams["ORDER"]);
+
+        return $arSections[0]["CHILDS"];
+    }
+
+    /**
+     * Сортировка массива разделов. Сортируются только элементы на одной глубине
+     *
+     * @param array $arSections Массив разделов
+     * @param array $arSortConditions Критерии сортировки вида array('CREATED_BY' => SORT_ASC, 'NAME' => SORT_ASC)
+     */
+    private function sortSectionsArray(&$arSections, $arSortConditions) {
+        // Сортируем разделы на текущем уровне
+        $arSections = $this->arrayMultiSort($arSections, $arSortConditions);
+        // Если есть дочерние разделы - сортируем и их
+        foreach ($arSections as &$arSection) {
+            if (isset($arSection["CHILDS"])) {
+                $this->sortSectionsArray($arSection["CHILDS"], $arSortConditions);
+            }
+        }
+    }
+
+    /**
+     * Сортировка многомерного массива по заданным критериям
+     * Основа для функции позаимствована с https://www.php.net/manual/ru/function.array-multisort.php
+     *
+     * @param array $array Исходный массив
+     * @param array $cols Критерии сортировки
+     * @return array Отсортированный массив
+     */
+    function arrayMultiSort($array, $cols)
+    {
+        $colarr = array();
+        foreach ($cols as $col => $order) {
+            $colarr[$col] = array();
+            foreach ($array as $k => $row) {
+                // Если это UF_ поле, то значение берем из его поля "VALUE"
+                if (substr($col, 0, 3) == "UF_") {
+                    $colarr[$col]['_'.$k] = strtolower($row[$col]["VALUE"]);
+                }
+                else {
+                    $colarr[$col]['_'.$k] = strtolower($row[$col]);
+                }
+            }
+
+        }
+        $eval = 'array_multisort(';
+        foreach ($cols as $col => $order) {
+            $eval .= '$colarr[\''.$col.'\'],'.$order.',';
+        }
+        $eval = substr($eval,0,-1).');';
+        eval($eval);
+        $ret = array();
+        foreach ($colarr as $col => $arr) {
+            foreach ($arr as $k => $v) {
+                $k = substr($k,1);
+                if (!isset($ret[$k])) $ret[$k] = $array[$k];
+                $ret[$k][$col] = $array[$k][$col];
+            }
+        }
+        return $ret;
     }
 
     /**
@@ -392,13 +512,13 @@ class COipIblockSectionList extends \CBitrixComponent
         // Получаем экземпляр класса кеша
         $cache = Cache::createInstance();
         // Проверяем кеш. TTL задается в секундах
-        // Если кеш есть и он актуальный у основного набора данных (массива разделов)
-        if ($cache->initCache($this->cacheLifeTime, $cacheKey) && $this->isCacheActual) {
+        // Если кеш есть, он включен и он актуальный у основного набора данных (массива разделов)
+        if ($this->isCacheEnabled && $cache->initCache($this->cacheLifeTime, $cacheKey) && $this->isCacheActual) {
             // Достаем переменные из кеша
             $vars = $cache->getVars();
             $this->arFiles = unserialize($vars["arFiles"]);
         }
-        // Если кеша нет или он неактуален
+        // Если кеша нет или он неактуален (или выключен)
         elseif ($cache->startDataCache()) {
             // Получаем информацию о файлах
             $dbRes = \CFile::GetList([],["@ID" => implode(',', array_keys($this->arFiles))]);
@@ -429,13 +549,13 @@ class COipIblockSectionList extends \CBitrixComponent
         // Получаем экземпляр класса кеша
         $cache = Cache::createInstance();
         // Проверяем кеш. TTL задается в секундах
-        // Если кеш есть и он актуальный у основного набора данных (массива разделов)
-        if ($cache->initCache($this->cacheLifeTime, $cacheKey) && $this->isCacheActual) {
+        // Если кеш есть и он актуальный у основного набора данных (массива разделов) (и он включен)
+        if ($this->isCacheEnabled && $cache->initCache($this->cacheLifeTime, $cacheKey) && $this->isCacheActual) {
             // Достаем переменные из кеша
             $vars = $cache->getVars();
             $this->arUFListValues = unserialize($vars["arUFListValues"]);
         }
-        // Если кеша нет или он неактуален
+        // Если кеша нет или он неактуален (или он выключен)
         elseif ($cache->startDataCache()) {
             $obEnum = new CUserFieldEnum;
             $rsEnum = $obEnum->GetList(array(), array());
@@ -537,6 +657,15 @@ class COipIblockSectionList extends \CBitrixComponent
             }
         }
         return $param;
+    }
+
+    /**
+     * Флаш - Вызван ли компонент для просмотра одного конкретного раздела (деталки)
+     *
+     * @return bool
+     */
+    public function isSingleSection() {
+        return $this->getParam("BASE_SECTION") > 0 && $this->getParam("DEPTH") == 0;
     }
 
 }

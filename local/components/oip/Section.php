@@ -18,6 +18,14 @@ class Section
     private $sort;
     /** @var string $name */
     private $name;
+    /** @var string $description */
+    private $description;
+    /** @var string $sectionPageUrl */
+    private $sectionPageUrl;
+    /** @var string $picture */
+    private $picture;
+    /** @var string $detailPicture */
+    private $detailPicture;
     /** @var UFProperty[] $props */
     private $props;
     /** @var Section[] $subSections */
@@ -30,8 +38,13 @@ class Section
         $this->iblockSectionId = $data["IBLOCK_SECTION_ID"];
         $this->code = $data["CODE"];
         $this->name = $data["NAME"];
+        $this->description = $data["DESCRIPTION"];
         $this->sort = $data["SORT"];
         $this->active = $data["ACTIVE"];
+        $this->sectionPageUrl = $data["SECTION_PAGE_URL"];
+        // array_shift, т.к. в VALUE для "PICTURE" / "DETAIL_PICTURE" будет всего один элемент - файл (изображение)
+        $this->picture = array_shift($data["PICTURE"]["VALUE"]);
+        $this->detailPicture = array_shift($data["DETAIL_PICTURE"]["VALUE"]);
 
         // Заполняем пользовательские поля
         $props = [];
@@ -100,6 +113,14 @@ class Section
     }
 
     /**
+     * @return string
+     */
+    public function getSectionPageUrl()
+    {
+        return $this->sectionPageUrl;
+    }
+
+    /**
      * @return boolean
      */
     public function isActive()
@@ -142,5 +163,26 @@ class Section
      */
     public function getSubSections() {
         return $this->subSections;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPictureUrl() {
+        return isset($this->picture) ? "/upload/" . $this->picture["SUBDIR"] . "/" . $this->picture["FILE_NAME"] : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDetailPictureUrl() {
+        return isset($this->detailPicture) ? "/upload/" . $this->detailPicture["SUBDIR"] . "/" . $this->detailPicture["FILE_NAME"] : null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription() {
+        return $this->description;
     }
 }

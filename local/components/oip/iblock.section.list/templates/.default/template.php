@@ -4,114 +4,153 @@ use Oip\Custom\Component\Iblock\Section;
 
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 
+/** @var $this \CBitrixComponentTemplate */
+/** @var $component \COipIblockSectionList */
+$component = $this->getComponent();
+
 /** @var array $arResult */
 /** @var Section[] $sections */
 $sections = $arResult["SECTIONS"];
 ?>
 
 <?php
-/** @var Section[] $sections */
-function printSection($sections) {
-    echo "<ul>";
-    /** @var Section $section */
-    // Для каждого раздела выводим определенные поля, а также подразделы
-    foreach ($sections as $section) {
-        echo "<li style='background: " . rand_color() . "55;'>" . $section->getName() . " (ID: " . $section->getId() . ")<br>";
-
-        // Пример вывода файла (изображения)
-        $backgroundImage = $section->getPropValue("UF_BACKGROUND_IMAGE");
-        echo $backgroundImage != null ? "<img src='" . $backgroundImage . "' width='150'/><br>" : "";
-
-        // Пример вывода нескольких файлов (изображений)
-        $images = $section->getPropValue("UF_TEST_FILES");
-        if (is_array($images)) {
-            foreach ($images as $image) {
-               echo "<img src='" . $image . "' width='150'/> ";
-            }
-        }
-
-        // Пример вывода значения из поля типа "список"
-        $listValue = $section->getPropValue("UF_TEST_LIST");
-        if (isset($listValue)) echo "<br><b>Пример вывода значения из поля типа \"список\"</b>: <br>" .  $listValue . "<br>";
-
-        // Пример вывода нескольких значений из поля типа "список"
-        $listValues = $section->getPropValue("UF_TEST_LISTS");
-        if (isset($listValues)) {
-            echo "<br><b>Пример вывода нескольких значений из поля типа \"список\"</b>: <br>";
-            foreach ($listValues as $listValue) {
-                echo $listValue . "<br>";
-            }
-            echo "<br>";
-        }
-
-        // Пример вывода значения "Привязка к элементу инфоблока"
-        $iblockElement = $section->getPropValue("UF_TEST_INFOBLOCK_EL");
-        if (isset($iblockElement)) {
-            echo "<b>Пример вывода значения \"Привязка к элементу инфоблока\":</b><br>";
-            echo "ID Элемента = " . $iblockElement . "<br>";
-        }
-
-        // Пример вывода значений "Привязка к элементу инфоблока"
-        $iblockElements = $section->getPropValue("UF_TEST_ELEMENTS");
-        if (isset($iblockElements)) {
-            echo "<b>Пример вывода нескольких значений \"Привязка к элементу инфоблока\":</b><br>";
-            foreach ($iblockElements as $key => $element) {
-                echo "ID Элемента = " . $key . "<br>";
-            }
-        }
-
-        // Пример вывода текстового значения
-        $stringValue = $section->getPropValue("UF_BROWSER_TITLE");
-        if (isset($stringValue)) {
-            echo "<b>Заголовок браузера:</b> " . $stringValue . "<br>";
-        }
-
-        // Пример вывода множественного текстовго значения
-        $stringValues = $section->getPropValue("UF_TEST_STRINGS");
-        if (isset($stringValues)) {
-            echo "<b>Пример вывода множественного текстовго значения:</b><br>";
-            foreach ($stringValues as $stringValue) {
-                echo $stringValue . "<br>";
-            }
-        }
-
-        // Пример вывода числового значения
-        $numberValue = $section->getPropValue("UF_TEST_NUMBER");
-        if (isset($numberValue)) {
-            echo "<b>Тестовое число:</b> " . $numberValue . "<br>";
-        }
-
-        // Пример вывода множественного числового значения
-        $numberValues = $section->getPropValue("UF_TEST_NUMBERS");
-        if (isset($numberValues)) {
-            echo "<b>Пример вывода множественного числового значения:</b><br>";
-            foreach ($numberValues as $numberValue) {
-                echo $numberValue . "<br>";
-            }
-        }
-
-        // Запросим подразделы
-        $subSections = $section->getSubSections();
-
-        // Если есть подразделы - выводим их
-        if (isset($subSections)) {
-            printSection($subSections);
-        }
-        echo "</li>";
-    }
-    echo "</ul>";
-}
-
 /**
- * Генерация рандомного цвета в HEX формате
+ * Рекурсивная функция вывода раздела и его подразделов
  *
- * @return string
+ * @param $component \COipIblockSectionList Компонент (чтобы читать параметры)
+ * @param Section[] $sections Массив разделов, который выводим
+ * @param boolean $isSubSection Является ли выводимый раздел дочерним (По факту - рекурсивный ли это вызов функции или самый первый)
  */
-function rand_color() {
-    return '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
-}
+function printSection($component, $sections, $isSubSection)
+{ ?>
 
-printSection($sections);
+    <?
+    // Для каждого раздела выводим определенные поля, а также подразделы (рекурсивно)
+    /** @var Section $section */
+    foreach ($sections as $section) {
 
-?>
+        $subSections = $section->getSubSections(); ?>
+
+        <!-- Обычные ссылки -->
+        <li<?if(isset($subSections) && !$isSubSection):?> class="uk-parent"<?endif;?>>
+            <a href="<?= $section->getSectionPageUrl()?>">
+
+                <?if($component->getParam("SHOW_PREVIEW") && ($pictureUrl = $section->getPictureUrl())):?>
+
+                    <div class="uk-grid-small uk-flex-middle" uk-grid>
+                        <div class="uk-width-auto">
+                            <div class="preview preview-small
+                                <?=$component->getParam("PREVIEW_PICTURE_HEIGHT_CLASS")?>
+                                <?=$component->getParam("PREVIEW_PICTURE_WIDTH_CLASS")?>">
+                                <div class="preview-img" data-src="<?=$pictureUrl?>" uk-img>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="uk-width-expand">
+                            <div class="uk-h6 uk-margin-remove"><?= $section->getName() ?> (ID: <?=$section->getId()?>)</div>
+                        </div>
+                    </div>
+
+                <?else:?>
+
+                    <?= $section->getName() ?>
+
+                <?endif;?>
+            </a>
+
+            <!-- Подразделы -->
+            <?if (isset($subSections)):?>
+
+                <ul class="uk-nav-sub">
+                    <?printSection($component, $subSections, true);?>
+                </ul>
+
+            <?endif;?>
+
+        </li>
+
+    <? } ?>
+
+<?}?>
+
+
+<? if ($component->isSingleSection()):
+    $section = $arResult["SECTIONS"][0];
+    /** @var Section $section */ ?>
+
+    <div class="<?=$component->getParam("TITLE_CLASS")?>"><?=$section->getName()?></div>
+    <p>Картинка раздела: <?=$section->getPictureUrl() ?></p>
+    <p>Детальная картинка раздела: <?=$section->getDetailPictureUrl() ?></p>
+    <p>Описание: <?=$section->getDescription() ?></p>
+
+    <p>TITLE: <?=$section->getPropValue("UF_BROWSER_TITLE") ?></p>
+    <p>DESCRIPTION: <?=$section->getPropValue("UF_META_DESCRIPTION") ?></p>
+    <p>KEYWORDS: <?=$section->getPropValue("UF_KEYWORDS") ?></p>
+
+    <p>Товар или услуга: <?=$section->getPropValue("UF_TEST_LIST") ?></p>
+    <p>Иконка категории: <?=$section->getPropValue("UF_CATEGORY_ICON") ?></p>
+    <p>Видео: <?=$section->getPropValue("UF_VIDEO") ?></p>
+
+    <?if ($files = $section->getPropValue("UF_DOCUMENTS")):
+        foreach ($files as $file):?>
+            <p>Документ: <?=$file ?></p>
+        <?endforeach;
+    endif?>
+
+
+    <?if ($files = $section->getPropValue("UF_GALLERY")):
+        foreach ($files as $file):?>
+            <p>Файл галереи: <?=$file ?></p>
+        <?endforeach;
+    endif?>
+
+    <?if ($specialOfferElements = $section->getPropValue("UF_TEST_ELEMENTS")):?>
+        <p>Спецпредложения:</p>
+    <?$APPLICATION->IncludeComponent("oip:iblock.element.list","",[
+        "IBLOCK_ID" => 1,
+        "COUNT" => 10,
+        "SHOW_ALL" => "Y",
+        "IS_CACHE" => "N",
+        "CACHE_TIME" => 60,
+        "FILTER" => array("ID" => array_keys($specialOfferElements))
+    ]);
+    endif;?>
+
+<? else: ?>
+
+    <div class="<?=$component->getParam("TITLE_CLASS")?>"><?=$component->getParam("TITLE_TEXT")?></div>
+
+    <?if($component->getParam("VIEW_TYPE") == "SLIDER"):?>
+
+        <div uk-slider>
+        <div class="uk-slider-container">
+
+    <?endif;?>
+
+    <!-- Общее для слайдеров и списков. В данном примере аккордеон -->
+    <ul class="<?= $component->getParam("LIST_TYPE") ?>
+           <?= $component->getParam("LIST_CLASS") ?>
+           <?= $component->getParam("LIST_ADDITIONAL_CLASS") ?>
+           <? if ($component->getParam("VIEW_TYPE") == "SLIDER"): ?> uk-slider-items uk-flex uk-flex-nowrap preview-nav <? endif; ?>"
+        <?= $component->getParam("LIST_ATTRIBUTE") ?>
+    >
+
+        <?printSection($component, $arResult["SECTIONS"], false);?>
+
+    </ul>
+
+    <?if($component->getParam("VIEW_TYPE") == "SLIDER"):?>
+
+                <div class="uk-visible@s">
+                    <a class="uk-position-center-left-out" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
+                    <a class="uk-position-center-right-out" href="#" uk-slidenav-next uk-slider-item="next"></a>
+                </div>
+            </div>
+        </div>
+
+    <?endif;?>
+
+
+<? endif; ?>
+
 
