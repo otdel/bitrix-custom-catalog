@@ -197,6 +197,8 @@ class COipIblockSectionList extends \CBitrixComponent
         $this->setDefaultParam($arParams["LIST_ADDITIONAL_CLASS"], "");
         // Атрибут списка, строка. По умолчанию ""
         $this->setDefaultParam($arParams["LIST_ATTRIBUTE"], "");
+        // Класс(ы) для превью картинки. По умолчанию ""
+        $this->setDefaultParam($arParams["PREVIEW_PICTURE_CLASS"], "");
 
         // Список/слайдер. По умолчанию список
         $viewTypes = ["LIST", "SLIDER"];
