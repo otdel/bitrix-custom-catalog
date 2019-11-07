@@ -6,11 +6,13 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 /** @var $component \COipIblockElementList */
 /** @var \Oip\Custom\Component\Iblock\Element $element */
 /** @var \Oip\Custom\Component\Iblock\Element[] $elements */
+/** @var string $sectionName */
 
 $component = $this->getComponent();
 $exception = $arResult["EXCEPTION"];
 $errors = $arResult["ERRORS"];
 $elements = $arResult["ELEMENTS"];
+$sectionName = $arResult["SECTION_NAME"];
 ?>
 
 <?if($exception):?>
@@ -105,63 +107,7 @@ $elements = $arResult["ELEMENTS"];
                         <?if($component->isContainerSlider() && !$component->isParam("SLIDER_CONTENT_ON_PICTURE")
                             || !$component->isContainerSlider()):?>
 
-                            <!-- card-body start-->
-                            <div class="uk-card-body">
-
-                                <div class="
-                                    uk-margin-remove
-                                    uk-<?=$component->getParam("ELEMENT_VIEW_TITLE_CSS")?>
-                                    uk-text-<?=$component->getParam("ELEMENT_VIEW_TITLE_ALIGN")?>
-                                ">
-                                    <?=$element->getName()?>
-                                </div>
-
-                                <?if($component->isParam("ELEMENT_VIEW_SHOW_CATEGORY_NAME")
-                                    || $component->isParam("ELEMENT_VIEW_SHOW_BRAND")):?>
-
-                                    <ul class="uk-subnav uk-subnav-divider uk-margin-small-top uk-text-small uk-flex-center">
-                                        <?if($component->isParam("ELEMENT_VIEW_SHOW_CATEGORY_NAME")):?>
-                                            <li>
-                                                холодильники
-                                            </li>
-                                        <?endif?>
-
-                                        <?if($component->isParam("ELEMENT_VIEW_SHOW_BRAND")):?>
-                                            <li>
-                                                Саратов
-                                            </li>
-                                        <?endif?>
-                                    </ul>
-                                <?endif?>
-
-                                <?if($component->isParam("ELEMENT_VIEW_SHOW_READ_MORE_BUTTON")):?>
-                                    <p class="uk-margin-medium-top uk-text-center">
-                                        <button class="uk-button uk-button-default">
-                                            <?=$component->getParam("ELEMENT_VIEW_READ_MORE_BUTTON_TEXT")?>
-                                        </button>
-                                    </p>
-                                <?endif?>
-
-                                <div class="uk-card uk-card-footer uk-text-meta">
-                                    <div class="uk-grid-small uk-flex-middle" uk-grid>
-
-                                        <!-- Только если показывать теги-->
-                                        <div class="uk-width-expand">
-                                            <div class="uk-panel">
-                                                <span class="uk-margin-small-right" uk-icon="tag"></span>Розовый холодильник, красивый холодильник
-                                            </div>
-                                        </div>
-
-                                        <!-- Только если показывать кол-во отзывов-->
-                                        <div class="uk-width-auto">
-                                            <span class="uk-margin-small-right" uk-icon="comment"></span>5
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                            </div>
-                            <!-- Card-body end -->
+                            <?include(__DIR__."/include/body.php")?>
 
                         <?endif?>
 
