@@ -1,12 +1,15 @@
 <?php
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
+/** @var $this \CBitrixComponentTemplate */
+/** @var $component \COipIblockElementOne */
 /** @var array $arResult */
 /** @var \Oip\Custom\Component\Iblock\Element $element */
 
 $exception = $arResult["EXCEPTION"];
 $errors = $arResult["ERRORS"];
 $element = $arResult["ELEMENT"];
+$component = $this->getComponent();
 ?>
 
 <div class="uk-section uk-section-default">

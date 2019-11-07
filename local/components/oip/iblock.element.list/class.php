@@ -298,7 +298,9 @@ class COipIblockElementList extends \COipIblockElement
                 [
                     "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
                     "BASE_SECTION" => $this->getParam("SECTION_ID"),
-                    "DEPTH" => 0
+                    "DEPTH" => 0,
+                    "IS_CACHE" => $this->getParam("IS_CACHE"),
+                    "CACHE_TIME" => $this->getParam("CACHE_TIME"),
                 ]
             );
 
@@ -324,7 +326,9 @@ class COipIblockElementList extends \COipIblockElement
                     [
                         "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
                         "BASE_SECTION" => (int)$idValue,
-                        "DEPTH" => 0
+                        "DEPTH" => 0,
+                        "IS_CACHE" => $this->getParam("IS_CACHE"),
+                        "CACHE_TIME" => $this->getParam("CACHE_TIME"),
                     ]
                 );
             }

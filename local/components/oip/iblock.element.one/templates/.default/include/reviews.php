@@ -9,5 +9,6 @@
     "SORT_1" => "active_from",
     "BY_1" => "DESC",
     "SHOW_ALL" => "Y",
-    "IS_CACHE" => "N"
+    "IS_CACHE" => $component->getParam("IS_CACHE"),
+    "CACHE_TIME" => $component->getParam("CACHE_TIME")
 ])?>

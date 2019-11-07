@@ -1,10 +1,9 @@
 <?php
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
-/** @var array $arResult */
-/** @var array $arParams */
 /** @var $this \CBitrixComponentTemplate */
 /** @var $component \COipIblockElementPage */
+$component = $this->getComponent();
 ?>
 
 <div class="uk-section uk-section-<?=$component->getParam("LIST_VIEW_WRAP_COLOR")?>

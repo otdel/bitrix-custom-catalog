@@ -1,9 +1,6 @@
 <?php
-/** @var array $arResult */
-/** @var array $arParams */
-/** @var $this \CBitrixComponentTemplate */
-/** @var $component \COipIblockElementOne */
 /** @var \Oip\Custom\Component\Iblock\Element $element */
+
 $advs = $element->getPropValue("ADVANTAGES");
 ?>
 
