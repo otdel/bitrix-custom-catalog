@@ -7,8 +7,8 @@ use Oip\Custom\Component\Iblock\Section;
 <p>Детальная картинка раздела: <?=$section->getDetailPictureUrl() ?></p>
 <p>Описание: <?=$section->getDescription() ?></p>
 
-<p>TITLE: <?=$section->getPropValue("UF_BROWSER_TITLE") ?></p>
-<p>DESCRIPTION: <?=$section->getPropValue("UF_META_DESCRIPTION") ?></p>
+<p>TITLE: <?=$section->getPropValue("UF_TITLE") ?></p>
+<p>DESCRIPTION: <?=$section->getPropValue("UF_DESCRIPTION") ?></p>
 <p>KEYWORDS: <?=$section->getPropValue("UF_KEYWORDS") ?></p>
 
 <p>Товар или услуга: <?=$section->getPropValue("UF_CATEGORY_TYPE") ?></p>
