@@ -150,7 +150,9 @@ class COipIblockElementList extends \COipIblockElement
         }
 
         $this->rawData = $arResult["ITEMS"];
-        $this->pagination = $arResult["PAGINATION"];
+        if(!$this->isParam("SHOW_ALL")) {
+            $this->pagination = $arResult["PAGINATION"];
+        }
 
         return $this;
     }
