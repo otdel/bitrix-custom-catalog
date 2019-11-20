@@ -3,6 +3,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 /** @var $this \CBitrixComponentTemplate */
 /** @var $component \COipIblockElementPage */
+/** @var $returnedData \Oip\Custom\Component\Iblock\ReturnedData */
 $component = $this->getComponent();
 ?>
 
@@ -27,10 +28,12 @@ $component = $this->getComponent();
 
                 <?include_once (__DIR__."/include/top.php")?>
 
-                <?$pagination = $APPLICATION->IncludeComponent("oip:iblock.element.list","",
+                <?$returnedData = $APPLICATION->IncludeComponent("oip:iblock.element.list","",
                     $component->getParams(), $component);?>
 
-                <?if($pagination["PAGES"] > 1):?>
+                <?$pagination = $returnedData->getPagination()?>
+
+                <?if(!empty($pagination) && $pagination["PAGES"] > 1):?>
                     <?$APPLICATION->IncludeComponent("oip:page.navigation","",[
                         "NAV_ID" => $pagination["NAV_ID"],
                         "PAGES" => $pagination["PAGES"],
