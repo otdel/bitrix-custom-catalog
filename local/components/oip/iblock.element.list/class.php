@@ -136,19 +136,18 @@ class COipIblockElementList extends \COipIblockElement
             $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
         }
 
-        $fetchFunction = function () use($order, $filter, $group, $navStartParams, $select) {
-           return \CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select);
+        $fetchFunction = function () use($order, $filter, $group, $navStartParams, $select, $propIDs) {
+           $dbResult =  \CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select);
+            return $this->getRows($dbResult, $propIDs);
         };
 
         if($this->isCache()) {
             $cacheId = $this->getCacheId().$pageNumber;
-            $dbResult = $this->cacheService($fetchFunction, $cacheId);
+            $arResult = $this->cacheService($fetchFunction, $cacheId);
         }
         else {
-            $dbResult = $fetchFunction();
+            $arResult = $fetchFunction();
         }
-
-        $arResult = $this->getRows($dbResult, $propIDs);
 
         $this->rawData = $arResult["ITEMS"];
         $this->pagination = $arResult["PAGINATION"];
