@@ -24,6 +24,9 @@ class COipIblockElementPage extends \COipIblockElement {
         $this->setDefaultBooleanParam( $arParams["SHOW_PAGER"],true);
         $this->setDefaultParam( $arParams["PAGER_TYPE"],"LOAD_MORE");
 
+        $this->setDefaultParam($arParams["BRANDS_IBLOCK_ID"], 0);
+        $this->setDefaultParam($arParams["TAGS_IBLOCK_ID"], 0);
+
         /*---------------------------------------------------------------------------------*/
 
         return $arParams;
