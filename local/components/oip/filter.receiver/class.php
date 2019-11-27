@@ -18,8 +18,8 @@ class COipFilterReceiver extends \COipComponent
     {
         $arParams =  parent::initParams($arParams);
 
-        if(!is_set($arParams["COMPONENT_ID"])) {
-            throw new ArgumentNullException("COMPONENT_ID");
+        if(!is_set($arParams["FILTER_ID"])) {
+            throw new ArgumentNullException("FILTER_ID");
         }
 
         $this->setDefaultParam($arParams["SOURCE"],"get");
@@ -80,9 +80,9 @@ class COipFilterReceiver extends \COipComponent
      * @return array
      */
     private function getByCondition($allParams) {
-        $componentId = $this->componentId;
+        $componentId = $this->getParam("FILTER_ID");
         return array_filter($allParams, function($key) use($componentId) {
-            return ("c".$componentId."_" === substr($key,0,3));
+            return ("f".$componentId."_" === substr($key,0,3));
         },ARRAY_FILTER_USE_KEY);
     }
 
