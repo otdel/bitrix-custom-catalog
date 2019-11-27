@@ -55,6 +55,13 @@ abstract class COipComponent extends \CBitrixComponent
     }
 
     /**
+     * @return int
+    */
+    public function getComponentId() {
+        return $this->componentId;
+    }
+
+    /**
      * @param mixed $param
      * @param boolean $defaultValue
      */
