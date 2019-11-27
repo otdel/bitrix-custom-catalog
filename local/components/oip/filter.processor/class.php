@@ -92,6 +92,11 @@ class COipFilterProcessor extends \COipComponent
      */
     private function makeFinalFilter($incomingParams) {
         switch($this->getParam("MODE")) {
+
+            case "TEMPLATE":
+                return $this->makeTemplateFilter($incomingParams);
+            break;
+
             default:
                 return $this->makeIblockFilter($incomingParams);
             break;
@@ -106,24 +111,34 @@ class COipFilterProcessor extends \COipComponent
         $finalIblockFilter = [];
 
         foreach ($incomingParams as $paramKey => $paramValue) {
-            $paramName = $this->getFinalFilterParamName($paramKey);
+            $paramName = $this->getIblockFilterParamName($paramKey);
             $paramType = $this->getFinalFilterParamType($paramKey);
 
             if($paramType == self::PARAM_TYPE_PROP) {
                 $paramName = "PROPERTY_".$paramName;
             }
 
-            $finalIblockFilter[$paramName] = $this->getFinalFilterParamValue($paramValue);
+            $finalIblockFilter[$paramName] = $this->getIblockFilterParamValue($paramValue);
         }
 
         return $finalIblockFilter;
+    }
+
+    private function makeTemplateFilter($incomingParams) {
+        $activeTemplateParams = [];
+
+        foreach ($incomingParams as $paramKey => $paramValue) {
+            $activeTemplateParams[$paramKey] = explode(",",$paramValue);
+        }
+
+        return $activeTemplateParams;
     }
 
     /**
      * @param array $incomingParam
      * @return string
      */
-    private function getFinalFilterParamName($incomingParam) {
+    private function getIblockFilterParamName($incomingParam) {
         return substr(explode("_",$incomingParam)[1],1);
     }
 
@@ -139,7 +154,7 @@ class COipFilterProcessor extends \COipComponent
      * @param array $incomingParamValue
      * @return array
      */
-    private function getFinalFilterParamValue($incomingParamValue) {
+    private function getIblockFilterParamValue($incomingParamValue) {
         return explode(",", $incomingParamValue);
     }
 }
