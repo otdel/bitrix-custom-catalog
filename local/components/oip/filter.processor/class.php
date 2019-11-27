@@ -6,7 +6,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\SystemException;
 
-class COipFilterReceiver extends \COipComponent
+class COipFilterProcessor extends \COipComponent
 {
 
     const PARAM_TYPE_FIELD = "f";
