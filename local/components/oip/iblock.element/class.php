@@ -75,10 +75,10 @@ abstract class COipIblockElement extends \COipComponent
 
         $this->setDefaultBooleanParam($arParams["SLIDER_SHOW_ARROWS"],true);
         $this->setDefaultBooleanParam($arParams["SLIDER_SHOW_BULLETS"]);
-        $this->setDefaultParam($arParams["SLIDER_AUTOPLAY"],"true");
+        $this->setDefaultParam($arParams["SLIDER_AUTOPLAY"],"");
         $this->setDefaultParam($arParams["SLIDER_AUTOPLAY_INTERVAL"],6000);
-        $this->setDefaultParam($arParams["SLIDER_CENTERED"],"false");
-        $this->setDefaultParam($arParams["SLIDER_MOVE_SETS"],"false");
+        $this->setDefaultParam($arParams["SLIDER_CENTERED"],"");
+        $this->setDefaultParam($arParams["SLIDER_MOVE_SETS"],"");
         $this->setDefaultBooleanParam($arParams["SLIDER_CONTENT_ON_PICTURE"]);
 
         $this->setDefaultParam($arParams["ELEMENT_VIEW_PICTURE_TYPE"],
