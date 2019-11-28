@@ -1,41 +1,21 @@
 <?php
+/** @var $component \COipIblockElementList */
+/** @var \Oip\Custom\Component\Iblock\Element $element */
+/** @var int $filterId */
+/** @var array $arFilterTemplate */
 ?>
 
-<div class="uk-inline uk-active"> <!-- .uk-active, если что-то выбрано-->
-    <button class="uk-button uk-button-default uk-button-small uk-text-lowercase" type="button">
-        <i class="uk-margin-small-right" uk-icon="bookmark"></i>
-        15 брендов
-        <!-- Без фильтра: выберите бренд,
-            выбран один бренд: название,
-            более одного: выбрано X брендов.
-            Дополнительно тут нужны правила склонения, это проще устно -->
-    </button>
+<?if($component->getParam("BRANDS_IBLOCK_ID")):?>
+    <?$APPLICATION->IncludeComponent(
+        "oip:iblock.element.list","brands-in-filter",
+        [
+            "IBLOCK_ID" => $component->getParam("BRANDS_IBLOCK_ID"),
+            "SHOW_ALL" => "Y",
+            "IS_CACHE" => $component->getParam("IS_CACHE"),
+            "CACHE_TIME" => $component->getParam("CACHE_TIME"),
+            "FILTER_ID" => $filterId,
+            "FILTER_PARAMS" => $arFilterTemplate
+        ]
+    )?>
+<?endif?>
 
-    <div uk-dropdown="mode: click">
-        <form>
-            <ul class="uk-nav uk-dropdown-nav">
-                <li class="uk-active">
-                    <a href="#">
-                        <label><input class="uk-checkbox" type="checkbox" checked>&nbsp;Aктивный бренд</label>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <label><input class="uk-checkbox" type="checkbox">&nbsp;Бренд 1</label>
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        <label><input class="uk-checkbox" type="checkbox">&nbsp;Бренд 2</label>
-                    </a>
-                </li>
-                <li class="uk-nav-divider"></li>
-                <li class="uk-text-center">
-                    <a class="uk-button uk-button-link uk-button-small" href="#">Выбрать все</a>
-                </li>
-
-            </ul>
-        </form>
-    </div>
-    <i class="uk-icon-button uk-margin-small-left" uk-icon="close"></i> <!-- Только если выбраны бренды-->
-</div>
