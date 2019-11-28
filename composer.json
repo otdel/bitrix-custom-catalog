@@ -12,6 +12,9 @@
         "wikimedia/composer-merge-plugin": "dev-master",
         "arrilot/bitrix-migrations": "dev-master"
     },
+    "autoload": {
+        "psr-4": {"Oip\\": "local/classes/Oip/"}
+    },
     "extra": {
         "merge-plugin": {
             "require": [
