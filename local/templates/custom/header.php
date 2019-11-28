@@ -19,6 +19,8 @@ use Bitrix\Main\Page\Asset;
 
     Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . "/js/uikit.min.js");
     Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . "/js/uikit-icons.min.js");
+
+    Asset::getInstance()->addJs("/local/js/oip-lib.js");
     ?>
 
     <title><?$APPLICATION->ShowTitle()?></title>
