@@ -29,21 +29,32 @@ $sectionName = $arResult["SECTION_NAME"];
 
         <?if($component->isContainerSlider()):?>
 
-            <div uk-slider="
-                autoplay: <?=$component->getParam("SLIDER_AUTOPLAY")?>;
-                autoplay-interval: <?=$component->getParam("SLIDER_AUTOPLAY_INTERVAL")?>;
-                center: <?=$component->getParam("SLIDER_CENTERED")?>;
-                sets: <?=$component->getParam("SLIDER_MOVE_SETS")?>;
-            ">
+            <?if($component->getParam("SLIDER_AUTOPLAY") || $component->getParam("SLIDER_CENTERED") || $component->getParam("SLIDER_MOVE_SETS")):?>
 
-                <div class="uk-position-relative">
+                <div class="uk-position-relative"  tabindex="-1" uk-slider="
 
-                    <div class="uk-slider-container shadow-fix">
+                    <?if($component->getParam("SLIDER_AUTOPLAY")):?>
+                        autoplay: <?=$component->getParam("SLIDER_AUTOPLAY")?>;
+                        autoplay-interval: <?=$component->getParam("SLIDER_AUTOPLAY_INTERVAL")?>;
+                    <?endif?>
+
+                    <?if($component->getParam("SLIDER_CENTERED")):?>
+                        center: <?=$component->getParam("SLIDER_CENTERED")?>;
+                    <?endif?>
+
+                    <?if($component->getParam("SLIDER_MOVE_SETS")):?>
+                        sets: <?=$component->getParam("SLIDER_MOVE_SETS")?>;
+                    <?endif?>
+                ">
+            <?else:?>
+                <div class="uk-position-relative" tabindex="-1" uk-slider>
+            <?endif?>
+            <div class="uk-slider-container shadow-fix">
 
         <?endif?>
 
 
-            <ul
+        <ul
                 class="
            <?=$component->getParam("LIST_VIEW_CONTAINER_ELEMENT_WIDTH_CSS")?>
 
@@ -59,19 +70,20 @@ $sectionName = $arResult["SECTION_NAME"];
         <?endif?>
 
         "
-        <?if(!$component->isContainerSlider()):?>
-            uk-grid="
+            <?if(!$component->isContainerSlider()):?>
+                uk-grid="
                 masonry: <?=$component->getParam("TILE_DYNAMIC")?>;
                 parallax: <?=$component->getParam("TILE_PARALLAX")?>"
-        <?endif?>
+            <?endif?>
         >
 
-        <?foreach($elements as $element):?>
+            <?foreach($elements as $element):?>
 
-            <li>
-                <a class="uk-link-reset uk-display-block uk-position-relative" href="<?=$element->getDetailUrl()?>">
+                <li>
+                    <a class="uk-link-reset uk-display-block uk-position-relative" href="<?=$element->getDetailUrl()?>">
 
-                    <div class="
+                        <div class="
+                    uk-height-1-1
                     uk-card
                     uk-card-<?=$component->getParam("ELEMENT_VIEW_BLOCK_SIZE")?>
                     uk-card-<?=$component->getParam("ELEMENT_VIEW_BLOCK_COLOR")?>
@@ -80,16 +92,12 @@ $sectionName = $arResult["SECTION_NAME"];
             ">
 
 
-                        <div class="
+                            <div class="
                             uk-position-relative uk-overflow-hidden uk-animation-toggle uk-visible-toggle
                             uk-card-media-<?=$component->getParam("ELEMENT_VIEW_PICTURE_POSITION")?>
                             uk-height-<?=$component->getParam("ELEMENT_VIEW_PICTURE_HEIGHT")?>
                                 "
-
-                             <?if(!$element->getPropValue("VIDEO")):?>
-                                 uk-slider="autoplay:true; autoplay-interval:3500"
-                             <?endif?>
-                                >
+                            >
 
                                 <?if($element->getPropValue("VIDEO")):?>
                                     <?$link_convertion = $component->getConvertedVideo($element->getPropValue("VIDEO"))?>
@@ -102,27 +110,28 @@ $sectionName = $arResult["SECTION_NAME"];
 
                                 <?endif?>
 
+                            </div>
+
+                            <?if($component->isContainerSlider() && !$component->isParam("SLIDER_CONTENT_ON_PICTURE")
+                                || !$component->isContainerSlider()):?>
+
+                                <?include(__DIR__."/include/body.php")?>
+
+                            <?endif?>
+
                         </div>
 
-                        <?if($component->isContainerSlider() && !$component->isParam("SLIDER_CONTENT_ON_PICTURE")
-                            || !$component->isContainerSlider()):?>
+                    </a>
+                </li>
 
-                            <?include(__DIR__."/include/body.php")?>
-
-                        <?endif?>
-
-                    </div>
-
-                </a>
-            </li>
-        
-        <?endforeach?>
+            <?endforeach?>
 
         </ul>
 
-            <?if($component->isContainerSlider()):?>
+        <?if($component->isContainerSlider()):?>
+            </div>
 
-                <?if($component->isParam("SLIDER_SHOW_ARROWS")):?>
+            <?if($component->isParam("SLIDER_SHOW_ARROWS")):?>
 
                 <div class="uk-hidden@s uk-light">
                     <a class="uk-position-center-left uk-position-small" href="#" uk-slidenav-previous uk-slider-item="previous"></a>
@@ -136,15 +145,10 @@ $sectionName = $arResult["SECTION_NAME"];
 
             <?endif?>
 
-                <?if($component->isParam("SLIDER_SHOW_BULLETS")):?>
-                    <ul class="uk-slider-nav uk-dotnav uk-flex-center uk-margin"></ul>
-                <?endif?>
-
-                    </div>
-                </div>
+            <?if($component->isParam("SLIDER_SHOW_BULLETS")):?>
+                <ul class="uk-slider-nav uk-dotnav uk-flex-center uk-margin"></ul>
+            <?endif?>
             </div>
-
-
         <?endif?>
 
     <?endif?>
