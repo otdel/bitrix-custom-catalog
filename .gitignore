@@ -1,7 +1,4 @@
-.idea
-bitrix
-upload
-.htaccess
-*.config
-/**/**/*.log**
-/vendor/
+/vendor
+composer.phar
+composer.lock
+/.idea
