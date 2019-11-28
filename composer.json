@@ -9,17 +9,6 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "wikimedia/composer-merge-plugin": "dev-master",
         "arrilot/bitrix-migrations": "dev-master"
-    },
-    "extra": {
-        "merge-plugin": {
-            "require": [
-                "bitrix/composer-bx.json"
-            ]
-        }
-    },
-    "config": {
-        "vendor-dir": "vendor"
     }
 }
