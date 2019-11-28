@@ -97,3 +97,59 @@ option.select-header {
 .shadow-fix{
     padding:20px 0;
 }
+.uk-child-width-2-3 > * {
+    width:66.6%;
+}
+.uk-child-width-3-4 > * {
+    width:75%;
+}
+ul.uk-slider-items.uk-grid-medium {
+    margin-left: -30px;
+}
+ul.uk-slider-items.uk-grid-small{
+    margin-left: -15px;
+}
+@media (min-width: 1200px) {
+    ul.uk-slider-items.uk-grid-large{
+        margin-left: -70px;
+    }
+}
+@media (min-width: 1200px){
+    .uk-child-width-1-10\@xl>* {
+        width: 10%;
+    }
+}
+.uk-height-xlarge {
+    height: 550px;
+}
+font.tablebodytext {
+    display: none !important;
+}
+.uk-card-default .uk-h1,
+.uk-card-default .uk-h2,
+.uk-card-default .uk-h3,
+.uk-card-default .uk-h4,
+.uk-card-default .uk-h5,
+.uk-card-default .uk-h6,
+.uk-card-default .uk-heading-2xlarge,
+.uk-card-default .uk-heading-large,
+.uk-card-default .uk-heading-medium,
+.uk-card-default .uk-heading-small,
+.uk-card-default .uk-heading-xlarge,
+.uk-card-default h1,
+.uk-card-default h2,
+.uk-card-default h3,
+.uk-card-default h4,
+.uk-card-default h5,
+.uk-card-default h6 {
+    color:#333 !important;
+}
+.uk-card-xsmall .uk-card-body, .uk-card-xsmall.uk-card-body {
+    padding: 10px 10px;
+}
+.uk-slidenav {
+    z-index: 999;
+}
+.uk-accordion-content .shadow-fix {
+    padding: 0;
+}
