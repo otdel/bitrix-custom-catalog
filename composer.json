@@ -1,14 +1,25 @@
 {
     "name": "oip/custom",
-    "type": "project",
+    "description": "Standart product catalog for Bitrix CMS from ООО \"Отдел Интернет-проектов\"",
+    "version": "0.2.0-dev",
+    "type": "library",
+    "keywords": ["bitrix", "catalog"],
     "authors": [
         {
             "name": "Ilya Fertikov",
-            "email": "rodeljob@gmail.com"
+            "email": "rodeljob@gmail.com",
+            "role": "developer"
+        },
+        {
+            "name": "Irina Lomakina",
+            "email": "nametoenter@gmail.com",
+            "role": "developer"
         }
     ],
+    "homepage": "https://github.com/otdel/bitrix-custom-catalog",
     "minimum-stability": "dev",
     "require": {
         "arrilot/bitrix-migrations": "dev-master"
-    }
+    },
+    "license": "MIT"
 }
