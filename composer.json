@@ -19,7 +19,7 @@
     "homepage": "https://github.com/otdel/bitrix-custom-catalog",
     "minimum-stability": "dev",
     "require": {
-        "arrilot/bitrix-migrations": "dev-master"
+        "arrilot/bitrix-migrations": "^2.3"
     },
     "license": "MIT"
 }
