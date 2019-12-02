@@ -1,4 +1,9 @@
-/vendor
-composer.phar
-composer.lock
-/.idea
+*
+
+!/composer.json
+!README.md
+
+!/migrations/
+!/local/components/oip/
+!/local/js/oip-lib.js
+!/local/templates/custom/
