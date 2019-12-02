@@ -76,7 +76,7 @@ class COipIblockSectionList extends \CBitrixComponent
         if ($this->isSingleSection()) {
             /** @var Section $section */
             $section = array_shift($this->arResult["SECTIONS"]);
-            return array(
+            return ($section) ? array(
                 "SECTION_NAME" => $section->getName(),
                 "UF_ELEMENTS_NUMBER" => $section->getPropValue("UF_ELEMENTS_NUMBER"),
                 "UF_COLUMNS_COUNT" => $section->getPropValue("UF_COLUMNS_COUNT"),
@@ -86,7 +86,7 @@ class COipIblockSectionList extends \CBitrixComponent
                 "UF_SIDEBAR_ELEMENT" => $section->getPropValue("UF_SIDEBAR_ELEMENT"),
                 "UF_SAME_ELEMENT" => $section->getPropValue("UF_SAME_ELEMENT"),
                 "UF_POPULAR_WITH_THIS" => $section->getPropValue("UF_POPULAR_WITH_THIS")
-            );
+            ) : [];
         }
 
     }
