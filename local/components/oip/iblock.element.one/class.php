@@ -30,13 +30,14 @@ class COipIblockElementOne extends COipIblockElementList {
     protected function initParams($arParams)
     {
         $arParams = parent::initParams($arParams);
+        $this->setDefaultParam($arParams["ELEMENT_CODE"],"");
 
         try {
-            if(!is_set($arParams["ELEMENT_ID"])) {
+            if(!$arParams["ELEMENT_CODE"] && !is_set($arParams["ELEMENT_ID"])) {
                 throw new \Bitrix\Main\ArgumentNullException("ELEMENT_ID");
             }
 
-            if(!intval($arParams["ELEMENT_ID"])) {
+            if(!$arParams["ELEMENT_CODE"] && !intval($arParams["ELEMENT_ID"])) {
                 throw new \Bitrix\Main\ArgumentTypeException("ELEMENT_ID");
             }
         }
@@ -53,7 +54,12 @@ class COipIblockElementOne extends COipIblockElementList {
     protected function consistFilter() {
         $filter = parent::consistFilter();
 
-        $filter["ID"] = $this->arParams["ELEMENT_ID"];
+        if($this->getParam("ELEMENT_CODE")) {
+           $filter["CODE"] = $this->getParam("ELEMENT_CODE");
+        }
+        else {
+            $filter["ID"] = $this->getParam("ELEMENT_ID");
+        }
 
         if($this->arParams["SECTION_ID"]) {
            unset($filter["SECTION_ID"]);
