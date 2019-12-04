@@ -2,8 +2,6 @@
 
 namespace Oip\RelevantProducts;
 
-use Oip\CacheInfo;
-
 class DataWrapper
 {
     /** @var \Oip\RelevantProducts\DataSourceInterface */
@@ -11,12 +9,11 @@ class DataWrapper
 
     /**
      * DataWrapper constructor.
-     * @param CacheInfo|null $cacheInfo Может быть не передан, тогда кеширование будет отключено
+     * @param DataSourceInterface $dataSource Реализация интерфейса \Oip\RelevantProducts\DataSourceInterface
      */
-    public function __construct(CacheInfo $cacheInfo = null)
+    public function __construct(DataSourceInterface $dataSource)
     {
-        global $DB;
-        $this->ds = new DBDataSource($DB, $cacheInfo);
+        $this->ds = $dataSource;
     }
 
     /**

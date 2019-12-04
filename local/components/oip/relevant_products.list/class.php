@@ -8,6 +8,7 @@ use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
 use Oip\CacheInfo;
 use Oip\RelevantProducts\DataWrapper;
+use Oip\RelevantProducts\DBDataSource;
 
 class COipRelevantProducts extends \CBitrixComponent
 {
@@ -47,7 +48,11 @@ class COipRelevantProducts extends \CBitrixComponent
     }
 
     protected function execute() {
-        $dataWrapper = new DataWrapper($this->cacheInfo);
+        global $DB;
+        // Создаем объект - источник данных
+        $dataSource = new DBDataSource($DB, $this->cacheInfo);
+        // Создаем объект-обертку для операций над источником данных
+        $dataWrapper = new DataWrapper($dataSource);
 
         // Фильтры
         $filter = (!isset($this->arParams["FILTER"])) ? "TOP_SECTIONS" : $this->arParams["FILTER"];
