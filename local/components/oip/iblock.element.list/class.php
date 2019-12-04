@@ -87,6 +87,7 @@ class COipIblockElementList extends \COipIblockElement
 
         if (intval($this->arParams["SECTION_ID"])) {
             $filter["SECTION_ID"] = $this->arParams["SECTION_ID"];
+            $filter["INCLUDE_SUBSECTIONS"] = "Y";
         }
 
         if ($this->arParams["SHOW_INACTIVE"] !== "Y") {
