@@ -3,6 +3,8 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 \CBitrixComponent::includeComponentClass("oip:iblock.element");
 
+use Bitrix\Main\Loader;
+
 class COipIblockElementComplex extends \COipIblockElement
 {
 
@@ -22,8 +24,8 @@ class COipIblockElementComplex extends \COipIblockElement
         if($arParams["URL_MODE"] == "CODE") {
             $this->setDefaultParam($arParams["SEF_URL_TEMPLATES"],[
                 "index"    => "",
-                "section" => "#SECTION_CODE#/",
-                "element" => "#SECTION_CODE#/#ELEMENT_CODE#/",
+                "section" => "#SECTION_CODE_PATH#/",
+                "element" => "#SECTION_CODE_PATH#/#ELEMENT_CODE#/",
             ]);
         }
         else {
@@ -63,7 +65,13 @@ class COipIblockElementComplex extends \COipIblockElement
 
         $arVariables = [];
 
-        $componentPage = CComponentEngine::ParseComponentPath(
+        $engine = new \CComponentEngine($this);
+        if(Loader::includeModule("iblock")) {
+            $engine->addGreedyPart("#SECTION_CODE_PATH#");
+            $engine->setResolveCallback(["CIBlockFindTools", "resolveComponentEngine"]);
+        }
+
+        $componentPage = $engine->guessComponentPath(
             $this->getParam("BASE_DIR"),
             $this->getParam("SEF_URL_TEMPLATES"),
             $arVariables
