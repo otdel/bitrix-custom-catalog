@@ -17,12 +17,22 @@ class COipIblockElementComplex extends \COipIblockElement
 
         $this->setDefaultBooleanParam($arParams["SEF_MODE"], true);
         $this->setDefaultParam($arParams["BASE_DIR"],"/");
+        $this->setDefaultParam($arParams["URL_MODE"],"CODE");
 
-        $this->setDefaultParam($arParams["SEF_URL_TEMPLATES"],[
-            "index"    => "",
-            "section" => "#SECTION_ID#/",
-            "element" => "#SECTION_ID#/#ELEMENT_ID#/",
-        ]);
+        if($arParams["URL_MODE"] == "CODE") {
+            $this->setDefaultParam($arParams["SEF_URL_TEMPLATES"],[
+                "index"    => "",
+                "section" => "#SECTION_CODE#/",
+                "element" => "#SECTION_CODE#/#ELEMENT_CODE#/",
+            ]);
+        }
+        else {
+            $this->setDefaultParam($arParams["SEF_URL_TEMPLATES"],[
+                 "index"    => "",
+                 "section" => "#SECTION_ID#/",
+                 "element" => "#SECTION_ID#/#ELEMENT_ID#/",
+             ]);
+        }
 
         $this->setDefaultParam($arParams["VARIABLE_ALIASES"], [
             "index" => [],
@@ -31,7 +41,8 @@ class COipIblockElementComplex extends \COipIblockElement
         ]);
         $this->setDefaultParam($arParams["SEF_VARIABLE_ALIASES"], $arParams["VARIABLE_ALIASES"]);
 
-        $this->setDefaultParam($arParams["COMPONENT_VARIABLES"], ["IBLOCK_ID", "SECTION_ID", "ELEMENT_ID"]);
+        $this->setDefaultParam($arParams["COMPONENT_VARIABLES"], ["IBLOCK_ID", "SECTION_CODE", "SECTION_ID",
+            "ELEMENT_CODE", "ELEMENT_ID"]);
 
         return $arParams;
     }
@@ -89,10 +100,10 @@ class COipIblockElementComplex extends \COipIblockElement
             $arVariables
         );
 
-        if (intval($arVariables["ELEMENT_ID"]) > 0) {
+        if (intval($arVariables["ELEMENT_ID"]) > 0 || $arVariables["ELEMENT_CODE"]) {
             $componentPage = "element";
         }
-        elseif (intval($arVariables["SECTION_ID"]) > 0) {
+        elseif (intval($arVariables["SECTION_ID"]) > 0 || $arVariables["SECTION_CODE"]) {
             $componentPage = "section";
         }
         else {
