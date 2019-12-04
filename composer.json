@@ -14,10 +14,14 @@
             "name": "Irina Lomakina",
             "email": "nametoenter@gmail.com",
             "role": "developer"
+        },
+        {
+            "name": "Dmitriy Ivanov",
+            "email": "eckoeckoecko64@gmail.com",
+            "role": "developer"
         }
     ],
     "homepage": "https://github.com/otdel/bitrix-custom-catalog",
-    "minimum-stability": "dev",
     "require": {
         "arrilot/bitrix-migrations": "dev-master"
     },
