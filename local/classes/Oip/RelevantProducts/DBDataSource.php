@@ -393,9 +393,9 @@ class DBDataSource implements DataSourceInterface
         // Если не нашлось "свежей" записи о просмотре данного раздела данным пользователем - запишем просмотр в таблицу
         if (!$query->SelectedRowsCount()) {
             $sql =
-                "INSERT INTO {$this->productViewTableName} (user_id, section_id, product_id) " .
-                "VALUES ('{$userId}', '{$sectionId}', '0') " .
-                "ON DUPLICATE KEY UPDATE date_modify = NOW(); ";
+                "INSERT INTO {$this->productViewTableName} (user_id, section_id, product_id, views_count) " .
+                "VALUES ('{$userId}', '{$sectionId}', '0', '1') " .
+                "ON DUPLICATE KEY UPDATE date_modify = NOW(), views_count = views_count + 1; ";
 
             // Выполняем запрос
             $query = $this->db->Query($sql);
