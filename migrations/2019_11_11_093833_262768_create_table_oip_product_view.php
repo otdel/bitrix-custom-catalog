@@ -26,7 +26,7 @@ class CreateTableOipProductView20191111093833262768 extends BitrixMigration
             . "date_modify      TIMESTAMP       DEFAULT NULL    DEFAULT CURRENT_TIMESTAMP(),"
             . "views_count      INT             NOT NULL    DEFAULT 0,"
             . "is_liked         TINYINT         NOT NULL    DEFAULT 0,"
-            . "PRIMARY KEY (product_view_id)"
+            . "PRIMARY KEY (id)"
             . ");";
         $this->db->query($sql);
 
