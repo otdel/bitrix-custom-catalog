@@ -79,14 +79,14 @@ class COipIblockElementOne extends COipIblockElementList {
 
             global $DB;
             global $USER;
-            
+
             $cacheInfo = new CacheInfo();
             $ds = new DBDataSource($DB, $cacheInfo);
             $dw = new DataWrapper($ds);
 
             $userID = $USER->GetID();
 
-            if(!$USER->Authorize($userID)) {
+            if(!$USER->IsAuthorized($userID)) {
                 return;
             }
 

@@ -703,7 +703,7 @@ class COipIblockSectionList extends \CBitrixComponent
 
             $userID = $USER->GetID();
 
-            if(!$USER->Authorize($userID)) {
+            if(!$USER->IsAuthorized($userID)) {
                 return;
             }
 
