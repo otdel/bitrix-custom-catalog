@@ -18,7 +18,9 @@ $sections = $arResult["SECTIONS"];
 // Если это деталка (запрошен котнкретный раздел, без дочерних) - выводим шаблон деталки
 if ($component->isSingleSection()) {
     $section = $arResult["SECTIONS"][0];
-    include_once(__DIR__ . "/include/sectionDetail.php");
+    if($section) {
+        include_once(__DIR__ . "/include/sectionDetail.php");
+    }
 }
 // Иначе - выводим шаблон списка разделов
 else {

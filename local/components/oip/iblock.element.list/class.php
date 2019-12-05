@@ -3,10 +3,12 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 require_once(__DIR__."/../Element.php");
 require_once(__DIR__."/../Property.php");
+require_once(__DIR__."/../ReturnedData.php");
 
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
 use Oip\Custom\Component\Iblock\Element;
+use Oip\Custom\Component\Iblock\ReturnedData;
 
 \CBitrixComponent::includeComponentClass("oip:iblock.element");
 
@@ -38,7 +40,7 @@ class COipIblockElementList extends \COipIblockElement
 
         $this->includeComponentTemplate();
 
-        return $this->pagination;
+        return $this->consistReturnedData();
     }
 
     protected function execute() {
@@ -85,6 +87,7 @@ class COipIblockElementList extends \COipIblockElement
 
         if (intval($this->arParams["SECTION_ID"])) {
             $filter["SECTION_ID"] = $this->arParams["SECTION_ID"];
+            $filter["INCLUDE_SUBSECTIONS"] = "Y";
         }
 
         if ($this->arParams["SHOW_INACTIVE"] !== "Y") {
@@ -96,6 +99,11 @@ class COipIblockElementList extends \COipIblockElement
         }
 
         return $filter;
+    }
+
+    /** @return ReturnedData */
+    protected function consistReturnedData() {
+        return new ReturnedData($this->pagination);
     }
 
     /** @return self */
@@ -136,22 +144,23 @@ class COipIblockElementList extends \COipIblockElement
             $propIDs = $this->fetchPropIDs($arParams["PROPERTIES"]);
         }
 
-        $fetchFunction = function () use($order, $filter, $group, $navStartParams, $select) {
-           return \CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select);
+        $fetchFunction = function () use($order, $filter, $group, $navStartParams, $select, $propIDs) {
+           $dbResult =  \CIBlockElement::GetList($order, $filter, $group, $navStartParams, $select);
+            return $this->getRows($dbResult, $propIDs);
         };
 
         if($this->isCache()) {
             $cacheId = $this->getCacheId().$pageNumber;
-            $dbResult = $this->cacheService($fetchFunction, $cacheId);
+            $arResult = $this->cacheService($fetchFunction, $cacheId);
         }
         else {
-            $dbResult = $fetchFunction();
+            $arResult = $fetchFunction();
         }
 
-        $arResult = $this->getRows($dbResult, $propIDs);
-
         $this->rawData = $arResult["ITEMS"];
-        $this->pagination = $arResult["PAGINATION"];
+        if(!$this->isParam("SHOW_ALL")) {
+            $this->pagination = $arResult["PAGINATION"];
+        }
 
         return $this;
     }

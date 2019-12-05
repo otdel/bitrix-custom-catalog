@@ -18,7 +18,9 @@ class COipIblockSectionOneName extends \COipIblockSectionList
 
                 $this->execute();
 
-                return reset($this->arResult["SECTIONS"])->getName();
+                $section = reset($this->arResult["SECTIONS"]);
+                
+                return ($section) ? $section->getName() : null;
 
             } catch (LoaderException $e) {
                 return  $e->getMessage();

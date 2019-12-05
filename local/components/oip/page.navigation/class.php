@@ -6,9 +6,9 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 class COipPageNavigation extends \COipComponent
 {
 
-    protected function initCommonParams($arParams)
+    protected function initParams($arParams)
     {
-        $arParams = parent::initCommonParams($arParams);
+        $arParams = parent::initParams($arParams);
 
         if(!is_set($arParams["NAV_ID"])) {
             throw new \Bitrix\Main\ArgumentNullException("NAV_ID");

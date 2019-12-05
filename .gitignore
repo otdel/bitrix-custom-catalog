@@ -1,7 +1,7 @@
-.idea
-bitrix
-upload
-.htaccess
-*.config
-/**/**/*.log**
-/vendor/
+/*
+
+!/composer.json
+!README.md
+
+!/migrations/
+!/local/

@@ -76,7 +76,7 @@ class COipIblockSectionList extends \CBitrixComponent
         if ($this->isSingleSection()) {
             /** @var Section $section */
             $section = array_shift($this->arResult["SECTIONS"]);
-            return array(
+            return ($section) ? array(
                 "SECTION_NAME" => $section->getName(),
                 "UF_ELEMENTS_NUMBER" => $section->getPropValue("UF_ELEMENTS_NUMBER"),
                 "UF_COLUMNS_COUNT" => $section->getPropValue("UF_COLUMNS_COUNT"),
@@ -86,7 +86,7 @@ class COipIblockSectionList extends \CBitrixComponent
                 "UF_SIDEBAR_ELEMENT" => $section->getPropValue("UF_SIDEBAR_ELEMENT"),
                 "UF_SAME_ELEMENT" => $section->getPropValue("UF_SAME_ELEMENT"),
                 "UF_POPULAR_WITH_THIS" => $section->getPropValue("UF_POPULAR_WITH_THIS")
-            );
+            ) : [];
         }
 
     }
@@ -96,7 +96,10 @@ class COipIblockSectionList extends \CBitrixComponent
         $this->arSectionsRaw = $this->getSectionList();
 
         // Если BASE_SECTION пришел пустым - значит выводить нужно относительно самого верхнего уровня
-        if (!isset($this->arParams["BASE_SECTION"]) || ($this->arParams["BASE_SECTION"] == 0)) {
+        if (!isset($this->arParams["BASE_SECTION"]) ||
+            ($this->arParams["FILTER_FIELD_NAME"] == "ID" && ($this->arParams["BASE_SECTION"] == 0)) ||
+            ($this->arParams["FILTER_FIELD_NAME"] == "CODE" && ($this->arParams["BASE_SECTION"] == ""))
+        ) {
             $sectionArray = $this->arSectionsRaw;
         }
         // Иначе строим относительно выбранного раздела
@@ -676,7 +679,8 @@ class COipIblockSectionList extends \CBitrixComponent
      * @return bool
      */
     public function isSingleSection() {
-        return $this->getParam("BASE_SECTION") > 0 && $this->getParam("DEPTH") == 0;
+        return ($this->getParam("BASE_SECTION") > 0 || $this->arParams["FILTER_FIELD_NAME"] == "CODE")
+            && $this->getParam("DEPTH") == 0;
     }
 
 }

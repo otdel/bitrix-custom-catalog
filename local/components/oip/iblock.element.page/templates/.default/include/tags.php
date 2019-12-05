@@ -1,39 +1,18 @@
 <?php
+/** @var $component \COipIblockElementList */
+/** @var \Oip\Custom\Component\Iblock\Element $element */
+/** @var array $arFilterTemplate */
 ?>
-
-<div class="uk-panel">
-    <ul class="uk-subnav uuk-subnav-divider">
-        <li class="uk-active">
-            <a href="" class="uk-text-lowercase">
-                Выбранный тег
-            </a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Розовенький телефончик</a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Из металла</a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Элитный</a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Какой-то тег</a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Какой-то тег</a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Какой-то тег</a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Какой-то тег</a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Какой-то тег</a>
-        </li>
-        <li>
-            <a href="" class="uk-text-lowercase">Какой-то тег</a>
-        </li>
-    </ul>
-</div>
+<?if($component->getParam("TAGS_IBLOCK_ID")):?>
+    <?$APPLICATION->IncludeComponent(
+        "oip:iblock.element.list","tags-in-filter",
+        [
+            "IBLOCK_ID" => $component->getParam("TAGS_IBLOCK_ID"),
+            "SHOW_ALL" => "Y",
+            "IS_CACHE" => $component->getParam("IS_CACHE"),
+            "CACHE_TIME" => $component->getParam("CACHE_TIME"),
+            "FILTER_ID" => $filterId,
+            "FILTER_PARAMS" => $arFilterTemplate
+        ]
+    )?>
+<?endif?>
