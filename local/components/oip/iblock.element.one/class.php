@@ -3,6 +3,10 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 use Oip\Custom\Component\Iblock\Element;
 
+use Oip\RelevantProducts\DataWrapper;
+use Oip\RelevantProducts\DBDataSource;
+use Oip\CacheInfo;
+
 \CBitrixComponent::includeComponentClass("oip:iblock.element.list");
 
 class COipIblockElementOne extends COipIblockElementList {
@@ -19,6 +23,8 @@ class COipIblockElementOne extends COipIblockElementList {
         }
 
         $this->includeComponentTemplate();
+
+        $this->addElementView($this->arResult["ELEMENT"]->getId());
 
 
         return ($this->arResult["ELEMENT"]) ? $this->arResult["ELEMENT"]->getId() : null;
@@ -66,5 +72,29 @@ class COipIblockElementOne extends COipIblockElementList {
         }
 
         return $filter;
+    }
+
+    private function addElementView($elementID) {
+        try {
+
+            global $DB;
+            global $USER;
+            
+            $cacheInfo = new CacheInfo();
+            $ds = new DBDataSource($DB, $cacheInfo);
+            $dw = new DataWrapper($ds);
+
+            $userID = $USER->GetID();
+
+            if(!$USER->Authorize($userID)) {
+                return;
+            }
+
+            $dw->addProductView((int)$userID, (int)$elementID);
+
+        }
+        catch(\Exception $exception) {
+            echo "<p>Не удалось обработать просмотр товара: {$exception->getMessage()}</p>";
+        }
     }
 }

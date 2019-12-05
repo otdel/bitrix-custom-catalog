@@ -12,6 +12,11 @@ use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
 use Oip\Custom\Component\Iblock\Section;
 
+use Oip\RelevantProducts\DataWrapper;
+use Oip\RelevantProducts\DBDataSource;
+use Oip\CacheInfo;
+
+
 /**
  * <?$APPLICATION->IncludeComponent("oip:iblock.section.list","",[
  *   "IBLOCK_ID" => 2,
@@ -74,6 +79,9 @@ class COipIblockSectionList extends \CBitrixComponent
         // Если компонент вызван для вывода деталки раздела - отдаем массив
         // значений некоторых полей, для использования в других компонентах
         if ($this->isSingleSection()) {
+
+            $this->addSectionView(reset($this->arResult["SECTIONS"])->getId());
+
             /** @var Section $section */
             $section = array_shift($this->arResult["SECTIONS"]);
             return ($section) ? array(
@@ -681,6 +689,30 @@ class COipIblockSectionList extends \CBitrixComponent
     public function isSingleSection() {
         return ($this->getParam("BASE_SECTION") > 0 || $this->arParams["FILTER_FIELD_NAME"] == "CODE")
             && $this->getParam("DEPTH") == 0;
+    }
+
+    private function addSectionView($sectionID) {
+        try {
+
+            global $DB;
+            global $USER;
+
+            $cacheInfo = new CacheInfo();
+            $ds = new DBDataSource($DB, $cacheInfo);
+            $dw = new DataWrapper($ds);
+
+            $userID = $USER->GetID();
+
+            if(!$USER->Authorize($userID)) {
+                return;
+            }
+
+            $dw->addSectionView((int)$userID, (int)$sectionID);
+
+        }
+        catch(\Exception $exception) {
+            echo "<p>Не удалось обработать просмотр категории: {$exception->getMessage()}</p>";
+        }
     }
 
 }
