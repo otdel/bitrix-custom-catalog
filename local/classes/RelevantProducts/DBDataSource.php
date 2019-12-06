@@ -664,4 +664,42 @@ class DBDataSource implements DataSourceInterface
 
         return $newProductCategories;
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getFreeGuestId() {
+        // Добавляем запись в таблицу просмотров товара
+        $sql =
+            "INSERT INTO {$this->productViewTableName} (user_id) " .
+            "SELECT MIN(user_id) - 1 " .
+            "FROM {$this->productViewTableName} ";
+
+        // Выполняем запрос
+        $query = $this->db->Query($sql);
+        // Если запрос не выполнился
+        if (!$query) throw new \Exception("Не удалось выполнить запрос на получение идентификатора нового гостевого пользователя.");
+        // Если запись не была добавлена
+        if ($query->AffectedRowsCount() == 0) throw new \Exception("Не удалось добавить запись с идентификатором нового гостевого пользователя.");
+
+        // Получаем идентификатор только что созданного нового идентификатора гостевого пользователя
+        global $DB;
+        $newGuestUserRowId = $DB->LastID();
+        // Узнаем, какой ID записался
+        $sql =
+            "SELECT user_id " .
+            "FROM {$this->productViewTableName} " .
+            "WHERE id = {$newGuestUserRowId} ";
+
+        // Выполняем запрос
+        $query = $this->db->Query($sql);
+        // Если запрос не выполнился
+        if (!$query) throw new \Exception("Не удалось выполнить запрос на получение данных об идентификаторе нового гостевого пользователя.");
+        // Если запись не была получена
+        if ($query->SelectedRowsCount() == 0) throw new \Exception("Запись с идентификатором нового гостевого пользователя не была получена.");
+
+        // Возвращаем полученный user_id
+        $queryResult = $query->Fetch();
+        return $queryResult["user_id"];
+    }
 }

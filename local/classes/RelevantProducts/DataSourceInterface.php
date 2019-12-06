@@ -75,7 +75,7 @@ interface DataSourceInterface {
     /**
      * Получение самых просматриваемых разделов
      *
-     * @return RelevantProduct[]
+     * @return RelevantSection[]
      * @throws \Exception
      */
     public function getMostViewedSections();
@@ -91,6 +91,12 @@ interface DataSourceInterface {
      * @throws \Exception
      */
     public function getNewProductCategories();
+
+    /**
+     * Получение свободного идентификатора гостя
+     * @return int
+     */
+    public function getFreeGuestId();
 
 
 }

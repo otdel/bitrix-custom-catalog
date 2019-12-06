@@ -23,6 +23,12 @@ class DataWrapper
         $userIds = self::prepareIdsArgument($userIds);
         $viewedCategories = $this->ds->getViewedSections($userIds);
 
+        // Оставляем только категории с id > 0
+        $viewedCategories = array_filter($viewedCategories, function($obj){
+            /** @var RelevantCategory $obj */
+            return $obj->getId() > 0;
+        });
+
         // Сортируем по весу, в порядке убывания. Название статической функции сравнения следует передавать с доп. указанием класса
         usort($viewedCategories, array('Oip\RelevantProducts\CompareFunctions','compareCategoriesByWeight'));
 
@@ -111,12 +117,17 @@ class DataWrapper
     /**
      * Получение списка наиболее просматриваемых категорий среди всех пользователей
      *
-     * @return RelevantSection[]|null $relevantCategories Список категорий (без товаров внутри)
+     * @return RelevantSection[]|null
      * @throws \Exception
      */
     public function getMostViewedCategories() {
         // Получаем список просмотренных пользователем[-ями] товаров
         $mostViewedCategories = $this->ds->getMostViewedSections();
+        // Оставляем только категории с id > 0
+        $mostViewedCategories = array_filter($mostViewedCategories, function($obj){
+            /** @var RelevantCategory $obj */
+            return $obj->getId() > 0;
+        });
         // Если ни в одной категории нет просмотров
         if (count($mostViewedCategories) == 0) return null;
         // Отсортируем по количеству просмотров
@@ -128,24 +139,29 @@ class DataWrapper
     /**
      * Получение списка наиболее залайканных категорий среди всех пользователей
      *
-     * @return RelevantSection[]|null $relevantCategories Список категорий (без товаров внутри)
+     * @return RelevantSection[]|null
      * @throws \Exception
      */
     public function getMostLikedCategories() {
         // Получаем список просмотренных пользователем[-ями] товаров
-        $mostViewedCategories = $this->ds->getMostViewedSections();
+        $mostLikedCategories = $this->ds->getMostViewedSections();
+        // Оставляем только категории с id > 0
+        $mostLikedCategories = array_filter($mostLikedCategories, function($obj){
+            /** @var RelevantCategory $obj */
+            return $obj->getId() > 0;
+        });
         // Если ни в одной категории нет просмотров
-        if (count($mostViewedCategories) == 0) return null;
+        if (count($mostLikedCategories) == 0) return null;
         // Отсортируем по количеству лайков
-        usort($mostViewedCategories, array('Oip\RelevantProducts\CompareFunctions', 'compareCategoriesByLikes'));
+        usort($mostLikedCategories, array('Oip\RelevantProducts\CompareFunctions', 'compareCategoriesByLikes'));
         //
-        return $mostViewedCategories;
+        return $mostLikedCategories;
     }
 
     /**
      * Получение списка наиболее просматриваемых товаров среди всех пользователей
      *
-     * @return RelevantSection[]|null $relevantCategories Список категорий (без товаров внутри)
+     * @return RelevantProduct[]|null $mostViewedProducts
      * @throws \Exception
      */
     public function getMostViewedProducts() {
@@ -162,18 +178,18 @@ class DataWrapper
     /**
      * Получение списка наиболее залайканных товаров среди всех пользователей
      *
-     * @return RelevantSection[]|null $relevantCategories Список категорий (без товаров внутри)
+     * @return RelevantProduct[]|null $mostLikedProducts
      * @throws \Exception
      */
     public function getMostLikedProducts() {
         // Получаем список просмотренных пользователем[-ями] товаров
-        $mostViewedProducts = $this->ds->getMostViewedProducts();
+        $mostLikedProducts = $this->ds->getMostViewedProducts();
         // Если ни в одной категории нет лайков
-        if (count($mostViewedProducts) == 0) return null;
+        if (count($mostLikedProducts) == 0) return null;
         // Отсортируем по количеству лайков
-        usort($mostViewedProducts, array('Oip\RelevantProducts\CompareFunctions', 'compareProductsByLikes'));
+        usort($mostLikedProducts, array('Oip\RelevantProducts\CompareFunctions', 'compareProductsByLikes'));
         //
-        return $mostViewedProducts;
+        return $mostLikedProducts;
     }
 
     /**
@@ -185,6 +201,11 @@ class DataWrapper
     public function getNewProductCategories() {
         // Получаем список просмотренных пользователем[-ями] товаров
         $newProductCategories = $this->ds->getNewProductCategories();
+        // Оставляем только категории с id > 0
+        $newProductCategories = array_filter($newProductCategories, function($obj){
+            /** @var RelevantCategory $obj */
+            return $obj->getId() > 0;
+        });
         // Если ни в одной категории нет новых товаров
         if (count($newProductCategories) == 0) return null;
         // Отсортируем по количеству лайков
@@ -192,7 +213,6 @@ class DataWrapper
         //
         return $newProductCategories;
     }
-
 
     /**
      * Получение списка популярных у пользователя категорий (без товаров внутри)
@@ -204,6 +224,11 @@ class DataWrapper
     public function getMostViewedCategoriesList($userIds) {
         // Получаем список просмотренных пользователем[-ями] товаров
         $newProductCategories = $this->ds->getNewProductCategories();
+        // Оставляем только категории с id > 0
+        $newProductCategories = array_filter($newProductCategories, function($obj){
+            /** @var RelevantCategory $obj */
+            return $obj->getId() > 0;
+        });
         // Если ни в одной категории нет новых товаров
         if (count($newProductCategories) == 0) return null;
         // Отсортируем по количеству лайков
@@ -226,11 +251,18 @@ class DataWrapper
         }
 
         // Удостоверимся, что нам пришел именно массив id, состоящий только из чисел
-        if (count($userIds) == 0 || !ctype_digit(implode('',$userIds))) {
+        if (count($userIds) == 0 || !($userIds === array_filter($userIds,'is_int'))) {
             throw new \Exception("Ошибка входных данных. Идентификаторы пользователей некорректны.");
         }
 
         return $userIds;
+    }
+
+    /**
+     * Получение свободного идентфиикатора для нового гостевого пользователя
+     */
+    public function getFreeGuestId() {
+        return $this->ds->getFreeGuestId();
     }
 
 }

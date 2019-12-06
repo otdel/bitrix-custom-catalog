@@ -33,18 +33,7 @@ class COipRelevantProducts extends \CBitrixComponent
             }
         }
 
-        // Если требуется что-то вернуть после подключения компонента
-//        if ($this->arParams) {
-//            return array(
-//                "SECTION_NAME" => $->getName(),
-//                "UF_ELEMENTS_NUMBER" => $section->getPropValue("UF_ELEMENTS_NUMBER")
-//            );
-//        }
-//        // Иначе просто подключаем шаблон
-//        else {
-            $this->includeComponentTemplate();
-//        }
-
+        $this->includeComponentTemplate();
     }
 
     protected function execute() {
