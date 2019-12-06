@@ -7,6 +7,12 @@ use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
 
+use Oip\GuestUser\Repository\CookieRepository;
+use Oip\GuestUser\Service;
+use Oip\GuestUser\IdGenerator\DBIdGenerator;
+
+use Bitrix\Main\Config\Configuration;
+
 \CBitrixComponent::includeComponentClass("oip:iblock.element.list");
 
 class COipIblockElementOne extends COipIblockElementList {
@@ -86,8 +92,13 @@ class COipIblockElementOne extends COipIblockElementList {
 
             $userID = $USER->GetID();
 
-            if(!$USER->IsAuthorized($userID)) {
-                return;
+            if(!$USER->IsAuthorized()) {
+                $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
+                $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
+                $rep = new CookieRepository($cookieName, $cookieExpired);
+                $idGen = new DBIdGenerator($ds);
+                $gus = new Service($rep, $idGen);
+                $userID = $gus->getUser()->getId();
             }
 
             $dw->addProductView((int)$userID, (int)$elementID);

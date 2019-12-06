@@ -10,12 +10,16 @@ use \Bitrix\Main\ArgumentTypeException;
 use Bitrix\Main\Data\Cache;
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
+use Bitrix\Main\Config\Configuration;
 use Oip\Custom\Component\Iblock\Section;
 
 use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
 
+use Oip\GuestUser\Repository\CookieRepository;
+use Oip\GuestUser\Service;
+use Oip\GuestUser\IdGenerator\DBIdGenerator;
 
 /**
  * <?$APPLICATION->IncludeComponent("oip:iblock.section.list","",[
@@ -703,8 +707,13 @@ class COipIblockSectionList extends \CBitrixComponent
 
             $userID = $USER->GetID();
 
-            if(!$USER->IsAuthorized($userID)) {
-                return;
+            if(!$USER->IsAuthorized()) {
+                $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
+                $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
+                $rep = new CookieRepository($cookieName, $cookieExpired);
+                $idGen = new DBIdGenerator($ds);
+                $gus = new Service($rep, $idGen);
+                $userID = $gus->getUser()->getId();
             }
 
             $dw->addSectionView((int)$userID, (int)$sectionID);
