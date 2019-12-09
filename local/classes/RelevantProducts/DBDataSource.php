@@ -672,7 +672,7 @@ class DBDataSource implements DataSourceInterface
         // Добавляем запись в таблицу просмотров товара
         $sql =
             "INSERT INTO {$this->productViewTableName} (user_id) " .
-            "SELECT CASE WHEN MIN(pv.user_id) - 1 >= 0 THEN -1 ELSE MIN(pv.user_id) - 1 END " .
+            "SELECT COALESCE(CASE WHEN MIN(pv.user_id) - 1 >= 0 THEN -1 ELSE MIN(pv.user_id) - 1 END, -1) " .
             "FROM {$this->productViewTableName} pv ";
 
         // Выполняем запрос
