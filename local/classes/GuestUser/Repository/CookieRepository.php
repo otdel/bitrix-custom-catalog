@@ -28,7 +28,7 @@ class CookieRepository implements RepositoryInterface
      * @throws SystemException
      */
     public function getData(): ?string {
-       return Application::getInstance()->getContext()->getRequest()->getCookie($this->name);
+       return $_COOKIE[$this->name];
     }
 
     /**
@@ -36,13 +36,7 @@ class CookieRepository implements RepositoryInterface
      * @throws SystemException
      */
     public function setData($id): void {
-        $context = Application::getInstance()->getContext();
-
-        $cookie = new Cookie($this->name, $id, time() + $this->expired);
-        $cookie->setDomain($context->getServer()->getHttpHost());
-        $cookie->setSecure(false);
-
-        $context->getResponse()->addCookie($cookie);
+        setcookie($this->name, $id,time() + $this->expired, "/", SITE_SERVER_NAME);
     }
 
 }
