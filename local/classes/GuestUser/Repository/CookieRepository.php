@@ -19,7 +19,7 @@ class CookieRepository implements RepositoryInterface
 
     public function __construct($name = null, $expired = null)
     {
-        $this->name = ($name) ? $expired : self::COOKIE_NAME_DEFAULT;
+        $this->name = ($name) ? $name : self::COOKIE_NAME_DEFAULT;
         $this->expired = ($expired) ? $expired : self::COOKIE_EXPIRE_DEFAULT;
     }
 
