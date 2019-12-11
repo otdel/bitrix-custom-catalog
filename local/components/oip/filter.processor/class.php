@@ -12,6 +12,9 @@ class COipFilterProcessor extends \COipComponent
     const PARAM_TYPE_FIELD = "f";
     const PARAM_TYPE_PROP = "p";
     const PARAM_TYPE_SORT = "s";
+    const RANGE_VALUE_MODE_FIELDS = [
+      "NAME"
+    ];
 
 
     protected function initParams($arParams)
@@ -118,7 +121,11 @@ class COipFilterProcessor extends \COipComponent
                 $paramName = "PROPERTY_".$paramName;
             }
 
-            $finalIblockFilter[$paramName] = $this->getIblockFilterParamValue($paramValue);
+            if($paramName == "SECTION_ID") {
+                $finalIblockFilter["INCLUDE_SUBSECTIONS"] = "Y";
+            }
+
+            $finalIblockFilter[$paramName] = $this->getIblockFilterParamValue($this->replaceRangeValueMode($paramName, $paramValue));
         }
 
         return $finalIblockFilter;
@@ -139,8 +146,34 @@ class COipFilterProcessor extends \COipComponent
      * @return string
      */
     private function getIblockFilterParamName($incomingParam) {
-        return substr(explode("_",$incomingParam)[1],1);
+        return $this->replaceSeparateIblockFilterParamName(substr(explode("_",$incomingParam)[1],1))
+        ;
     }
+
+    /**
+     * @param string $paramName
+     * @return string
+     */
+    private function replaceSeparateIblockFilterParamName($paramName) {
+        return str_replace("-","_", $paramName);
+    }
+
+    /**
+     * @param string $paramName
+     * @return string
+     */
+    private function replaceRangeValueMode($paramName, $paramValue) {
+        return ($this->isRangeValueMode($paramName)) ? "%".$paramValue."%" : $paramValue;
+    }
+
+    /**
+     * @param string $paramName
+     * @return boolean
+     */
+    private function isRangeValueMode($paramName) {
+        return in_array($paramName, self::RANGE_VALUE_MODE_FIELDS);
+    }
+
 
     /**
      * @param array $incomingParam
