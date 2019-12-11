@@ -4,10 +4,12 @@ namespace Oip\Custom\Component\Iblock;
 class ReturnedData
 {
     private $pagination;
+    private $componentID;
 
-    public function __construct(array $pagination)
+    public function __construct(array $pagination, $componentID)
     {
         $this->pagination = $pagination;
+        $this->componentID = $componentID;
     }
 
     /**
@@ -17,4 +19,14 @@ class ReturnedData
     {
         return $this->pagination;
     }
+
+    /**
+     * @return int
+     */
+    public function getComponentID(): int
+    {
+        return $this->componentID;
+    }
+
+
 }
