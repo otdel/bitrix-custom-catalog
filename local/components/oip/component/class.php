@@ -111,6 +111,20 @@ abstract class COipComponent extends \CBitrixComponent
 
     /**
      * @param string $paramCode
+     * @param string $paramValue
+     * @return mixed
+     */
+    public function setParam($paramCode, $paramValue) {
+        if(is_set($this->getParam($paramCode))) {
+            $this->arParams[$paramCode] = $paramValue;
+            return $this->arParams[$paramCode];
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $paramCode
      * @return boolean
      */
     public function isParam($paramCode) {
