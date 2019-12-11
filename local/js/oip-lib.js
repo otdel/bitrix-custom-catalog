@@ -155,6 +155,15 @@ var OIP  = (function () {
             }
         },
 
+        unsetStoreFilter = function($filterKey) {
+            var store = getStore();
+
+            for (paramName in store) {
+                if(paramName.indexOf("f"+$filterKey) > -1) {
+                    unsetStoreItem(paramName, store[paramName]);
+                }
+            }
+        }
 /* ---------------------------------------------------------------------------------------- */
 
         getGetParams = function () {
@@ -298,6 +307,7 @@ var OIP  = (function () {
             getItem: getStoreItem,
             setItem: setStoreItem,
             unsetItem: unsetStoreItem,
+            unsetFilter: unsetStoreFilter
         }
     };
 
