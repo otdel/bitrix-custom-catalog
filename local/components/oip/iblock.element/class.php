@@ -41,7 +41,7 @@ abstract class COipIblockElement extends \COipComponent
 
         $this->setDefaultBooleanParam( $arParams["SHOW_404"],true);
 
-        $this->setDefaultParam( $arParams["COUNT"],24);
+        $this->setDefaultParam( $arParams["COUNT"],24,$arParams["_COUNT"]);
 
         $this->setDefaultParam( $arParams["FILTER"],"");
         $this->setDefaultParam( $arParams["SORT_1"],"sort");
@@ -51,7 +51,8 @@ abstract class COipIblockElement extends \COipComponent
 
         $this->setDefaultParam($arParams["LIST_VIEW_TITLE_TEXT"],"");
         $this->setDefaultParam($arParams["LIST_VIEW_TITLE_TAG"],"div");
-        $this->setDefaultParam($arParams["LIST_VIEW_TITLE_CSS"],"uk-h1");
+        $this->setDefaultParam($arParams["LIST_VIEW_TITLE_CSS"],"uk-h1",
+            $arParams["_LIST_VIEW_TITLE_CSS"]);
         $this->setDefaultParam($arParams["LIST_VIEW_TITLE_ICON_CSS"],"");
         $this->setDefaultParam($arParams["LIST_VIEW_TITLE_ALIGN"],"left");
 
@@ -62,7 +63,8 @@ abstract class COipIblockElement extends \COipComponent
         $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_WIDTH_CSS"],"expand");
         $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_TYPE"],"TILE");
         $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_ELEMENT_WIDTH_CSS"],
-            "uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-child-width-1-4@xl");
+            "uk-child-width-1-1 uk-child-width-1-2@m uk-child-width-1-3@l uk-child-width-1-4@xl",
+            $arParams["_LIST_VIEW_CONTAINER_ELEMENT_WIDTH_CSS"]);
         $this->setDefaultParam($arParams["LIST_VIEW_CONTAINER_MARGIN_CSS"],"medium");
         $this->setDefaultBooleanParam($arParams["LIST_VIEW_CONTAINER_VERTICAL_ALIGN"],true);
 
