@@ -45,13 +45,25 @@ abstract class COipComponent extends \CBitrixComponent
     /**
      * @param mixed $param
      * @param mixed $defaultValue
+     * @param mixed $paramOrig
      */
-    protected function setDefaultParam(&$param, $defaultValue) {
+    protected function setDefaultParam(&$param, $defaultValue, &$paramOrig = null) {
+
+
+        $paramOrig = $defaultValue;
 
         if(!is_set($param)) {
             $param = $defaultValue;
         }
 
+    }
+
+    /**
+     * @param string $paramCode
+     * @return boolean
+     */
+    public function isParamDefault($paramCode) {
+        return ($this->getParam($paramCode) == $this->getParam("_".$paramCode));
     }
 
     /**
