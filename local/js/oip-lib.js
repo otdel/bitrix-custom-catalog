@@ -255,7 +255,7 @@ var OIP  = (function () {
             var
                 filterId = arParamName[0].slice(1,2),
                 paramType = arParamName[1].slice(0,1),
-                paramName = arParamName[1].slice(1);
+                paramName = arParamName[1].slice(1).replace("-","_");
 
             map.filterId = filterId;
             map.paramType = paramType;
