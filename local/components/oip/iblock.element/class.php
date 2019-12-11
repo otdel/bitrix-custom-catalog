@@ -26,6 +26,7 @@ abstract class COipIblockElement extends \COipComponent
         }
 
         $this->setDefaultParam($arParams["SECTION_ID"],0);
+        $this->setDefaultParam($arParams["SECTION_CODE"],"");
         $this->setDefaultParam($arParams["FILTER_ID"],0);
         $this->setDefaultParam($arParams["FILTER_PARAMS"], []);
         $this->setDefaultParam($arParams["SECTION_NAME"],"");
