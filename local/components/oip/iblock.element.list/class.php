@@ -103,7 +103,7 @@ class COipIblockElementList extends \COipIblockElement
 
     /** @return ReturnedData */
     protected function consistReturnedData() {
-        return new ReturnedData($this->pagination);
+        return new ReturnedData($this->pagination, $this->componentId);
     }
 
     /** @return self */
