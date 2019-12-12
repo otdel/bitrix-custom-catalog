@@ -75,7 +75,9 @@ class COipIblockSectionList extends \COipComponent
             }
         }
 
-        $this->includeComponentTemplate();
+        if($this->isParam("INCLUDE_TEMPLATE")) {
+            $this->includeComponentTemplate();
+        }
 
         // Если компонент вызван для вывода деталки раздела - отдаем массив
         // значений некоторых полей, для использования в других компонентах
@@ -226,6 +228,9 @@ class COipIblockSectionList extends \COipComponent
         $this->setDefaultParam($arParams["LIST_ATTRIBUTE"], "");
         // Класс(ы) для превью картинки. По умолчанию ""
         $this->setDefaultParam($arParams["PREVIEW_PICTURE_CLASS"], "");
+
+        $this->setDefaultBooleanParam($arParams["INCLUDE_TEMPLATE"], true);
+
         // Поле, по которому производится выборка раздела
         $arParams["FILTER_FIELD_NAME"] = is_int($arParams["BASE_SECTION"]) ? "ID": "CODE";
 
