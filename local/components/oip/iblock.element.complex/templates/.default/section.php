@@ -28,6 +28,9 @@ $component->setParam("SECTION_ID", $sectionId);
 ])?>
 
 <?
+    // если вдруг при вызвове комплексного был задан кастомный заголовок
+    // то его нужно сбросить при выводе данных в разделе - тут приоритетнее название раздела
+    $component->setParam("LIST_VIEW_TITLE_TEXT", "");
     $component->rewriteComponentParams("LIST_VIEW_TITLE_TEXT", $returnedSectionData["SECTION_NAME"]);
     $component->rewriteComponentParams("SECTION_NAME", $returnedSectionData["SECTION_NAME"]);
     $component->rewriteComponentParams("COUNT", (int)$returnedSectionData["UF_ELEMENTS_NUMBER"]);
