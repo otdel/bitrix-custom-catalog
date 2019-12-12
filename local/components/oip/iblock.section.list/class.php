@@ -107,7 +107,7 @@ class COipIblockSectionList extends \CBitrixComponent
         // Получение разделов
         $this->arSectionsRaw = $this->getSectionList();
 
-        // Если BASE_SECTION пришел пустым - значит выводить нужно относительно самого верхнего уровня
+        // Если BASE_SECTION пришел пустым (или равным 0) - значит выводить нужно относительно самого верхнего уровня
         if (!isset($this->arParams["BASE_SECTION"]) ||
             ($this->arParams["FILTER_FIELD_NAME"] == "ID" && ($this->arParams["BASE_SECTION"] == 0)) ||
             ($this->arParams["FILTER_FIELD_NAME"] == "CODE" && ($this->arParams["BASE_SECTION"] == ""))
@@ -125,6 +125,15 @@ class COipIblockSectionList extends \CBitrixComponent
 
         // Убираем лишние элементы, которые выходят за заданную глубину вложенности
         $this->buildSectionArray($sectionArray, 0, $this->arParams["DEPTH"]);
+
+        // Если не нужно выводить базовый уровень - убираем его
+        if ($this->isBaseSectionSet() &&
+            !$this->arParams["SHOW_BASE_SECTION"] &&
+            $this->arParams["DEPTH"] !=0 &&
+            count($sectionArray) > 0
+        ) {
+            $sectionArray = array_shift($sectionArray)["CHILDS"];
+        }
 
         // Получение значений для полей типа "список"
         // 1. Получим все значения, которые могут принимать пользовательские поля с типом "список"
@@ -188,6 +197,8 @@ class COipIblockSectionList extends \CBitrixComponent
         $this->isCacheEnabled = $arParams["CACHE"] =="Y";
         // ID или код раздела, относительно которого начнется построение дерева
         $this->setDefaultParam($arParams["BASE_SECTION"], 0);
+        // Скрывать/показывать базовый раздел. По умолчанию скрывать.
+        $this->setDefaultBooleanParam($arParams["SHOW_BASE_SECTION"], false);
         // Массив с критериями фильтра
         $this->setDefaultParam($arParams["FILTER"], array());
         // Массив с критериями сортировки
@@ -722,6 +733,17 @@ class COipIblockSectionList extends \CBitrixComponent
         catch(\Exception $exception) {
             echo "<p>Не удалось обработать просмотр категории: {$exception->getMessage()}</p>";
         }
+    }
+
+    /**
+     * Установлен ли базовый раздел
+     *
+     * @return bool
+     */
+    private function isBaseSectionSet () {
+        return
+            ($this->arParams["FILTER_FIELD_NAME"] == "ID" && ($this->arParams["BASE_SECTION"] > 0)) ||
+            ($this->arParams["FILTER_FIELD_NAME"] == "CODE" && ($this->arParams["BASE_SECTION"] != ""));
     }
 
 }
