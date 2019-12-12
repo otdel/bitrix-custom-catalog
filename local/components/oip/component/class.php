@@ -6,6 +6,8 @@ use Bitrix\Main\Data\Cache;
 abstract class COipComponent extends \CBitrixComponent
 {
 
+    const BOOL_PARAMS_NEGATIVE_VALUES = ["N"];
+
     protected $componentId;
 
     /** @var Cache $cache */
@@ -56,6 +58,32 @@ abstract class COipComponent extends \CBitrixComponent
      */
     public function isParamDefault($paramCode) {
         return ($this->getParam($paramCode) == $this->getParam("_".$paramCode));
+    }
+
+    /**
+     * @param string $componentParamName
+     * @param mixed $valueToRewrite
+     * @param boolean $boolTypeParam
+     */
+    public function rewriteComponentParams($componentParamName, $valueToRewrite, $boolTypeParam = false): void {
+        if(!$valueToRewrite) {
+           return;
+        }
+
+        $value = $valueToRewrite;
+
+        if($boolTypeParam) {
+            if($valueToRewrite && !in_array($valueToRewrite,self::BOOL_PARAMS_NEGATIVE_VALUES)) {
+                $value = "Y";
+            }
+            else {
+                $value = "N";
+            }
+        }
+
+        if($this->isParamDefault($componentParamName)) {
+            $this->setParam($componentParamName, $value);
+        }
     }
 
     /**
