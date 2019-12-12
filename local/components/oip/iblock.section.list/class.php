@@ -21,6 +21,8 @@ use Oip\GuestUser\Repository\CookieRepository;
 use Oip\GuestUser\Service;
 use Oip\GuestUser\IdGenerator\DBIdGenerator;
 
+\CBitrixComponent::includeComponentClass("oip:component");
+
 /**
  * <?$APPLICATION->IncludeComponent("oip:iblock.section.list","",[
  *   "IBLOCK_ID" => 2,
@@ -31,7 +33,7 @@ use Oip\GuestUser\IdGenerator\DBIdGenerator;
  *   "CACHE" => "Y"
  *   ])?>
  */
-class COipIblockSectionList extends \CBitrixComponent
+class COipIblockSectionList extends \COipComponent
 {
     /** @var array $arSectionsRaw "Сырой" массив с разделами */
     private $arSectionsRaw = array();
@@ -55,11 +57,6 @@ class COipIblockSectionList extends \CBitrixComponent
     private $isCacheEnabled;
     /** @var boolean $isCacheActual Флаг - актуальный кеш или нет. Нужен для одновременного обновления всех кешей, если один "просрочился" */
     private $isCacheActual;
-
-    public function onPrepareComponentParams($arParams)
-    {
-        return $this->initParams($arParams);
-    }
 
     public function executeComponent()
     {
@@ -173,6 +170,8 @@ class COipIblockSectionList extends \CBitrixComponent
      * @return array
      */
     protected function initParams($arParams) {
+        $this->initComponentId();
+
         try {
             // ID инфоблока, внутри которого просматриваются разделы
             if(!is_set($arParams["IBLOCK_ID"])) {
@@ -648,52 +647,12 @@ class COipIblockSectionList extends \CBitrixComponent
 
     /**
      * @param mixed $param
-     * @param mixed $defaultValue
-     */
-    protected function setDefaultParam(&$param, $defaultValue) {
-        if(!is_set($param)) {
-            $param = $defaultValue;
-        }
-    }
-
-    /**
-     * @param mixed $param
      * @param boolean $defaultValue
      */
     protected function setDefaultBooleanParam(&$param, $defaultValue) {
         if(!is_set($param) || !is_bool($param)) {
             $param = $defaultValue;
         }
-    }
-
-    /**
-     *
-     * @param string $paramCode
-     * @return mixed
-     */
-    public function getParam($paramCode) {
-        return $this->getParamRecursive($paramCode, $this->arParams);
-    }
-
-    /**
-     * @param string $paramCode
-     * @param array $arParams
-     * @return mixed
-     */
-    protected function getParamRecursive($paramCode, $arParams) {
-        $param = null;
-        foreach ($arParams as $paramName => $paramValue) {
-            if($paramName === $paramCode) {
-                $param = $paramValue;
-                break;
-            }
-            elseif(is_array($paramValue)) {
-                $param = $this->getParamRecursive($paramCode, $paramValue);
-
-                if($param) break;
-            }
-        }
-        return $param;
     }
 
     /**
