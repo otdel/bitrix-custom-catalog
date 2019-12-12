@@ -309,7 +309,7 @@ class COipIblockElementList extends \COipIblockElement
 
             global $APPLICATION;
             $sectionName = $APPLICATION->IncludeComponent(
-                "oip:iblock.section.one.name",
+                "oip:iblock.section.list",
                 "",
                 [
                     "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
@@ -317,8 +317,9 @@ class COipIblockElementList extends \COipIblockElement
                     "DEPTH" => 0,
                     "IS_CACHE" => $this->getParam("IS_CACHE"),
                     "CACHE_TIME" => $this->getParam("CACHE_TIME"),
+                    "INCLUDE_TEMPLATE" => false
                 ]
-            );
+            )["SECTION_NAME"];
 
             $this->arResult["SECTION_NAME"] = $sectionName;
         }
@@ -336,7 +337,7 @@ class COipIblockElementList extends \COipIblockElement
             foreach ($sections as $idKey => $idValue) {
 
                 $sections[$idKey] =  $APPLICATION->IncludeComponent(
-                    "oip:iblock.section.one.name",
+                    "oip:iblock.section.list",
                     "",
                     [
                         "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
@@ -344,8 +345,9 @@ class COipIblockElementList extends \COipIblockElement
                         "DEPTH" => 0,
                         "IS_CACHE" => $this->getParam("IS_CACHE"),
                         "CACHE_TIME" => $this->getParam("CACHE_TIME"),
+                        "INCLUDE_TEMPLATE" => false
                     ]
-                );
+                )["SECTION_NAME"];
             }
 
             foreach ($this->rawData as $key => $item) {
