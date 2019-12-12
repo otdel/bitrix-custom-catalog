@@ -29,6 +29,7 @@ $component->setParam("SECTION_ID", $sectionId);
 
 <?
     $component->rewriteComponentParams("LIST_VIEW_TITLE_TEXT", $returnedSectionData["SECTION_NAME"]);
+    $component->rewriteComponentParams("SECTION_NAME", $returnedSectionData["SECTION_NAME"]);
     $component->rewriteComponentParams("COUNT", (int)$returnedSectionData["UF_ELEMENTS_NUMBER"]);
     $component->rewriteComponentParams("LIST_VIEW_CONTAINER_ELEMENT_WIDTH_CSS",
         $returnedSectionData["UF_COLUMNS_COUNT"]);
