@@ -299,7 +299,13 @@ class COipIblockElementList extends \COipIblockElement
             $this->arResult["SECTION_NAME"] = $this->getParam("SECTION_NAME");
         }
         // если есть id категории из параметра компонента
-        elseif($this->getParam("SECTION_ID")) {
+
+        // @todo вероятно, этот случай уже не актуален, т.к. если выше отработал компонент раздела,
+        // @todo то он вернул название раздела, и оно было передано через параметры - случай выше
+
+        elseif($this->getParam("SECTION_ID") || $this->getParam("SECTION_CODE")) {
+            $section = ($this->getParam("SECTION_CODE")) ? $this->getParam("SECTION_CODE")
+                : $this->getParam("SECTION_ID");
 
             global $APPLICATION;
             $sectionName = $APPLICATION->IncludeComponent(
@@ -307,7 +313,7 @@ class COipIblockElementList extends \COipIblockElement
                 "",
                 [
                     "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
-                    "BASE_SECTION" => $this->getParam("SECTION_ID"),
+                    "BASE_SECTION" => $section,
                     "DEPTH" => 0,
                     "IS_CACHE" => $this->getParam("IS_CACHE"),
                     "CACHE_TIME" => $this->getParam("CACHE_TIME"),
@@ -318,7 +324,6 @@ class COipIblockElementList extends \COipIblockElement
         }
         // смотрим id раздела в каждом элементе
         else {
-
             global $APPLICATION;
             $sections = [];
 
