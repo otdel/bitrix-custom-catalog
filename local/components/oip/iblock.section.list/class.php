@@ -656,6 +656,13 @@ class COipIblockSectionList extends \COipComponent
     }
 
     /**
+     * @inheritdoc
+     */
+    public function isParam($paramCode) {
+        return ($this->getParam($paramCode)) ? true : false;
+    }
+
+    /**
      * Флаш - Вызван ли компонент для просмотра одного конкретного раздела (деталки)
      *
      * @return bool
