@@ -244,7 +244,7 @@ class COipIblockElementList extends \COipIblockElement
     /** @return self */
     protected function getAddData() {
 
-        $this->getFileProps()->getSectionName();
+        $this->getFileProps()->getSectionData();
 
         return $this;
     }
@@ -292,7 +292,7 @@ class COipIblockElementList extends \COipIblockElement
         return $this;
     }
 
-    protected function getSectionName() {
+    protected function getSectionData() {
 
         // если имя категории пришло из параметра компонента
         if($this->getParam("SECTION_NAME")) {
