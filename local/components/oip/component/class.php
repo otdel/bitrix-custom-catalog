@@ -1,7 +1,6 @@
 <?php
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
-use \Bitrix\Main\SystemException;
 use Bitrix\Main\Data\Cache;
 
 abstract class COipComponent extends \CBitrixComponent
@@ -21,14 +20,7 @@ abstract class COipComponent extends \CBitrixComponent
 
     public function onPrepareComponentParams($arParams)
     {
-        try {
-            return $this->initParams($arParams);
-        }
-        catch (SystemException $e) {
-            $this->arResult["EXCEPTION"] = $e->getMessage();
-        }
-
-        return $arParams;
+        return $this->initParams($arParams);
     }
 
     final protected function initComponentId() {
@@ -184,7 +176,7 @@ abstract class COipComponent extends \CBitrixComponent
 
     /**
      * @param callable $fetchFunction
-     * @param string $addCahceId
+     * @param string $cacheId
      * @return mixed
      */
     public function cacheService(callable $fetchFunction, $cacheId) {
