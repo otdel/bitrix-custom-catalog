@@ -85,6 +85,24 @@ $component = $this->getComponent();
                 <div class="uk-margin-large-top">
                     <?=$element->getDetailText()?>
                 </div>
+
+                <?if($component->isParam("CARD_VIEW_SHOW_SIDEBAR")):?>
+                    <div class="uk-margin-large-top">
+                        Блок сайбдара в деталке
+                    </div>
+                <?endif?>
+
+                <?if($component->isParam("CARD_VIEW_SHOW_SAME_ELEMENT")):?>
+                    <div class="uk-margin-large-top">
+                        Блок "Похожие товары"
+                    </div>
+                <?endif?>
+
+                <?if($component->isParam("CARD_VIEW_SHOW_POPULAR_WITH_THIS")):?>
+                    <div class="uk-margin-large-top">
+                        Блок "С этими товарами покупают"
+                    </div>
+                <?endif?>
             <?endif?>
 
         <?endif?>
