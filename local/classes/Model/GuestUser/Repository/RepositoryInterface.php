@@ -1,6 +1,6 @@
 <?php
 
-namespace Oip\GuestUser\Repository;
+namespace Oip\Model\GuestUser\Repository;
 
 
 interface RepositoryInterface

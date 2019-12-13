@@ -1,6 +1,6 @@
 <?php
 
-namespace Oip\GuestUser\IdGenerator;
+namespace Oip\Model\GuestUser\IdGenerator;
 
 interface IdGeneratorInterface
 {

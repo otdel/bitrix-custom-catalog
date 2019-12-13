@@ -17,9 +17,9 @@ use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
 
-use Oip\GuestUser\Repository\CookieRepository;
-use Oip\GuestUser\Service;
-use Oip\GuestUser\IdGenerator\DBIdGenerator;
+use Oip\Model\GuestUser\Repository\CookieRepository;
+use Oip\Model\GuestUser\Service;
+use Oip\Model\GuestUser\IdGenerator\DBIdGenerator;
 
 \CBitrixComponent::includeComponentClass("oip:component");
 

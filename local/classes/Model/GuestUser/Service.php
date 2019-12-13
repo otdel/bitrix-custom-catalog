@@ -1,10 +1,10 @@
 <?php
 
 
-namespace Oip\GuestUser;
+namespace Oip\Model\GuestUser;
 
-use Oip\GuestUser\IdGenerator\IdGeneratorInterface;
-use Oip\GuestUser\Repository\RepositoryInterface;
+use Oip\Model\GuestUser\IdGenerator\IdGeneratorInterface;
+use Oip\Model\GuestUser\Repository\RepositoryInterface;
 
 class Service
 {

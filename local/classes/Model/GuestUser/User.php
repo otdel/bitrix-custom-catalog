@@ -1,6 +1,6 @@
 <?php
 
-namespace Oip\GuestUser;
+namespace Oip\Model\GuestUser;
 
 class User
 {

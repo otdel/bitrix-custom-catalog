@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Oip\GuestUser\Repository;
+namespace Oip\Model\GuestUser\Repository;
 
 use Bitrix\Main\Application;
 use Bitrix\Main\SystemException;
