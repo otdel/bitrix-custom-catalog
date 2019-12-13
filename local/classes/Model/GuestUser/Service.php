@@ -20,13 +20,13 @@ class Service
     }
 
     /**
-     * @return null|User
+     * @return null|Entity\User
      */
     public function getUser() {
         $id = (int) $this->repository->getData();
 
         if($id) {
-            return new User($id);
+            return new Entity\User($id);
         }
 
         $newUser = $this->createUser();
@@ -35,9 +35,9 @@ class Service
         return $newUser;
     }
 
-    /** @return User */
+    /** @return Entity\User */
     private function createUser() {
-       return new User($this->idGenerator->generateId());
+       return new Entity\User($this->idGenerator->generateId());
     }
 
 }
