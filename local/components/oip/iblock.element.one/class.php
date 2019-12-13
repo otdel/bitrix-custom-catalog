@@ -12,6 +12,7 @@ use Oip\Model\GuestUser\Service;
 use Oip\Model\GuestUser\IdGenerator\DBIdGenerator;
 
 use Bitrix\Main\Config\Configuration;
+use \Bitrix\Main\Application;
 
 \CBitrixComponent::includeComponentClass("oip:iblock.element.list");
 
@@ -95,7 +96,8 @@ class COipIblockElementOne extends COipIblockElementList {
             if(!$USER->IsAuthorized()) {
                 $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
                 $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
-                $rep = new CookieRepository($cookieName, $cookieExpired);
+                $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
+                $rep = new CookieRepository($cookieName, $cookieExpired, $siteName);
                 $idGen = new DBIdGenerator($ds);
                 $gus = new Service($rep, $idGen);
                 $userID = $gus->getUser()->getId();

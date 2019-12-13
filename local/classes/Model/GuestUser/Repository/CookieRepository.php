@@ -12,11 +12,14 @@ class CookieRepository implements RepositoryInterface
     private $name;
     /** @var int $expired */
     private $expired;
+    /** @var string $domain */
+    private $domain;
 
-    public function __construct($name = null, $expired = null)
+    public function __construct($name = null, $expired = null, $domain)
     {
         $this->name = ($name) ? $name : self::COOKIE_NAME_DEFAULT;
         $this->expired = ($expired) ? $expired : self::COOKIE_EXPIRE_DEFAULT;
+        $this->domain = $domain;
     }
 
     /**
@@ -30,7 +33,7 @@ class CookieRepository implements RepositoryInterface
      * @var integer $id
      */
     public function setData($id): void {
-        setcookie($this->name, $id,time() + $this->expired, "/", SITE_SERVER_NAME);
+        setcookie($this->name, $id,time() + $this->expired, "/", $this->domain);
     }
 
 }

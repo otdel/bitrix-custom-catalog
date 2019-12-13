@@ -11,6 +11,8 @@ use Bitrix\Main\Data\Cache;
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
 use Bitrix\Main\Config\Configuration;
+use \Bitrix\Main\Application;
+
 use Oip\Custom\Component\Iblock\Section;
 
 use Oip\RelevantProducts\DataWrapper;
@@ -692,7 +694,8 @@ class COipIblockSectionList extends \COipComponent
             if(!$USER->IsAuthorized()) {
                 $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
                 $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
-                $rep = new CookieRepository($cookieName, $cookieExpired);
+                $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
+                $rep = new CookieRepository($cookieName, $cookieExpired, $siteName);
                 $idGen = new DBIdGenerator($ds);
                 $gus = new Service($rep, $idGen);
                 $userID = $gus->getUser()->getId();
