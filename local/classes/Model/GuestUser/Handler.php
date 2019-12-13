@@ -6,7 +6,7 @@ namespace Oip\Model\GuestUser;
 use Oip\Model\GuestUser\IdGenerator\IdGeneratorInterface;
 use Oip\Model\GuestUser\Repository\RepositoryInterface;
 
-class Service
+class Handler
 {
     /** @var RepositoryInterface $repository */
     private $repository;

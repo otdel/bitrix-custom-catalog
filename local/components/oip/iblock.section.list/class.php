@@ -20,7 +20,7 @@ use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
 
 use Oip\Model\GuestUser\Repository\CookieRepository;
-use Oip\Model\GuestUser\Service;
+use Oip\Model\GuestUser\Handler as GuestService;
 use Oip\Model\GuestUser\IdGenerator\DBIdGenerator;
 
 \CBitrixComponent::includeComponentClass("oip:component");
@@ -697,7 +697,7 @@ class COipIblockSectionList extends \COipComponent
                 $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
                 $rep = new CookieRepository($cookieName, $cookieExpired, $siteName);
                 $idGen = new DBIdGenerator($ds);
-                $gus = new Service($rep, $idGen);
+                $gus = new GuestService($rep, $idGen);
                 $userID = $gus->getUser()->getId();
             }
 
