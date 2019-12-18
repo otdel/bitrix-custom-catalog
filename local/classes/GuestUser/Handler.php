@@ -1,10 +1,11 @@
 <?php
 
 
-namespace Oip\Model\GuestUser;
+namespace Oip\GuestUser;
 
-use Oip\Model\GuestUser\IdGenerator\IdGeneratorInterface;
-use Oip\Model\GuestUser\Repository\RepositoryInterface;
+use Oip\GuestUser\Entity\User;
+use Oip\GuestUser\IdGenerator\IdGeneratorInterface;
+use Oip\GuestUser\Repository\RepositoryInterface;
 
 class Handler
 {
@@ -20,13 +21,13 @@ class Handler
     }
 
     /**
-     * @return null|Entity\User
+     * @return null|User
      */
     public function getUser() {
         $id = (int) $this->repository->getData();
 
         if($id) {
-            return new Entity\User($id);
+            return new User($id);
         }
 
         $newUser = $this->createUser();
@@ -35,9 +36,9 @@ class Handler
         return $newUser;
     }
 
-    /** @return Entity\User */
+    /** @returnUser */
     private function createUser() {
-       return new Entity\User($this->idGenerator->generateId());
+       return new User($this->idGenerator->generateId());
     }
 
 }

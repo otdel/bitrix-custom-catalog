@@ -7,9 +7,9 @@ use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
 
-use Oip\Model\GuestUser\Repository\CookieRepository;
-use Oip\Model\GuestUser\Handler as GuestService;
-use Oip\Model\GuestUser\IdGenerator\DBIdGenerator;
+use Oip\GuestUser\Repository\CookieRepository;
+use Oip\GuestUser\Handler as GuestService;
+use Oip\GuestUser\IdGenerator\DBIdGenerator;
 
 use Bitrix\Main\Config\Configuration;
 use \Bitrix\Main\Application;

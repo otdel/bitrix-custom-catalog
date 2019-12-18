@@ -1,6 +1,6 @@
 <?php
 
-namespace Oip\Model\GuestUser\IdGenerator;
+namespace Oip\GuestUser\IdGenerator;
 
 use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DataSourceInterface;
