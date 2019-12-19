@@ -8,6 +8,13 @@ use Oip\SocialStore\Cart\Repository\RepositoryInterface;
 
 class Handler
 {
+
+    const GLOBAL_CART_ACTION_NAME = "oipCartAction";
+    const GLOBAL_CART_ACTION_REMOVE_PRODUCT = "oipCartRemoveProduct";
+    const GLOBAL_CART_ACTION_ADD_PRODUCT = "oipCartAddProduct";
+    const GLOBAL_CART_ACTION_REMOVE_ALL = "oipCartRemoveAll";
+    const GLOBAL_CART_DATA_PRODUCT_ID = "oipCartProductId";
+
     /** @var User $user */
     private $user;
     /** @var Entity\ProductCollection $products */
