@@ -51,7 +51,7 @@ class Handler
      */
     public function getProducts(): Entity\ProductCollection
     {
-        if(empty($this->products->getArray())) {
+        if($this->products->isEmpty()) {
             $this->products = $this->repository->getByUserId($this->user->getId());
         }
         return $this->products;

@@ -7,15 +7,16 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 /** @var $products \Oip\SocialStore\Product\Entity\ProductCollection */
 /** @var $cart \Oip\SocialStore\Cart\Handler */
 
-$cart =  $arResult["CART"];
-$products = $arResult["CART"]->getProducts();
 $component = $this->getComponent();
+$cart =  $arResult["CART"];
+$products = $cart->getProducts();
+
 ?>
 
 <div class="uk-container">
     <div class="uk-padding">
 
-        <?if(!$products->count()):?>
+        <?if($products->isEmpty()):?>
             <table class="uk-table">
                 <caption>Ваша корзина пуста</caption>
             </table>
@@ -35,7 +36,7 @@ $component = $this->getComponent();
                 </thead>
 
                 <tbody>
-                <?foreach($products->getArray() as $product):?>
+                <?foreach($products as $product):?>
                     <tr>
 
                         <td><?=$product->getName()?></td>

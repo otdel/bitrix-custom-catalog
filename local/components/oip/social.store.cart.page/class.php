@@ -72,6 +72,8 @@ class COipSocialStoreCartPage extends \COipComponent {
     /**
      * @param Cart $cart
      * @return Cart
+     *
+     * @throws
      */
     private function handleActions(Cart $cart): Cart {
         $action = Application::getInstance()->getContext()->getRequest()->getPost(Cart::GLOBAL_CART_ACTION_NAME);
@@ -95,7 +97,10 @@ class COipSocialStoreCartPage extends \COipComponent {
         return $cart;
     }
 
-    /** @return GuestUser */
+    /**
+     * @return GuestUser
+     * @throws
+     */
     private function initGuestUser(): GuestUser {
         $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
         $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
