@@ -59,6 +59,14 @@ class Handler
 
     /**
      * @param int $productId
+     * @return bool
+     */
+    public function hasProduct(int $productId): bool {
+        return ($this->products->getById($productId)) ? true : false;
+    }
+
+    /**
+     * @param int $productId
      * @return  self
      */
     public function addProduct(int $productId): self {
