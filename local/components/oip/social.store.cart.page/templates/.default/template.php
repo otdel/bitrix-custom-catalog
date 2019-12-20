@@ -54,6 +54,7 @@ $products = $cart->getProducts();
                         <td>
                             <form action="" class="uk-form" method="post">
                                 <input type="hidden" name="<?=$cart::GLOBAL_CART_DATA_PRODUCT_ID?>" value="<?=$product->getId()?>">
+                                <input type="hidden" name="oipCartActionHandler" value="<?=$component->getComponentId()?>">
                                 <button class="uk-button" name="<?=$cart::GLOBAL_CART_ACTION_NAME?>"
                                         value="<?=$cart::GLOBAL_CART_ACTION_REMOVE_PRODUCT?>">
                                     <i class="uk-icon" uk-icon="close" ></i>
@@ -70,6 +71,7 @@ $products = $cart->getProducts();
                 <tr>
                     <td colspan="3">
                         <form action="" class="uk-form" method="post">
+                            <input type="hidden" name="oipCartActionHandler" value="<?=$component->getComponentId()?>">
                             <button class="uk-button" name="<?=$cart::GLOBAL_CART_ACTION_NAME?>"
                                     value="<?=$cart::GLOBAL_CART_ACTION_REMOVE_ALL?>">
                                     <i class="uk-icon" uk-icon="trash" ></i>
