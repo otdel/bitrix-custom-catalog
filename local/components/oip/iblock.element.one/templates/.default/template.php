@@ -66,7 +66,11 @@ $component = $this->getComponent();
 
                             <div class="uk-grid-small uk-child-width-auto uk-flex-middle" uk-grid>
                                 <div>
-                                    <button class="uk-button uk-button-primary">Добавить в корзину</button>
+                                    <?$APPLICATION->IncludeComponent("oip:social.store.cart.button","",[
+                                        "PRODUCT_ID" => $element->getId(),
+                                        "BUTTON_ICON_ADD" => "cart",
+                                        "BUTTON_ICON_REMOVE" => "close"
+                                    ])?>
                                 </div>
                                 <div>
                                     <button class="uk-icon-button uk-margin-small-right" uk-icon="heart" uk-tooltip="Отложить"></button>
