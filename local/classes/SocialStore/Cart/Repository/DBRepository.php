@@ -98,7 +98,7 @@ class DBRepository implements RepositoryInterface
      * @inheritdoc
      * @throws
      */
-    public function removeAllFlush($userId): Entity\ProductCollection {
+    public function removeAllFlush(int $userId): Entity\ProductCollection {
         if(!$this->getRowsCount($userId)) {
             throw new ItemsDontExist($userId);
         }
