@@ -37,10 +37,7 @@ document.addEventListener("DOMContentLoaded",function() {
 
     if(filterReset) {
         filterReset.addEventListener("click", function () {
-
             OIP.Store.unsetFilter(filterId);
-
-            console.log(OIP.Store.getStore());
 
             this.classList.add("uk-invisible");
             OIP.Filter.apply(this.getAttribute("data-filter-id"));
