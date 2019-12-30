@@ -85,7 +85,9 @@ class COipIblockSectionList extends \COipComponent
         // значений некоторых полей, для использования в других компонентах
         if ($this->isSingleSection()) {
 
-            $this->addSectionView(reset($this->arResult["SECTIONS"])->getId());
+            if($this->arResult["SECTIONS"]) {
+                $this->addSectionView(reset($this->arResult["SECTIONS"])->getId());
+            }
 
             /** @var Section $section */
             $section = array_shift($this->arResult["SECTIONS"]);
