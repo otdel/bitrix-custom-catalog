@@ -10,6 +10,10 @@ $filterId = $component->getParam("FILTER_ID");
     "MODE" => "TEMPLATE"
 ])?>
 
+<?
+$namePlaceholder = ($arFilterTemplate["f{$filterId}_fNAME"])
+    ? $arFilterTemplate["f{$filterId}_fNAME"][0] : "";
+?>
 <div class="uk-section uk-section-xsmall uk-section-secondary">
     <div class="uk-container uk-container-large">
         <form class="uk-flex-middle uk-flex-center uk-grid-small oip-filter-form" uk-grid>
@@ -21,7 +25,7 @@ $filterId = $component->getParam("FILTER_ID");
             <div class="uk-width-1-5@m">
                 <div class="uk-panel">
                     <input class="uk-input oip-filter-input oip-filter-simple-item" type="text" name="f<?=$filterId?>_fNAME"
-                           placeholder="Впишите сюда название товара" value="<?=reset($arFilterTemplate["f{$filterId}_fNAME"])?>"
+                           placeholder="Впишите сюда название товара" value="<?=$namePlaceholder?>"
                            data-filter-id="<?=$filterId?>">
                 </div>
             </div>
@@ -53,10 +57,10 @@ $filterId = $component->getParam("FILTER_ID");
                 </div>
             </div>
 
-<!--            --><?//if($isBrandsSelected):?>
+            <?if(!empty($arFilterTemplate)):?>
                 <i class="uk-icon-button uk-margin-small-left" uk-icon="close" id="oip-filter-reset"
                    data-filter-id="<?=$filterId?>"></i>
-<!--            --><?//endif?>
+            <?endif?>
 
         </form>
     </div>
