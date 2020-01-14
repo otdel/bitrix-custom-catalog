@@ -10,7 +10,11 @@ use Oip\SocialStore\Cart\Handler as Cart;
 use Oip\SocialStore\User\Entity\User as CartUser;
 use Oip\SocialStore\Cart\Repository\RepositoryInterface;
 use Oip\SocialStore\Cart\Repository\DBRepository as CartRepository;
-use Oip\SocialStore\Product\Factory\ProductCollection as ProductsFactory;
+
+//use Oip\SocialStore\Product\Factory\ProductCollection as ProductsFactory;
+use Oip\Util\Collection\Factory\CollectionsFactory as ProductsFactory;
+use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
+use Oip\Util\Collection\Factory\NonUniqueIdCreating as NonUniqueIdCreatingException;
 
 use Oip\GuestUser\Handler as GuestUser;
 use Oip\GuestUser\Repository\CookieRepository as GuestUserRepository;
@@ -18,7 +22,11 @@ use Oip\GuestUser\IdGenerator\DBIdGenerator;
 
 abstract class COipSocialStoreCart extends \COipComponent {
 
-    /** @return Cart */
+    /**
+     * @return Cart
+     * @throws InvalidSubclassException
+     * @throws NonUniqueIdCreatingException
+     */
     public function executeComponent()
     {
         $repository = $this->initCartRepository();
@@ -95,14 +103,16 @@ abstract class COipSocialStoreCart extends \COipComponent {
         return new CartUser((int)$userId);
     }
 
-    /*
+    /**
      * @param CartUser $user
      * @param RepositoryInterface $repository
      * @return Cart
      *
-     * */
+     * @throws InvalidSubclassException
+     * @throws NonUniqueIdCreatingException
+     */
     private function initCart(CartUser $user, RepositoryInterface $repository): Cart {
-        $products = ProductsFactory::createByObjects([]);
+        $products = ProductsFactory::createByObjects([], "Oip\SocialStore\Product\Entity\ProductCollection");
         return new Cart($user, $products, $repository);
     }
 

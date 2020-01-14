@@ -2,7 +2,7 @@
 
 namespace Oip\SocialStore\Product\Entity;
 
-use Oip\Util\Collection;
+use Oip\Util\Collection\Collection;
 
 class ProductCollection extends Collection
 {

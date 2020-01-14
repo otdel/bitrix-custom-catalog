@@ -4,10 +4,10 @@ namespace Oip\SocialStore\Cart\Repository;
 
 use Bitrix\Main;
 use Oip\SocialStore\Product\Entity;
-use Oip\SocialStore\Product\Factory\ProductCollection as ProductsFactory;
 
-use Oip\SocialStore\Product\Exception\InvalidObjectType;
-use Oip\SocialStore\Product\Exception\NonUniqueIdCreating;
+use Oip\Util\Collection\Factory\CollectionsFactory as ProductsFactory;
+use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
+use Oip\Util\Collection\Factory\NonUniqueIdCreating as NonUniqueIdCreatingException;
 
 use Oip\SocialStore\Cart\Exception\ItemExists;
 use Oip\SocialStore\Cart\Exception\ItemDoesntExist;
@@ -33,8 +33,8 @@ class DBRepository implements RepositoryInterface
      * @inheritdoc
      *
      * @throws Main\Db\SqlQueryException
-     * @throws NonUniqueIdCreating
-     * @throws InvalidObjectType
+     * @throws NonUniqueIdCreatingException
+     * @throws InvalidSubclassException
      */
     public function getByUserId($userId): Entity\ProductCollection
     {
@@ -53,7 +53,7 @@ class DBRepository implements RepositoryInterface
             );
         }
 
-        return ProductsFactory::createByObjects($products);
+        return ProductsFactory::createByObjects($products, "Oip\SocialStore\Product\Entity\ProductCollection");
     }
 
     /**
@@ -106,7 +106,7 @@ class DBRepository implements RepositoryInterface
         $sql = $this->getRemoveFlushSql($userId);
         $this->db->query($sql);
 
-        return ProductsFactory::createByObjects([]);
+        return ProductsFactory::createByObjects([], "Oip\SocialStore\Product\Entity\ProductCollection");
     }
 
     /**
