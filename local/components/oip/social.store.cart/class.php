@@ -11,7 +11,6 @@ use Oip\SocialStore\User\Entity\User as CartUser;
 use Oip\SocialStore\Cart\Repository\RepositoryInterface;
 use Oip\SocialStore\Cart\Repository\DBRepository as CartRepository;
 
-//use Oip\SocialStore\Product\Factory\ProductCollection as ProductsFactory;
 use Oip\Util\Collection\Factory\CollectionsFactory as ProductsFactory;
 use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
 use Oip\Util\Collection\Factory\NonUniqueIdCreating as NonUniqueIdCreatingException;
@@ -20,7 +19,14 @@ use Oip\GuestUser\Handler as GuestUser;
 use Oip\GuestUser\Repository\CookieRepository as GuestUserRepository;
 use Oip\GuestUser\IdGenerator\DBIdGenerator;
 
+use Oip\SocialStore\Order\Repository\Exception\OrderCreatingError as OrderCreatingErrorException;
+
 abstract class COipSocialStoreCart extends \COipComponent {
+
+    /** @var  string $exception */
+    protected $exception;
+    /** @var  string $success */
+    protected $success;
 
     /**
      * @return Cart
@@ -64,6 +70,27 @@ abstract class COipSocialStoreCart extends \COipComponent {
 
                     case Cart::GLOBAL_CART_ACTION_REMOVE_PRODUCT:
                        return $cart->removeProduct($actionProductId);
+                    break;
+
+                    case Cart::GLOBAL_CART_ACTION_CREATE_ORDER:
+                        global $APPLICATION;
+
+                        try {
+                            $APPLICATION->IncludeComponent("oip:social.store.order.add","",
+                                [
+                                    "USER" => $cart->getUser(),
+                                    "PRODUCTS" => $cart->getProducts()
+                                ]);
+
+                            $cart->removeAll();
+                            $this->success = "Your new order was successfully created";
+                        }
+                        catch (OrderCreatingErrorException $exception) {
+                            $this->exception = $exception->getMessage();
+                        }
+
+                        return $cart;
+
                     break;
 
                     case Cart::GLOBAL_CART_ACTION_REMOVE_ALL:

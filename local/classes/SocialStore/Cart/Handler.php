@@ -13,6 +13,7 @@ class Handler
     const GLOBAL_CART_ACTION_REMOVE_PRODUCT = "oipCartRemoveProduct";
     const GLOBAL_CART_ACTION_ADD_PRODUCT = "oipCartAddProduct";
     const GLOBAL_CART_ACTION_REMOVE_ALL = "oipCartRemoveAll";
+    const GLOBAL_CART_ACTION_CREATE_ORDER = "oipCartCreateOrder";
     const GLOBAL_CART_DATA_PRODUCT_ID = "oipCartProductId";
 
     /** @var User $user */
