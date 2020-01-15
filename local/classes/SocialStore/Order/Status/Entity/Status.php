@@ -5,6 +5,8 @@ namespace Oip\SocialStore\Order\Status\Entity;
 
 class Status
 {
+    const START_STATUS_CODE = "created";
+
     /** @var int */
     private $id;
     /** @var string */
