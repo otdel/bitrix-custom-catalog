@@ -3,6 +3,8 @@
 namespace Oip\SocialStore\Order\Repository;
 
 use Exception;
+use Oip\SocialStore\Order\Repository\Exception\OrderCreatingError as OrderCreatingErrorException;
+use Oip\SocialStore\Order\Repository\Exception\OrderDeletingError as OrderDeletingErrorException;
 use Oip\Util\Collection\Factory\NonUniqueIdCreating as NonUniqueIdCreatingException;
 use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
 use Bitrix\Main;
@@ -97,6 +99,7 @@ class DBRepository implements RepositoryInterface
     /**
      * @inheritdoc
      * @throws Main\DB\SqlQueryException
+     * @throws OrderCreatingErrorException
      */
     public function addOrder(Entity\Order $order): int
     {
@@ -107,17 +110,26 @@ class DBRepository implements RepositoryInterface
         $sql = $this->getAddOrderSql($userId, $statusId, $products);
         $this->db->query($sql);
 
+        if($this->db->getAffectedRowsCount() === 0) {
+            throw new OrderCreatingErrorException();
+        }
+
         return $this->db->getAffectedRowsCount();
     }
 
     /**
      * @inheritdoc
      * @throws Main\DB\SqlQueryException
+     * @throws OrderDeletingErrorException
      */
     public function removeOrder(int $orderId): int
     {
        $sql = $this->removeOrderSql($orderId);
        $this->db->query($sql);
+
+       if($this->db->getAffectedRowsCount() === 0) {
+           throw new OrderDeletingErrorException($orderId);
+       }
 
        return $this->db->getAffectedRowsCount();
     }
