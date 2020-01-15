@@ -145,7 +145,7 @@ class DBRepository implements RepositoryInterface
      */
     private function getAddOrderSql(int $userId, int $statusId, string $products): string
     {
-        return "INSERT INTO {$this->ordersTableName} (user_id, status_id, products) VALUES ($userId, $statusId, '$products')";
+        return "INSERT INTO {$this->ordersTableName} (user_id, status_id, products) VALUE ($userId, $statusId, '$products')";
     }
 
     /**
