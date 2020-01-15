@@ -21,13 +21,13 @@ interface RepositoryInterface
 
     /**
      * @param Entity\Order $order
-     * @return void
+     * @return int
      * */
-    public function addOrder(Entity\Order $order): void;
+    public function addOrder(Entity\Order $order): int;
 
     /**
      * @param int $orderId
-     * @return void
+     * @return int
     */
-    public function removeOrder(int $orderId): void;
+    public function removeOrder(int $orderId): int;
 }

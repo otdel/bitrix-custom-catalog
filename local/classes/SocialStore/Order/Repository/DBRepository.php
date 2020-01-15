@@ -98,7 +98,7 @@ class DBRepository implements RepositoryInterface
      * @inheritdoc
      * @throws Main\DB\SqlQueryException
      */
-    public function addOrder(Entity\Order $order): void
+    public function addOrder(Entity\Order $order): int
     {
         $userId = $order->getUser()->getId();
         $statusId = $order->getStatus()->getId();
@@ -106,16 +106,20 @@ class DBRepository implements RepositoryInterface
 
         $sql = $this->getAddOrderSql($userId, $statusId, $products);
         $this->db->query($sql);
+
+        return $this->db->getAffectedRowsCount();
     }
 
     /**
      * @inheritdoc
      * @throws Main\DB\SqlQueryException
      */
-    public function removeOrder(int $orderId): void
+    public function removeOrder(int $orderId): int
     {
        $sql = $this->removeOrderSql($orderId);
        $this->db->query($sql);
+
+       return $this->db->getAffectedRowsCount();
     }
 
     /**
