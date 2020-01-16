@@ -30,10 +30,13 @@ class COipSocialStoreCartButton extends \COipSocialStoreCart {
 
     public function executeComponent()
     {
-        $cart = parent::executeComponent();
 
-        $this->arResult["CART"] = $cart;
-        $this->arResult["IN_CART"] = ($cart->hasProduct($this->getParam("PRODUCT_ID")));
+       $cart = $this->getProcessorResult();
+
+        if($cart) {
+            $this->arResult["CART"] = $cart;
+            $this->arResult["IN_CART"] = ($cart->hasProduct($this->getParam("PRODUCT_ID")));
+        }
 
         $this->includeComponentTemplate();
     }

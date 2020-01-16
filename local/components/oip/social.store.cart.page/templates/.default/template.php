@@ -14,8 +14,14 @@ use  Oip\SocialStore\Product\Entity\ProductCollection;
 /** @var $cart Cart */
 
 $component = $this->getComponent();
-$cart =  $arResult["CART"];
-$products = $cart->getProducts();
+
+
+$exception = $arResult["EXCEPTION"];
+
+if(!$exception) {
+    $cart =  $arResult["CART"];
+    $products = $cart->getProducts();
+}
 
 ?>
 

@@ -19,14 +19,7 @@ use Oip\GuestUser\Handler as GuestUser;
 use Oip\GuestUser\Repository\CookieRepository as GuestUserRepository;
 use Oip\GuestUser\IdGenerator\DBIdGenerator;
 
-use Oip\SocialStore\Order\Repository\Exception\OrderCreatingError as OrderCreatingErrorException;
-
 abstract class COipSocialStoreCart extends \COipComponent {
-
-    /** @var  string $exception */
-    protected $exception;
-    /** @var  string $success */
-    protected $success;
 
     /**
      * @return Cart
@@ -35,70 +28,19 @@ abstract class COipSocialStoreCart extends \COipComponent {
      */
     public function executeComponent()
     {
-        $repository = $this->initCartRepository();
-        $user = $this->initCartUser();
-        $cart = $this->initCart($user, $repository);
-
-        $cart = $this->handleActions($cart);
-        $cart->getProducts();
-
-        return $cart;
+        return $this->getCart();
     }
 
     /**
-     * @param Cart $cart
      * @return Cart
-     *
-     * @throws
+     * @throws InvalidSubclassException
+     * @throws NonUniqueIdCreatingException
      */
-    protected function handleActions(Cart $cart): Cart {
-
-        $action = Application::getInstance()->getContext()->getRequest()->getPost(Cart::GLOBAL_CART_ACTION_NAME);
-        $actionProductId = (int)Application::getInstance()->getContext()
-            ->getRequest()->getPost(Cart::GLOBAL_CART_DATA_PRODUCT_ID);
-        $actionHandlerId = (int)Application::getInstance()->getContext()
-            ->getRequest()->getPost("oipCartActionHandler");
-
-        if( $this->componentId === $actionHandlerId) {
-            if(is_set($action)) {
-                switch ($action) {
-
-                    case Cart::GLOBAL_CART_ACTION_ADD_PRODUCT:
-
-                        return $cart->addProduct($actionProductId);
-                    break;
-
-                    case Cart::GLOBAL_CART_ACTION_REMOVE_PRODUCT:
-                       return $cart->removeProduct($actionProductId);
-                    break;
-
-                    case Cart::GLOBAL_CART_ACTION_CREATE_ORDER:
-                        global $APPLICATION;
-
-                        try {
-                            $APPLICATION->IncludeComponent("oip:social.store.order.add","",
-                                [
-                                    "USER" => $cart->getUser(),
-                                    "PRODUCTS" => $cart->getProducts()
-                                ]);
-
-                            $cart->removeAll();
-                            $this->success = "Your new order was successfully created";
-                        }
-                        catch (OrderCreatingErrorException $exception) {
-                            $this->exception = $exception->getMessage();
-                        }
-
-                        return $cart;
-
-                    break;
-
-                    case Cart::GLOBAL_CART_ACTION_REMOVE_ALL:
-                        return $cart->removeAll();
-                    break;
-                }
-            }
-        }
+    protected function getCart() {
+        $repository = $this->initCartRepository();
+        $user = $this->initCartUser();
+        $cart = $this->initCart($user, $repository);
+        $cart->getProducts();
 
         return $cart;
     }
@@ -159,6 +101,21 @@ abstract class COipSocialStoreCart extends \COipComponent {
         $idGenerator = new DBIdGenerator($ds);
 
         return new GuestUser($repository, $idGenerator);
+    }
+
+    /**
+     * @return Cart|null
+    */
+    protected function getProcessorResult(): ?Cart {
+        global $OipSocialStoreCart;
+
+        if(!is_set($OipSocialStoreCart) || !($OipSocialStoreCart instanceof Cart)) {
+            $this->arResult["EXCEPTION"] = "The component oip:social.store.cart.processor wasn't running";
+            return null;
+        }
+        else {
+            return $OipSocialStoreCart;
+        }
     }
 
 }

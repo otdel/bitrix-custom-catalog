@@ -3,17 +3,27 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 \CBitrixComponent::includeComponentClass("oip:social.store.cart");
 
-
 class COipSocialStoreCartPage extends \COipSocialStoreCart {
 
     public function executeComponent()
     {
-        $cart = parent::executeComponent();
+        $this->arResult["CART"] = $this->getProcessorResult();
 
-        $this->arResult["CART"] = $cart;
-        $this->arResult["EXCEPTION"] = $this->exception;
-        $this->arResult["SUCCESS"] = $this->success;
+        if(!$this->arResult["EXCEPTION"]) {
+            $this->arResult["EXCEPTION"] = $this->getOrderCreatingError();
+            $this->arResult["SUCCESS"] = $this->getOrderCreatingSuccess();
+        }
 
         $this->includeComponentTemplate();
+    }
+
+    private function getOrderCreatingSuccess() {
+        global $OipSocialStoreCartOrderCreatedSuccess;
+        return $OipSocialStoreCartOrderCreatedSuccess;
+    }
+
+    private function getOrderCreatingError() {
+        global $OipSocialStoreCartOrderCreatingErrorException;
+        return $OipSocialStoreCartOrderCreatingErrorException;
     }
 }
