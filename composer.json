@@ -24,7 +24,7 @@
     "homepage": "https://github.com/otdel/bitrix-custom-catalog",
     "require": {
         "php": ">=7.2",
-        "arrilot/bitrix-migrations": "2.6.2"
+        "arrilot/bitrix-migrations": "2.6"
     },
     "autoload": {
         "psr-4": {"Oip\\": "local/classes/"}
