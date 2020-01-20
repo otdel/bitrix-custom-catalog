@@ -7,9 +7,6 @@ use Oip\GuestUser\Entity\User;
 use Oip\GuestUser\IdGenerator\IdGeneratorInterface;
 use Oip\GuestUser\Repository\RepositoryInterface;
 
-use Oip\RelevantProducts\DBDataSource as RelevantProductsDS;
-use Oip\CacheInfo;
-
 class Handler
 {
     /** @var RepositoryInterface $repository */
@@ -42,13 +39,5 @@ class Handler
     /** @returnUser */
     private function createUser() {
        return new User($this->idGenerator->generateId());
-    }
-
-    /** @return RelevantProductsDS */
-    public static function getIDGenDataSource(): RelevantProductsDS {
-        global $DB;
-
-        $cacheInfo = new CacheInfo();
-        return new RelevantProductsDS($DB, $cacheInfo);
     }
 }

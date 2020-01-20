@@ -94,11 +94,10 @@ abstract class COipSocialStoreCart extends \COipComponent {
         $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
 
         $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
-
-        $ds = GuestUser::getIDGenDataSource();
+        $connection = Application::getConnection();
 
         $repository = new GuestUserRepository($cookieName, $cookieExpired, $siteName);
-        $idGenerator = new DBIdGenerator($ds);
+        $idGenerator = new DBIdGenerator($connection);
 
         return new GuestUser($repository, $idGenerator);
     }

@@ -2,26 +2,37 @@
 
 namespace Oip\GuestUser\IdGenerator;
 
-use Oip\RelevantProducts\DataWrapper;
-use Oip\RelevantProducts\DataSourceInterface;
+use Bitrix\Main\DB\SqlException;
+use Bitrix\Main\DB\Connection;
+
+use Oip\GuestUser\IdGenerator\Exception\AddingNewGuestId as AddingNewGuestIdException;
 
 class DBIdGenerator implements IdGeneratorInterface
 {
-    /** @var DataSourceInterface */
-    private $ds;
 
-    public function __construct(DataSourceInterface $ds)
+    /** @var $guestUserTableName string */
+    private $guestUserTableName = "oip_guest_users";
+
+    /** @var $db Connection */
+    private $db;
+
+    public function __construct(Connection $connection)
     {
-        $this->ds = $ds;
+        $this->db = $connection;
     }
 
     /**
-     * @return integer
-     * @throws \Exception
+     * @return int
+     * @throws SqlException
+     * @throws AddingNewGuestIdException
      */
-    public function generateId(): int
-    {
-        $dw = new DataWrapper($this->ds);
-        return $dw->getFreeGuestId();
-    }
+   public function generateId(): int
+   {
+       $this->db->query("INSERT INTO {$this->guestUserTableName} (id) VALUE ('') ");
+
+       if($this->db->getAffectedRowsCount() === 0) {
+           throw new AddingNewGuestIdException();
+       }
+       return (0 - $this->db->getInsertedId());
+   }
 }

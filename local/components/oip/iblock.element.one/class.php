@@ -97,8 +97,10 @@ class COipIblockElementOne extends COipIblockElementList {
                 $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
                 $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
                 $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
+                $connection = Application::getInstance()->getConnection();
+
                 $rep = new CookieRepository($cookieName, $cookieExpired, $siteName);
-                $idGen = new DBIdGenerator($ds);
+                $idGen = new DBIdGenerator($connection);
                 $gus = new GuestService($rep, $idGen);
                 $userID = $gus->getUser()->getId();
             }
