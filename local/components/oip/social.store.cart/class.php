@@ -4,7 +4,6 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 \CBitrixComponent::includeComponentClass("oip:component");
 
 use Bitrix\Main\Application;
-use Bitrix\Main\Config\Configuration;
 
 use Oip\SocialStore\Cart\Handler as Cart;
 use Oip\SocialStore\User\Entity\User as CartUser;
@@ -16,8 +15,6 @@ use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
 use Oip\Util\Collection\Factory\NonUniqueIdCreating as NonUniqueIdCreatingException;
 
 use Oip\GuestUser\Handler as GuestUser;
-use Oip\GuestUser\Repository\CookieRepository as GuestUserRepository;
-use Oip\GuestUser\IdGenerator\DBIdGenerator;
 
 abstract class COipSocialStoreCart extends \COipComponent {
 
@@ -67,7 +64,12 @@ abstract class COipSocialStoreCart extends \COipComponent {
                 $userId = $this->initGuestUser()->getUser()->getId();
             }
         */
-        $userId = $this->initGuestUser()->getUser()->getId();
+
+        /**
+         * @var $OipGuestUser GuestUser
+        */
+        global $OipGuestUser;
+        $userId = $OipGuestUser->getUser()->getId();
 
         return new CartUser((int)$userId);
     }
@@ -83,23 +85,6 @@ abstract class COipSocialStoreCart extends \COipComponent {
     private function initCart(CartUser $user, RepositoryInterface $repository): Cart {
         $products = ProductsFactory::createByObjects([], "Oip\SocialStore\Product\Entity\ProductCollection");
         return new Cart($user, $products, $repository);
-    }
-
-    /**
-     * @return GuestUser
-     * @throws
-     */
-    private function initGuestUser(): GuestUser {
-        $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
-        $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
-
-        $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
-        $connection = Application::getConnection();
-
-        $repository = new GuestUserRepository($cookieName, $cookieExpired, $siteName);
-        $idGenerator = new DBIdGenerator($connection);
-
-        return new GuestUser($repository, $idGenerator);
     }
 
     /**

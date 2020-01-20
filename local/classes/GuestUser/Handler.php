@@ -14,6 +14,9 @@ class Handler
     /** @var  IdGeneratorInterface $idGenerator */
     private $idGenerator;
 
+    /** @var $user User */
+    private $user;
+
     public function __construct(RepositoryInterface $repository, IdGeneratorInterface $idGenerator)
     {
         $this->repository = $repository;
@@ -21,23 +24,33 @@ class Handler
     }
 
     /**
-     * @return null|User
+     * @return User
      */
-    public function getUser() {
-        $id = (int) $this->repository->getData();
+    public function getUser(): User {
 
-        if($id) {
-            return new User($id);
+        if(is_null($this->user))     {
+            $this->user = new User($this->fetchUserId());
         }
 
-        $newUser = $this->createUser();
-        $this->repository->setData($newUser->getId());
-
-        return $newUser;
+        return $this->user;
     }
 
-    /** @returnUser */
-    private function createUser() {
-       return new User($this->idGenerator->generateId());
+    /**
+     * @return int
+     */
+    private function fetchUserId(): int {
+        $id = (int)$this->repository->getData();
+        if(!$id) {
+            $id = $this->idGenerator->generateId();
+        }
+
+        return $id;
+    }
+
+    /**
+     * @return void
+     */
+    public function setUser(): void {
+        $this->repository->setData($this->user->getId());
     }
 }
