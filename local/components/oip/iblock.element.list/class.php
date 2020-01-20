@@ -317,7 +317,8 @@ class COipIblockElementList extends \COipIblockElement
                     "DEPTH" => 0,
                     "IS_CACHE" => $this->getParam("IS_CACHE"),
                     "CACHE_TIME" => $this->getParam("CACHE_TIME"),
-                    "INCLUDE_TEMPLATE" => false
+                    "INCLUDE_TEMPLATE" => false,
+                    "COUNT_VIEW" => false
                 ]
             )["SECTION_NAME"];
 
@@ -345,7 +346,8 @@ class COipIblockElementList extends \COipIblockElement
                         "DEPTH" => 0,
                         "IS_CACHE" => $this->getParam("IS_CACHE"),
                         "CACHE_TIME" => $this->getParam("CACHE_TIME"),
-                        "INCLUDE_TEMPLATE" => false
+                        "INCLUDE_TEMPLATE" => false,
+                        "COUNT_VIEW" => false,
                     ]
                 )["SECTION_NAME"];
             }

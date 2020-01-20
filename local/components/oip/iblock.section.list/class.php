@@ -234,6 +234,7 @@ class COipIblockSectionList extends \COipComponent
         $this->setDefaultParam($arParams["PREVIEW_PICTURE_CLASS"], "");
 
         $this->setDefaultBooleanParam($arParams["INCLUDE_TEMPLATE"], true);
+        $this->setDefaultBooleanParam($arParams["COUNT_VIEW"], true);
 
         // Поле, по которому производится выборка раздела
         $arParams["FILTER_FIELD_NAME"] = is_int($arParams["BASE_SECTION"]) ? "ID": "CODE";
@@ -682,32 +683,34 @@ class COipIblockSectionList extends \COipComponent
     }
 
     private function addSectionView($sectionID) {
-        try {
+        if($this->isParam("COUNT_VIEW")) {
+            try {
 
-            global $DB;
-            global $USER;
+                global $DB;
+                global $USER;
 
-            $cacheInfo = new CacheInfo();
-            $ds = new DBDataSource($DB, $cacheInfo);
-            $dw = new DataWrapper($ds);
+                $cacheInfo = new CacheInfo();
+                $ds = new DBDataSource($DB, $cacheInfo);
+                $dw = new DataWrapper($ds);
 
-            $userID = $USER->GetID();
+                $userID = $USER->GetID();
 
-            if(!$USER->IsAuthorized()) {
-                $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
-                $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
-                $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
-                $rep = new CookieRepository($cookieName, $cookieExpired, $siteName);
-                $idGen = new DBIdGenerator($ds);
-                $gus = new GuestService($rep, $idGen);
-                $userID = $gus->getUser()->getId();
+                if(!$USER->IsAuthorized()) {
+                    $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
+                    $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
+                    $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
+                    $rep = new CookieRepository($cookieName, $cookieExpired, $siteName);
+                    $idGen = new DBIdGenerator($ds);
+                    $gus = new GuestService($rep, $idGen);
+                    $userID = $gus->getUser()->getId();
+                }
+
+                $dw->addSectionView((int)$userID, (int)$sectionID);
+
             }
-
-            $dw->addSectionView((int)$userID, (int)$sectionID);
-
-        }
-        catch(\Exception $exception) {
-            echo "<p>Не удалось обработать просмотр категории: {$exception->getMessage()}</p>";
+            catch(\Exception $exception) {
+                echo "<p>Не удалось обработать просмотр категории: {$exception->getMessage()}</p>";
+            }
         }
     }
 

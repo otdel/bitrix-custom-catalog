@@ -129,6 +129,7 @@ class COipIblockElementOne extends COipIblockElementList {
                     "IS_CACHE" => $this->getParam("IS_CACHE"),
                     "CACHE_TIME" => $this->getParam("CACHE_TIME"),
                     "INCLUDE_TEMPLATE" => false,
+                    "COUNT_VIEW" => false,
                     "USER_FIELDS" => ["UF_*"],
                 ]
             );
