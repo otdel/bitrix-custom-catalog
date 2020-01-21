@@ -29,6 +29,8 @@ class COipGuestUserProcessorInit extends \COipComponent
         $repository = new GuestUserRepository($cookieName, $cookieExpired, $siteName);
         $idGenerator = new DBIdGenerator($connection);
 
-        $GLOBALS["OipGuestUser"] = new GuestUser($repository, $idGenerator);
+        $user = new GuestUser($repository, $idGenerator);
+        $user->getUser();
+        $GLOBALS["OipGuestUser"] = $user;
     }
 }
