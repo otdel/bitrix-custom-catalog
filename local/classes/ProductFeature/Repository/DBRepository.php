@@ -3,18 +3,10 @@
 
 namespace Oip\ProductFeature\Repository;
 
-use Bitrix\Main\Application;
-use Bitrix\Main\SystemException;
-use Oip\IblockElementFeature\ElementFeature\ElementFeatureTable;
-use Oip\IblockElementFeature\ElementFeatureValue\ElementFeatureValueTable;
 use Oip\IblockElementFeature\Feature\Feature;
 use Oip\IblockElementFeature\Feature\FeatureCollection;
-use Oip\IblockElementFeature\Feature\FeatureTable;
 use Oip\IblockElementFeature\FeatureValue\FeatureValue;
 use Oip\IblockElementFeature\FeatureValue\FeatureValueCollection;
-use Oip\IblockElementFeature\FeatureValue\FeatureValueTable;
-use Oip\Mr3Sync\Ware\Ware;
-use Oip\Mr3Sync\Ware\WareCookerHood;
 use Oip\ProductFeature\ProductFeature;
 use Oip\ProductFeature\ProductFeatureValue;
 use Protobuf\Exception;
