@@ -4,23 +4,23 @@
 namespace Oip\GuestUser;
 
 use Oip\GuestUser\Entity\User;
-use Oip\GuestUser\UserGenerator\UserGeneratorInterface;
-use Oip\GuestUser\Repository\RepositoryInterface;
+use Oip\GuestUser\Repository\ServerRepository\RepositoryInterface as ServerRepositoryInterface;
+use Oip\GuestUser\Repository\ClientRepository\RepositoryInterface as ClientRepositoryInterface;
 
 class Handler
 {
-    /** @var RepositoryInterface $repository */
-    private $repository;
-    /** @var  UserGeneratorInterface $userGenerator */
-    private $userGenerator;
+    /** @var ClientRepositoryInterface $clientRepository */
+    private $clientRepository;
+    /** @var  ServerRepositoryInterface $serverRepository */
+    private $serverRepository;
 
     /** @var $user User */
     private $user;
 
-    public function __construct(RepositoryInterface $repository, UserGeneratorInterface $userGenerator)
+    public function __construct(ClientRepositoryInterface $clientRepository, ServerRepositoryInterface $serverRepository)
     {
-        $this->repository = $repository;
-        $this->userGenerator = $userGenerator;
+        $this->clientRepository = $clientRepository;
+        $this->serverRepository = $serverRepository;
     }
 
     /**
@@ -39,13 +39,13 @@ class Handler
      * @return User
      */
     private function fetchUser(): User {
-        $hashId = $this->repository->getData();
+        $hashId = $this->clientRepository->getData();
 
         if(!$hashId) {
-            $user = $this->userGenerator->generateUser();
+            $user = $this->serverRepository->addUser();
         }
         else {
-            $user = $this->userGenerator->getUserByHashId($hashId);
+            $user = $this->serverRepository->getUserByHashId($hashId);
         }
 
         return $user;
@@ -55,6 +55,6 @@ class Handler
      * @return void
      */
     public function setUser(): void {
-        $this->repository->setData($this->user->getHashId());
+        $this->clientRepository->setData($this->user->getHashId());
     }
 }

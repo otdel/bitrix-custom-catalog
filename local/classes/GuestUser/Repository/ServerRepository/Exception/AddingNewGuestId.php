@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Oip\GuestUser\ServerRepository\Exception;
+namespace Oip\GuestUser\Repository\ServerRepository\Exception;
 
 use Exception;
 

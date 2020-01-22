@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Oip\GuestUser\Repository;
+namespace Oip\GuestUser\Repository\ClientRepository;
 
 class CookieRepository implements RepositoryInterface
 {

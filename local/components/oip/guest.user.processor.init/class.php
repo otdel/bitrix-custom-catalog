@@ -6,8 +6,8 @@ use Bitrix\Main\Config\Configuration;
 use Bitrix\Main\SystemException;
 
 use Oip\GuestUser\Handler as GuestUser;
-use Oip\GuestUser\Repository\CookieRepository as GuestUserRepository;
-use Oip\GuestUser\UserGenerator\DBUserGenerator;
+use Oip\GuestUser\Repository\ClientRepository\CookieRepository;
+use Oip\GuestUser\Repository\ServerRepository\DBRepository;
 
 \CBitrixComponent::includeComponentClass("oip:component");
 
@@ -26,10 +26,10 @@ class COipGuestUserProcessorInit extends \COipComponent
         $siteName = Application::getInstance()->getContext()->getServer()->getServerName();
         $connection = Application::getConnection();
 
-        $repository = new GuestUserRepository($cookieName, $cookieExpired, $siteName);
-        $userGenerator = new DBUserGenerator($connection);
+        $clientRepository = new CookieRepository($cookieName, $cookieExpired, $siteName);
+        $serverRepository = new DBRepository($connection);
 
-        $user = new GuestUser($repository, $userGenerator);
+        $user = new GuestUser($clientRepository, $serverRepository);
         $user->getUser();
         $GLOBALS["OipGuestUser"] = $user;
     }

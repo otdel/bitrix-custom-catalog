@@ -1,6 +1,6 @@
 <?php
 
-namespace Oip\GuestUser\UserGenerator;
+namespace Oip\GuestUser\Repository\ServerRepository;
 
 use DateTime;
 use Exception;
@@ -9,9 +9,9 @@ use Bitrix\Main\DB\SqlException;
 use Bitrix\Main\DB\Connection;
 
 use Oip\GuestUser\Entity\User;
-use Oip\GuestUser\Exception\AddingNewGuestId as AddingNewGuestIdException;
+use Oip\GuestUser\Repository\ServerRepository\Exception\AddingNewGuestId as AddingNewGuestIdException;
 
-class DBUserGenerator implements UserGeneratorInterface
+class DBRepository implements RepositoryInterface
 {
 
     /** @var $guestUserTableName string */
@@ -40,7 +40,7 @@ class DBUserGenerator implements UserGeneratorInterface
      * @throws AddingNewGuestIdException
      * @throws Exception
      */
-   public function generateUser(): User
+   public function addUser(): User
    {
        $hashId = $this->generateHashId();
 

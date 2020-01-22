@@ -1,12 +1,12 @@
 <?php
 
-namespace Oip\GuestUser\UserGenerator;
+namespace Oip\GuestUser\Repository\ServerRepository;
 
 use Oip\GuestUser\Entity\User;
 
-interface UserGeneratorInterface
+interface RepositoryInterface
 {
-    public function generateUser(): User;
+    public function addUser(): User;
     /**
      * @param $hashId string
      * @return User
