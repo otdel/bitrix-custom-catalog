@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Oip\GuestUser\IdGenerator\Exception;
+namespace Oip\GuestUser\ServerRepository\Exception;
 
 use Exception;
 

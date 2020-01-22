@@ -4,23 +4,23 @@
 namespace Oip\GuestUser;
 
 use Oip\GuestUser\Entity\User;
-use Oip\GuestUser\IdGenerator\IdGeneratorInterface;
+use Oip\GuestUser\UserGenerator\UserGeneratorInterface;
 use Oip\GuestUser\Repository\RepositoryInterface;
 
 class Handler
 {
     /** @var RepositoryInterface $repository */
     private $repository;
-    /** @var  IdGeneratorInterface $idGenerator */
-    private $idGenerator;
+    /** @var  UserGeneratorInterface $userGenerator */
+    private $userGenerator;
 
     /** @var $user User */
     private $user;
 
-    public function __construct(RepositoryInterface $repository, IdGeneratorInterface $idGenerator)
+    public function __construct(RepositoryInterface $repository, UserGeneratorInterface $userGenerator)
     {
         $this->repository = $repository;
-        $this->idGenerator = $idGenerator;
+        $this->userGenerator = $userGenerator;
     }
 
     /**
@@ -29,28 +29,32 @@ class Handler
     public function getUser(): User {
 
         if(is_null($this->user))     {
-            $this->user = new User($this->fetchUserId());
+            $this->user = $this->fetchUser();
         }
 
         return $this->user;
     }
 
     /**
-     * @return int
+     * @return User
      */
-    private function fetchUserId(): int {
-        $id = (int)$this->repository->getData();
-        if(!$id) {
-            $id = $this->idGenerator->generateId();
+    private function fetchUser(): User {
+        $hashId = $this->repository->getData();
+
+        if(!$hashId) {
+            $user = $this->userGenerator->generateUser();
+        }
+        else {
+            $user = $this->userGenerator->getUserByHashId($hashId);
         }
 
-        return $id;
+        return $user;
     }
 
     /**
      * @return void
      */
     public function setUser(): void {
-        $this->repository->setData($this->user->getId());
+        $this->repository->setData($this->user->getHashId());
     }
 }

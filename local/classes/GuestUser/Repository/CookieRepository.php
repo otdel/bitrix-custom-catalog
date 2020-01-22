@@ -30,7 +30,7 @@ class CookieRepository implements RepositoryInterface
     }
 
     /**
-     * @var integer $id
+     * @var string $id
      */
     public function setData($id): void {
         setcookie($this->name, $id,time() + $this->expired, "/", $this->domain);
