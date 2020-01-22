@@ -5,7 +5,7 @@ namespace Oip\GuestUser\Repository\ServerRepository\Exception;
 
 use Exception;
 
-class AddingNewGuestId extends Exception
+class AddingNewGuest extends Exception
 {
     public function __construct()
     {

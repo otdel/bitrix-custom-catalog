@@ -1,7 +1,7 @@
 {
     "name": "oip/custom",
     "description": "Standart product catalog for Bitrix CMS from ООО \"Отдел Интернет-проектов\"",
-    "version": "0.18.15",
+    "version": "0.18.1",
     "type": "library",
     "keywords": ["bitrix", "catalog"],
     "authors": [

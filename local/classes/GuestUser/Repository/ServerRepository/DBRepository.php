@@ -9,7 +9,7 @@ use Bitrix\Main\DB\SqlException;
 use Bitrix\Main\DB\Connection;
 
 use Oip\GuestUser\Entity\User;
-use Oip\GuestUser\Repository\ServerRepository\Exception\AddingNewGuestId as AddingNewGuestIdException;
+use Oip\GuestUser\Repository\ServerRepository\Exception\AddingNewGuest as AddingNewGuestException;
 use Oip\GuestUser\Repository\ServerRepository\Exception\GettingByHashId as GettingByHashIdException;
 
 class DBRepository implements RepositoryInterface
@@ -42,7 +42,7 @@ class DBRepository implements RepositoryInterface
     /**
      * @return User
      * @throws SqlException
-     * @throws AddingNewGuestIdException
+     * @throws AddingNewGuestException
      * @throws Exception
      */
    public function addUser(): User
@@ -52,7 +52,7 @@ class DBRepository implements RepositoryInterface
        $this->db->query("INSERT INTO {$this->guestUserTableName} (hash_id) VALUE ('$hashId') ");
 
        if($this->db->getAffectedRowsCount() === 0) {
-           throw new AddingNewGuestIdException();
+           throw new AddingNewGuestException();
        }
 
        return (new User($this->getNegativeId($this->db->getInsertedId()), $hashId));
