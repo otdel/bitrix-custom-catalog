@@ -10,6 +10,7 @@ use Bitrix\Main\DB\Connection;
 
 use Oip\GuestUser\Entity\User;
 use Oip\GuestUser\Repository\ServerRepository\Exception\AddingNewGuestId as AddingNewGuestIdException;
+use Oip\GuestUser\Repository\ServerRepository\Exception\GettingByHashId as GettingByHashIdException;
 
 class DBRepository implements RepositoryInterface
 {
@@ -28,9 +29,13 @@ class DBRepository implements RepositoryInterface
     /**
      * @inheritDoc
      * @throws SqlException;
+     * @throws GettingByHashIdException;
     */
     public  function getUserByHashId(string $hashId): User {
         $user = $this->db->query("SELECT * FROM {$this->guestUserTableName} WHERE `hash_id` = '$hashId' ")->fetch();
+        if(!$user) {
+            throw new GettingByHashIdException($hashId);
+        }
         return new User($this->getNegativeId((int)$user["id"]), $user["hash_id"]);
     }
 
