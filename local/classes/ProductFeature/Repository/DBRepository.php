@@ -45,6 +45,7 @@ class DBRepository implements RepositoryInterface
         // Базовые
         $arFeatures[] = new ProductFeature(["name" => "Цвет", "code" => "color"]);
         $arFeatures[] = new ProductFeature(["name" => "Гарантия", "code" => "guarantee"]);
+        $arFeatures[] = new ProductFeature(["name" => "Модель кухни", "code" => "kitchenModelName"]);
         // Кухонные вытяжки
         $arFeatures[] = new ProductFeature(["name" => "Ширина", "code" => "width"]);
         $arFeatures[] = new ProductFeature(["name" => "Тип", "code" => "type"]);
@@ -58,6 +59,10 @@ class DBRepository implements RepositoryInterface
         //foreach ($arFeatures as $features) {
             foreach ($arFeatures as $key => $feature) {
                 // Добавляем запись
+                $sql = "ALTER TABLE {$this->featureTableName} AUTO_INCREMENT = 1; ";
+                // Выполняем запрос
+                $query = $this->db->Query($sql);
+
                 $sql =
                     "INSERT IGNORE INTO {$this->featureTableName} (code, name, sort_filter, sort_info, css_filter_classname, is_filter, is_predefined, is_disabled) " .
                     "VALUES (" .
@@ -69,12 +74,16 @@ class DBRepository implements RepositoryInterface
                     "   '" . ($feature->getIsFilter() ? 1 : 0) . "', " .
                     "   '" . ($feature->getIsPredefined() ? 1 : 0) . "', " .
                     "   '" . ($feature->getIsDisabled() ? 1 : 0) . "' " .
-                    ");";
+                    "); ";
 
+                // Заменяем все переводы строк, приводя запрос в одну большую строку
+                $sql = preg_replace("/[\r\n]*/","", $sql);
                 // Выполняем запрос
                 $query = $this->db->Query($sql);
                 // Если запрос не выполнился
                 if (!$query) throw new \Exception("Не удалось выполнить запрос на создание новой характеристики.");
+
+
             }
         //}
     }
