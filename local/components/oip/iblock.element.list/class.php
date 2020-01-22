@@ -244,7 +244,7 @@ class COipIblockElementList extends \COipIblockElement
     /** @return self */
     protected function getAddData() {
 
-        $this->getFileProps()->getSectionName();
+        $this->getFileProps()->getSectionData();
 
         return $this;
     }
@@ -292,33 +292,40 @@ class COipIblockElementList extends \COipIblockElement
         return $this;
     }
 
-    protected function getSectionName() {
+    protected function getSectionData() {
 
         // если имя категории пришло из параметра компонента
         if($this->getParam("SECTION_NAME")) {
             $this->arResult["SECTION_NAME"] = $this->getParam("SECTION_NAME");
         }
         // если есть id категории из параметра компонента
-        elseif($this->getParam("SECTION_ID")) {
+
+        // @todo вероятно, этот случай уже не актуален, т.к. если выше отработал компонент раздела,
+        // @todo то он вернул название раздела, и оно было передано через параметры - случай выше
+
+        elseif($this->getParam("SECTION_ID") || $this->getParam("SECTION_CODE")) {
+            $section = ($this->getParam("SECTION_CODE")) ? $this->getParam("SECTION_CODE")
+                : $this->getParam("SECTION_ID");
 
             global $APPLICATION;
             $sectionName = $APPLICATION->IncludeComponent(
-                "oip:iblock.section.one.name",
+                "oip:iblock.section.list",
                 "",
                 [
                     "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
-                    "BASE_SECTION" => $this->getParam("SECTION_ID"),
+                    "BASE_SECTION" => $section,
                     "DEPTH" => 0,
                     "IS_CACHE" => $this->getParam("IS_CACHE"),
                     "CACHE_TIME" => $this->getParam("CACHE_TIME"),
+                    "INCLUDE_TEMPLATE" => false,
+                    "COUNT_VIEW" => false
                 ]
-            );
+            )["SECTION_NAME"];
 
             $this->arResult["SECTION_NAME"] = $sectionName;
         }
         // смотрим id раздела в каждом элементе
         else {
-
             global $APPLICATION;
             $sections = [];
 
@@ -331,7 +338,7 @@ class COipIblockElementList extends \COipIblockElement
             foreach ($sections as $idKey => $idValue) {
 
                 $sections[$idKey] =  $APPLICATION->IncludeComponent(
-                    "oip:iblock.section.one.name",
+                    "oip:iblock.section.list",
                     "",
                     [
                         "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
@@ -339,8 +346,10 @@ class COipIblockElementList extends \COipIblockElement
                         "DEPTH" => 0,
                         "IS_CACHE" => $this->getParam("IS_CACHE"),
                         "CACHE_TIME" => $this->getParam("CACHE_TIME"),
+                        "INCLUDE_TEMPLATE" => false,
+                        "COUNT_VIEW" => false,
                     ]
-                );
+                )["SECTION_NAME"];
             }
 
             foreach ($this->rawData as $key => $item) {

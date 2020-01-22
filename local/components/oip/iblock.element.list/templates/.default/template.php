@@ -117,6 +117,14 @@ $sectionName = $arResult["SECTION_NAME"];
 
                                 <?include(__DIR__."/include/body.php")?>
 
+                            <?$APPLICATION->IncludeComponent("oip:social.store.cart.button","",[
+                                    "PRODUCT_ID" => $element->getId(),
+                                    "BUTTON_TEXT_ADD" => "В корзину",
+                                    "BUTTON_TEXT_REMOVE" => "В корзине",
+                                    "BUTTON_ICON_ADD" => "cart",
+                                    "BUTTON_ICON_REMOVE" => "close"
+                            ])?>
+
                             <?endif?>
 
                         </div>

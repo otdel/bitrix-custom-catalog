@@ -112,6 +112,13 @@ abstract class COipIblockElement extends \COipComponent
         $this->setDefaultParam($arParams["ELEMENT_VIEW_READ_MORE_BUTTON_TEXT"],
             "подробнее");
 
+        $this->setDefaultBooleanParam($arParams["CARD_VIEW_SHOW_SIDEBAR"],false,
+            $arParams["_CARD_VIEW_SHOW_SIDEBAR"]);
+        $this->setDefaultBooleanParam($arParams["CARD_VIEW_SHOW_SAME_ELEMENT"],false,
+            $arParams["_CARD_VIEW_SHOW_SAME_ELEMENT"]);
+        $this->setDefaultBooleanParam($arParams["CARD_VIEW_SHOW_POPULAR_WITH_THIS"],false,
+            $arParams["_CARD_VIEW_SHOW_POPULAR_WITH_THIS"]);
+
         if(is_array($arParams["PROPERTIES"])) {
             $arParams["PROPERTIES"] = $this->trimPropCodes($arParams["PROPERTIES"]);
         }

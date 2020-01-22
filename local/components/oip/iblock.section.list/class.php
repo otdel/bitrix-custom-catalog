@@ -10,16 +10,16 @@ use \Bitrix\Main\ArgumentTypeException;
 use Bitrix\Main\Data\Cache;
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
-use Bitrix\Main\Config\Configuration;
+
 use Oip\Custom\Component\Iblock\Section;
 
 use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
 
-use Oip\GuestUser\Repository\CookieRepository;
-use Oip\GuestUser\Service;
-use Oip\GuestUser\IdGenerator\DBIdGenerator;
+use Oip\GuestUser\Handler as GuestService;
+
+\CBitrixComponent::includeComponentClass("oip:component");
 
 /**
  * <?$APPLICATION->IncludeComponent("oip:iblock.section.list","",[
@@ -31,7 +31,7 @@ use Oip\GuestUser\IdGenerator\DBIdGenerator;
  *   "CACHE" => "Y"
  *   ])?>
  */
-class COipIblockSectionList extends \CBitrixComponent
+class COipIblockSectionList extends \COipComponent
 {
     /** @var array $arSectionsRaw "Сырой" массив с разделами */
     private $arSectionsRaw = array();
@@ -56,11 +56,6 @@ class COipIblockSectionList extends \CBitrixComponent
     /** @var boolean $isCacheActual Флаг - актуальный кеш или нет. Нужен для одновременного обновления всех кешей, если один "просрочился" */
     private $isCacheActual;
 
-    public function onPrepareComponentParams($arParams)
-    {
-        return $this->initParams($arParams);
-    }
-
     public function executeComponent()
     {
         if(empty($this->arResult["EXCEPTION"])) {
@@ -78,13 +73,17 @@ class COipIblockSectionList extends \CBitrixComponent
             }
         }
 
-        $this->includeComponentTemplate();
+        if($this->isParam("INCLUDE_TEMPLATE")) {
+            $this->includeComponentTemplate();
+        }
 
         // Если компонент вызван для вывода деталки раздела - отдаем массив
         // значений некоторых полей, для использования в других компонентах
         if ($this->isSingleSection()) {
 
-            $this->addSectionView(reset($this->arResult["SECTIONS"])->getId());
+            if($this->arResult["SECTIONS"]) {
+                $this->addSectionView(reset($this->arResult["SECTIONS"])->getId());
+            }
 
             /** @var Section $section */
             $section = array_shift($this->arResult["SECTIONS"]);
@@ -107,7 +106,7 @@ class COipIblockSectionList extends \CBitrixComponent
         // Получение разделов
         $this->arSectionsRaw = $this->getSectionList();
 
-        // Если BASE_SECTION пришел пустым - значит выводить нужно относительно самого верхнего уровня
+        // Если BASE_SECTION пришел пустым (или равным 0) - значит выводить нужно относительно самого верхнего уровня
         if (!isset($this->arParams["BASE_SECTION"]) ||
             ($this->arParams["FILTER_FIELD_NAME"] == "ID" && ($this->arParams["BASE_SECTION"] == 0)) ||
             ($this->arParams["FILTER_FIELD_NAME"] == "CODE" && ($this->arParams["BASE_SECTION"] == ""))
@@ -125,6 +124,15 @@ class COipIblockSectionList extends \CBitrixComponent
 
         // Убираем лишние элементы, которые выходят за заданную глубину вложенности
         $this->buildSectionArray($sectionArray, 0, $this->arParams["DEPTH"]);
+
+        // Если не нужно выводить базовый уровень - убираем его
+        if ($this->isBaseSectionSet() &&
+            !$this->arParams["SHOW_BASE_SECTION"] &&
+            $this->arParams["DEPTH"] !=0 &&
+            count($sectionArray) > 0
+        ) {
+            $sectionArray = array_shift($sectionArray)["CHILDS"];
+        }
 
         // Получение значений для полей типа "список"
         // 1. Получим все значения, которые могут принимать пользовательские поля с типом "список"
@@ -164,6 +172,8 @@ class COipIblockSectionList extends \CBitrixComponent
      * @return array
      */
     protected function initParams($arParams) {
+        $this->initComponentId();
+
         try {
             // ID инфоблока, внутри которого просматриваются разделы
             if(!is_set($arParams["IBLOCK_ID"])) {
@@ -188,6 +198,8 @@ class COipIblockSectionList extends \CBitrixComponent
         $this->isCacheEnabled = $arParams["CACHE"] =="Y";
         // ID или код раздела, относительно которого начнется построение дерева
         $this->setDefaultParam($arParams["BASE_SECTION"], 0);
+        // Скрывать/показывать базовый раздел. По умолчанию скрывать.
+        $this->setDefaultBooleanParam($arParams["SHOW_BASE_SECTION"], false);
         // Массив с критериями фильтра
         $this->setDefaultParam($arParams["FILTER"], array());
         // Массив с критериями сортировки
@@ -216,6 +228,10 @@ class COipIblockSectionList extends \CBitrixComponent
         $this->setDefaultParam($arParams["LIST_ATTRIBUTE"], "");
         // Класс(ы) для превью картинки. По умолчанию ""
         $this->setDefaultParam($arParams["PREVIEW_PICTURE_CLASS"], "");
+
+        $this->setDefaultBooleanParam($arParams["INCLUDE_TEMPLATE"], true);
+        $this->setDefaultBooleanParam($arParams["COUNT_VIEW"], true);
+
         // Поле, по которому производится выборка раздела
         $arParams["FILTER_FIELD_NAME"] = is_int($arParams["BASE_SECTION"]) ? "ID": "CODE";
 
@@ -637,16 +653,6 @@ class COipIblockSectionList extends \CBitrixComponent
 
     /**
      * @param mixed $param
-     * @param mixed $defaultValue
-     */
-    protected function setDefaultParam(&$param, $defaultValue) {
-        if(!is_set($param)) {
-            $param = $defaultValue;
-        }
-    }
-
-    /**
-     * @param mixed $param
      * @param boolean $defaultValue
      */
     protected function setDefaultBooleanParam(&$param, $defaultValue) {
@@ -656,33 +662,10 @@ class COipIblockSectionList extends \CBitrixComponent
     }
 
     /**
-     *
-     * @param string $paramCode
-     * @return mixed
+     * @inheritdoc
      */
-    public function getParam($paramCode) {
-        return $this->getParamRecursive($paramCode, $this->arParams);
-    }
-
-    /**
-     * @param string $paramCode
-     * @param array $arParams
-     * @return mixed
-     */
-    protected function getParamRecursive($paramCode, $arParams) {
-        $param = null;
-        foreach ($arParams as $paramName => $paramValue) {
-            if($paramName === $paramCode) {
-                $param = $paramValue;
-                break;
-            }
-            elseif(is_array($paramValue)) {
-                $param = $this->getParamRecursive($paramCode, $paramValue);
-
-                if($param) break;
-            }
-        }
-        return $param;
+    public function isParam($paramCode) {
+        return ($this->getParam($paramCode)) ? true : false;
     }
 
     /**
@@ -696,32 +679,44 @@ class COipIblockSectionList extends \CBitrixComponent
     }
 
     private function addSectionView($sectionID) {
-        try {
+        if($this->isParam("COUNT_VIEW")) {
+            try {
 
-            global $DB;
-            global $USER;
+                global $DB;
+                global $USER;
 
-            $cacheInfo = new CacheInfo();
-            $ds = new DBDataSource($DB, $cacheInfo);
-            $dw = new DataWrapper($ds);
+                $cacheInfo = new CacheInfo();
+                $ds = new DBDataSource($DB, $cacheInfo);
+                $dw = new DataWrapper($ds);
 
-            $userID = $USER->GetID();
+                $userID = $USER->GetID();
 
-            if(!$USER->IsAuthorized()) {
-                $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
-                $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
-                $rep = new CookieRepository($cookieName, $cookieExpired);
-                $idGen = new DBIdGenerator($ds);
-                $gus = new Service($rep, $idGen);
-                $userID = $gus->getUser()->getId();
+                if(!$USER->IsAuthorized()) {
+                    /**
+                     * @var $OipGuestUser GuestService
+                     */
+                    global $OipGuestUser;
+                    $userID = $OipGuestUser->getUser()->getId();
+                }
+
+                $dw->addSectionView((int)$userID, (int)$sectionID);
+
             }
-
-            $dw->addSectionView((int)$userID, (int)$sectionID);
-
+            catch(\Exception $exception) {
+                echo "<p>Не удалось обработать просмотр категории: {$exception->getMessage()}</p>";
+            }
         }
-        catch(\Exception $exception) {
-            echo "<p>Не удалось обработать просмотр категории: {$exception->getMessage()}</p>";
-        }
+    }
+
+    /**
+     * Установлен ли базовый раздел
+     *
+     * @return bool
+     */
+    private function isBaseSectionSet () {
+        return
+            ($this->arParams["FILTER_FIELD_NAME"] == "ID" && ($this->arParams["BASE_SECTION"] > 0)) ||
+            ($this->arParams["FILTER_FIELD_NAME"] == "CODE" && ($this->arParams["BASE_SECTION"] != ""));
     }
 
 }

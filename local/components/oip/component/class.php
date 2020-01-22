@@ -57,6 +57,12 @@ abstract class COipComponent extends \CBitrixComponent
      * @return boolean
      */
     public function isParamDefault($paramCode) {
+        if(!$this->getParam("_".$paramCode)) {
+            // если параметр не был создан с копией себя _#PARAM_NAME#,
+            // то невозможно проверить, был ли он задан вручную или определен по умолчанию
+            // поэтому считаем, что он дефолтный, его приоритет не важен и его можно перебивать данными из раздела
+            return true;
+        }
         return ($this->getParam($paramCode) == $this->getParam("_".$paramCode));
     }
 
@@ -97,18 +103,20 @@ abstract class COipComponent extends \CBitrixComponent
      * @param mixed $param
      * @param boolean $defaultValue
      */
-    protected function setDefaultBooleanParam(&$param, $defaultValue = false) {
+    protected function setDefaultBooleanParam(&$param, $defaultValue = false,  &$paramOrig = null) {
 
         switch($defaultValue) {
             case true:
                 if(!is_set($param) || $param !== "N") {
                     $param = "Y";
+                    $paramOrig = "Y";
                 }
                 break;
 
             default:
                 if(!is_set($param) || $param !== "Y") {
-                    $param = "N";
+                    $paramOrig = $param = "N";
+                    $paramOrig = "N";
                 }
                 break;
         }
@@ -135,12 +143,8 @@ abstract class COipComponent extends \CBitrixComponent
      * @return mixed
      */
     public function setParam($paramCode, $paramValue) {
-        if(is_set($this->getParam($paramCode))) {
-            $this->arParams[$paramCode] = $paramValue;
-            return $this->arParams[$paramCode];
-        }
-
-        return null;
+        $this->arParams[$paramCode] = $paramValue;
+        return $this->arParams[$paramCode];
     }
 
     /**

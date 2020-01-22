@@ -7,11 +7,7 @@ use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
 
-use Oip\GuestUser\Repository\CookieRepository;
-use Oip\GuestUser\Service;
-use Oip\GuestUser\IdGenerator\DBIdGenerator;
-
-use Bitrix\Main\Config\Configuration;
+use Oip\GuestUser\Handler as GuestService;
 
 \CBitrixComponent::includeComponentClass("oip:iblock.element.list");
 
@@ -93,12 +89,11 @@ class COipIblockElementOne extends COipIblockElementList {
             $userID = $USER->GetID();
 
             if(!$USER->IsAuthorized()) {
-                $cookieName = Configuration::getValue("oip_guest_user")["cookieName"];
-                $cookieExpired = Configuration::getValue("oip_guest_user")["cookieExpired"];
-                $rep = new CookieRepository($cookieName, $cookieExpired);
-                $idGen = new DBIdGenerator($ds);
-                $gus = new Service($rep, $idGen);
-                $userID = $gus->getUser()->getId();
+                /**
+                 * @var $OipGuestUser GuestService
+                 */
+                global $OipGuestUser;
+                $userID = $OipGuestUser->getUser()->getId();
             }
 
             $dw->addProductView((int)$userID, (int)$elementID);
@@ -106,6 +101,40 @@ class COipIblockElementOne extends COipIblockElementList {
         }
         catch(\Exception $exception) {
             echo "<p>Не удалось обработать просмотр товара: {$exception->getMessage()}</p>";
+        }
+    }
+
+    protected function getSectionData()
+    {
+        $item = reset($this->rawData);
+        $sectionId = ($item["FIELDS"]["IBLOCK_SECTION_ID"]) ?? 0;
+
+        if($sectionId > 0) {
+
+            global $APPLICATION;
+            $sectionData =  $APPLICATION->IncludeComponent(
+                "oip:iblock.section.list",
+                "",
+                [
+                    "IBLOCK_ID" => $this->getParam("IBLOCK_ID"),
+                    "BASE_SECTION" => (int)$sectionId,
+                    "DEPTH" => 0,
+                    "IS_CACHE" => $this->getParam("IS_CACHE"),
+                    "CACHE_TIME" => $this->getParam("CACHE_TIME"),
+                    "INCLUDE_TEMPLATE" => false,
+                    "COUNT_VIEW" => false,
+                    "USER_FIELDS" => ["UF_*"],
+                ]
+            );
+
+            $this->rewriteComponentParams("CARD_VIEW_SHOW_SIDEBAR",
+                $sectionData["UF_SIDEBAR_ELEMENT"], true);
+            $this->rewriteComponentParams("CARD_VIEW_SHOW_SAME_ELEMENT",
+                $sectionData["UF_SAME_ELEMENT"], true);
+            $this->rewriteComponentParams("CARD_VIEW_SHOW_POPULAR_WITH_THIS",
+                $sectionData["UF_POPULAR_WITH_THIS"], true);
+
+            $this->rawData[0]["FIELDS"]["SECTION_NAME"] = $sectionData["SECTION_NAME"];
         }
     }
 }
