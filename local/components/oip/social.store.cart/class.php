@@ -61,7 +61,7 @@ abstract class COipSocialStoreCart extends \COipComponent {
                 $userId = $USER->GetID();
             }
             else {
-                $userId = $this->initGuestUser()->getUser()->getId();
+                $userId = $this->initGuestUser()->getUser()->getNegativeId();
             }
         */
 
@@ -69,7 +69,7 @@ abstract class COipSocialStoreCart extends \COipComponent {
          * @var $OipGuestUser GuestUser
         */
         global $OipGuestUser;
-        $userId = $OipGuestUser->getUser()->getId();
+        $userId = $OipGuestUser->getUser()->getNegativeId();
 
         return new CartUser((int)$userId);
     }

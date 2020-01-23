@@ -36,7 +36,7 @@ class DBRepository implements RepositoryInterface
         if(!$user) {
             throw new GettingByHashIdException($hashId);
         }
-        return new User($this->getNegativeId((int)$user["id"]), $user["hash_id"]);
+        return new User((int)$user["id"], $user["hash_id"]);
     }
 
     /**
@@ -55,7 +55,7 @@ class DBRepository implements RepositoryInterface
            throw new AddingNewGuestException();
        }
 
-       return (new User($this->getNegativeId($this->db->getInsertedId()), $hashId));
+       return (new User($this->db->getInsertedId(), $hashId));
    }
 
     /** @return string
@@ -63,9 +63,5 @@ class DBRepository implements RepositoryInterface
      */
    private function generateHashId(): string {
        return hash("md5", ((new DateTime())->getTimestamp()));
-   }
-
-   private function getNegativeId(int $id): int {
-       return (0 - $id);
    }
 }
