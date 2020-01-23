@@ -51,25 +51,16 @@ abstract class COipSocialStoreCart extends \COipComponent {
     /** @return CartUser */
     private function initCartUser(): CartUser {
 
-        /*
-         * пока нет функционала слива данных гостя при авторизации,
-         * временно возвращается только id гостя и корзина хранится по нему
-
-            global $USER;
-
-            if($USER->IsAuthorized()) {
-                $userId = $USER->GetID();
-            }
-            else {
-                $userId = $this->initGuestUser()->getUser()->getNegativeId();
-            }
-        */
-
-        /**
-         * @var $OipGuestUser GuestUser
-        */
+        global $USER;
         global $OipGuestUser;
-        $userId = $OipGuestUser->getUser()->getNegativeId();
+
+        if($USER->IsAuthorized()) {
+            $userId = $USER->GetID();
+        }
+        else {
+            /** @var $OipGuestUser GuestUser */
+            $userId = $OipGuestUser->getUser()->getNegativeId();
+        }
 
         return new CartUser((int)$userId);
     }
