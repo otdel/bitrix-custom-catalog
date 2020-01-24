@@ -7,4 +7,7 @@ $em = EventManager::getInstance();
 
 require($_SERVER['DOCUMENT_ROOT'] . '/local/include/init_app.php');
 
+$em->addEventHandlerCompatible("main","OnAfterUserAuthorize",
+    ["Oip\Event\Handler\Bitrix\UserLinker\UserLinker","onAfterUserAuthorize"]);
+
 require($_SERVER['DOCUMENT_ROOT'] . '/local/include/epilog_app.php');
