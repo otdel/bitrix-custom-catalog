@@ -16,6 +16,7 @@ class UserLinker
         /** @var $OipGuestUser GuestUser */
         $connection = Application::getConnection();
         global $OipGuestUser;
+        global $APPLICATION;
 
         $rep = new UsersLinkerRepository($connection);
 
@@ -28,7 +29,9 @@ class UserLinker
             }
         }
         catch(Exception $e) {
-            print_r($e->getMessage());
+            $APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
+                "EXCEPTION" => $e
+            ]);
         }
     }
 }
