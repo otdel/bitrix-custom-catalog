@@ -4,6 +4,7 @@ namespace Oip\ProductFeature\Repository;
 
 use Oip\ProductFeature\ProductFeature;
 use Oip\ProductFeature\ProductFeatureValue;
+use Oip\ProductFeature\SectionFeatureOption;
 
 interface RepositoryInterface
 {
@@ -43,4 +44,30 @@ interface RepositoryInterface
      * @return int|string
      */
     public function createProperty(ProductFeature $productFeature);
+
+    /**
+     * Получение настроек характеристик внутри раздела
+     *
+     * @param int[] $arSectionId Массив с идентификаторами разделов
+     * @return SectionFeatureOption[] | null
+     */
+    public function getSectionFeatureOptions($arSectionId);
+
+    /**
+     * Получение уникальных значений для характеристики по ее коду
+     *
+     * @param string $featureCode Код характеристики
+     * @return array | null
+     */
+    public function getFeatureDistinctValues($featureCode);
+
+    /**
+     * Получение списка элементов, удовлетворяющих набору фильтров
+     *
+     * @param array $filters Код характеристики
+     * @param int $limit Ограничение количества
+     * @param $offset Смещение
+     * @return array | null
+     */
+    public function getFilteredElements($filters, $limit, $offset);
 }

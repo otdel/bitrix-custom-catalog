@@ -84,7 +84,7 @@ class DataWrapper
         $productFeatures = array();
         foreach($productFeatureValues as $productFeatureValue)
         {
-            // Созадем элемент массива, если для текущего товара еще нет данных в массиве
+            // Создаем элемент массива, если для текущего товара еще нет данных в массиве
             $productId = $productFeatureValue->getProductId();
             if(!in_array($productId, array_keys($productFeatures))) {
                 $productFeatures[$productId] = array();
@@ -93,6 +93,64 @@ class DataWrapper
         }
 
         return $productFeatures;
+    }
+
+    /**
+     * Получение настроек характеристик внутри категорий
+     *
+     * @param int[] $arSectionId Массив идентификаторов товаров
+     * @return array | null
+     * @throws \Exception
+     */
+    public function getSectionFeatureOptions($arSectionId) {
+        // Получаем сырые данные из источника данных
+        $rawData = $this->repository->getSectionFeatureOptions($arSectionId);
+
+        $sectionFeatureOptions = array();
+
+        // Пробегаемся по всем полученным данным и собираем их них ProductFeature массив
+        foreach ($rawData as $queryResult) {
+            $sectionFeatureOption = new SectionFeatureOption([
+                "id" => $queryResult["id"],
+                "sectionId" => $queryResult["section_id"],
+                "featureCode" => $queryResult["feature_code"],
+                "featureName" => $queryResult["feature_name"],
+                "isFilter" => $queryResult["is_filter"],
+                "isInfo" => $queryResult["is_info"],
+                "isDisabled" => $queryResult["is_disabled"],
+                "sortFilter" => $queryResult["sort_filter"],
+                "sortInfo" => $queryResult["sort_info"],
+                "dateInsert" => $queryResult["date_insert"],
+                "dateModify" => $queryResult["date_modify"]
+            ]);
+            $sectionFeatureOptions[] = $sectionFeatureOption;
+        }
+
+        return $sectionFeatureOptions;
+    }
+
+    /**
+     * Получение уникальных значений для характеристики по ее коду
+     *
+     * @param string $featureCode Код характеристики
+     * @return array | null
+     * @throws \Exception
+     */
+    public function getFeatureDistinctValues($featureCode) {
+        return $this->repository->getFeatureDistinctValues($featureCode);
+    }
+
+    /**
+     * Получение списка элементов, удовлетворяющих набору фильтров
+     *
+     * @param array $filters Код характеристики
+     * @param int $limit Ограничение количества
+     * @param int $offset Смещение
+     * @return array | null
+     * @throws \Exception
+     */
+    public function getFilteredElements($filters, $limit = 1000, $offset = 0) {
+        return $this->repository->getFilteredElements($filters, $limit, 0);
     }
 
 }
