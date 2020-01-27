@@ -4,8 +4,12 @@
 namespace Oip\GuestUser;
 
 use Oip\GuestUser\Entity\User;
+use Oip\GuestUser\Repository\ClientRepository\Exception\UserDoesntExist;
 use Oip\GuestUser\Repository\ServerRepository\RepositoryInterface as ServerRepositoryInterface;
 use Oip\GuestUser\Repository\ClientRepository\RepositoryInterface as ClientRepositoryInterface;
+
+use Oip\GuestUser\Repository\ClientRepository\Exception\UserDoesntExist as UserDoesntExistException;
+use Oip\GuestUser\Repository\ServerRepository\Exception\GettingByHashId as GettingByHashIdException;
 
 class Handler
 {
@@ -45,7 +49,13 @@ class Handler
             $user = $this->serverRepository->addUser();
         }
         else {
-            $user = $this->serverRepository->getUserByHashId($hashId);
+            try {
+                $user = $this->serverRepository->getUserByHashId($hashId);
+            }
+            catch (GettingByHashIdException $exception) {
+                $user = $this->serverRepository->addUser();
+            }
+
         }
 
         return $user;
@@ -53,8 +63,14 @@ class Handler
 
     /**
      * @return void
+     * @throws UserDoesntExistException
      */
     public function setUser(): void {
-        $this->clientRepository->setData($this->user->getHashId());
+        if(is_null($this->user)) {
+            throw new UserDoesntExistException();
+        }
+        else {
+            $this->clientRepository->setData($this->user->getHashId());
+        }
     }
 }

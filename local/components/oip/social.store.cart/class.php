@@ -4,6 +4,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 \CBitrixComponent::includeComponentClass("oip:component");
 
 use Bitrix\Main\Application;
+use Bitrix\Main\DB\SqlQueryException;
 
 use Oip\SocialStore\Cart\Handler as Cart;
 use Oip\SocialStore\User\Entity\User as CartUser;
@@ -34,12 +35,22 @@ abstract class COipSocialStoreCart extends \COipComponent {
      * @throws NonUniqueIdCreatingException
      */
     protected function getCart() {
-        $repository = $this->initCartRepository();
-        $user = $this->initCartUser();
-        $cart = $this->initCart($user, $repository);
-        $cart->getProducts();
 
-        return $cart;
+        try {
+            $repository = $this->initCartRepository();
+            $user = $this->initCartUser();
+            $cart = $this->initCart($user, $repository);
+            $cart->getProducts();
+
+            return $cart;
+        }
+        catch(SqlQueryException $exception) {
+            global $APPLICATION;
+            $APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
+                "EXCEPTION" => $exception
+            ]);
+        }
+
     }
 
     /** @return RepositoryInterface */
@@ -59,7 +70,17 @@ abstract class COipSocialStoreCart extends \COipComponent {
         }
         else {
             /** @var $OipGuestUser GuestUser */
-            $userId = $OipGuestUser->getUser()->getNegativeId();
+
+            try {
+                $userId = $OipGuestUser->getUser()->getNegativeId();
+            }
+            catch(SqlQueryException $exception) {
+                global $APPLICATION;
+                $APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
+                    "EXCEPTION" => $exception
+                ]);
+            }
+
         }
 
         return new CartUser((int)$userId);

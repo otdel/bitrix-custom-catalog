@@ -6,6 +6,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 use Bitrix\Main\SystemException;
 use Oip\GuestUser\Handler as GuestUser;
 
+use Oip\GuestUser\Repository\ClientRepository\Exception\UserDoesntExist as UserDoesntExistException;
 
 class COipGuestUserProcessorWrite extends \COipComponent
 {
@@ -19,6 +20,14 @@ class COipGuestUserProcessorWrite extends \COipComponent
          * @var $OipGuestUser GuestUser
          */
         global $OipGuestUser;
-        $OipGuestUser->setUser();
+        try {
+            $OipGuestUser->setUser();
+        }
+        catch (UserDoesntExistException $exception) {
+            global $APPLICATION;
+            $APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
+                "EXCEPTION" => $exception
+            ]);
+        }
     }
 }

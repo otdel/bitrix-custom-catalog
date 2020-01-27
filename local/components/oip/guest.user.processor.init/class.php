@@ -4,6 +4,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 use Bitrix\Main\Application;
 use Bitrix\Main\Config\Configuration;
 use Bitrix\Main\SystemException;
+use Bitrix\Main\DB\SqlQueryException;
 
 use Oip\GuestUser\Handler as GuestUser;
 use Oip\GuestUser\Repository\ClientRepository\CookieRepository;
@@ -30,7 +31,17 @@ class COipGuestUserProcessorInit extends \COipComponent
         $serverRepository = new DBRepository($connection);
 
         $user = new GuestUser($clientRepository, $serverRepository);
-        $user->getUser();
+
+        try {
+            $user->getUser();
+        }
+        catch(SqlQueryException $exception) {
+            global $APPLICATION;
+            $APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
+                "EXCEPTION" => $exception
+            ]);
+        }
+
         $GLOBALS["OipGuestUser"] = $user;
     }
 }

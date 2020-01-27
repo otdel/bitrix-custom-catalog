@@ -7,6 +7,7 @@ use Bitrix\Main\SystemException;
 use Oip\SocialStore\Cart\Handler as Cart;
 
 use Oip\SocialStore\Order\Repository\Exception\OrderCreatingError as OrderCreatingErrorException;
+use Oip\SocialStore\Cart\Exception\UnableToCreateTheCart as UnableToCreateTheCartException;
 use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
 use Oip\Util\Collection\Factory\NonUniqueIdCreating as NonUniqueIdCreatingException;
 
@@ -22,7 +23,21 @@ class COipSocialStoreProcessor extends \COipSocialStoreCart {
     public function executeComponent()
     {
         $cart = $this->getCart();
-        $GLOBALS["OipSocialStoreCart"] =  $this->handleAction($cart);
+
+        try {
+            if(is_null($cart)) {
+                throw new UnableToCreateTheCartException();
+            }
+            else {
+                $GLOBALS["OipSocialStoreCart"] =  $this->handleAction($cart);
+            }
+        }
+        catch (UnableToCreateTheCartException $exception) {
+            global $APPLICATION;
+            $APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
+                "EXCEPTION" => $exception
+            ]);
+        }
     }
 
     /**
