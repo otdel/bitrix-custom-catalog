@@ -17,6 +17,8 @@ $component = $this->getComponent();
 
 
 $exception = $arResult["EXCEPTION"];
+$errors = $arResult["ERRORS"];
+$success = $arResult["SUCCESS"];
 
 if(!$exception) {
     $cart =  $arResult["CART"];
@@ -28,12 +30,18 @@ if(!$exception) {
 <div class="uk-container">
     <div class="uk-padding">
 
-        <?if($arResult["EXCEPTION"]):?>
-            <p  style="color:red"><?=$arResult["EXCEPTION"]?></p>
+        <?if($exception):?>
+            <p style="color:red"><?=$exception?></p>
         <?else:?>
 
-            <?if($arResult["SUCCESS"]):?>
-                <p style="color:green"><?=$arResult["SUCCESS"]?></p>
+            <?if(!empty($errors)):?>
+                <?foreach($errors as $error):?>
+                    <p style="color:red"><?=$error?></p>
+                <?endforeach?>
+            <?endif?>
+
+            <?if($success):?>
+                <p style="color:green"><?=$success?></p>
             <?endif?>
 
             <?if($products->isEmpty()):?>

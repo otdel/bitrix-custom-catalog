@@ -67,14 +67,19 @@ class COipSocialStoreProcessor extends \COipSocialStoreCart {
                     global $APPLICATION;
 
                     try {
-                        $APPLICATION->IncludeComponent("oip:social.store.order.add","",
+                        $resultError = $APPLICATION->IncludeComponent("oip:social.store.order.add","",
                             [
                                 "USER" => $cart->getUser(),
                                 "PRODUCTS" => $cart->getProducts()
                             ]);
 
-                        $cart->removeAll();
-                        $GLOBALS["OipSocialStoreCartOrderCreatedSuccess"] = "Your new order was successfully created";
+                        if(is_null($resultError)) {
+                            $cart->removeAll();
+                            $GLOBALS["OipSocialStoreCartOrderCreatedSuccess"] = "Your new order was successfully created";
+                        }
+                        else {
+                            $GLOBALS["OipSocialStoreCartOrderCreatingErrors"][] = $resultError;
+                        }
                     }
                     catch (OrderCreatingErrorException $exception) {
                         $GLOBALS["OipSocialStoreCartOrderCreatingErrorException"] = $exception->getMessage();
