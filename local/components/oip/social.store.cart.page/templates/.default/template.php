@@ -65,33 +65,56 @@ if(!$exception) {
 
                     <tbody>
                     <?foreach($products as $product):?>
-                        <tr>
 
-                            <td><?=$product->getName()?></td>
-                            <td>
-                                <?if($product->getLink()):?>
-                                <a href="<?=$product->getLink()?>" title="<?=$product->getName()?>">
-                                    <?endif?>
+                        <?if($product->getName() == "deleted"):?>
+                            <tr>
+                                <td colspan="3">
+                                    <span style="color: red">Товар недоступен или удален</span>
+                                </td>
 
-                                    <img src="<?=$product->getPicture()?>" alt="<?=$product->getName()?>" width="150">
+                                <td>
+                                    <form action="" class="uk-form" method="post">
+                                        <input type="hidden" name="<?=$cart::GLOBAL_CART_DATA_PRODUCT_ID?>" value="<?=$product->getId()?>">
+                                        <input type="hidden" name="oipCartActionHandler" value="<?=$component->getComponentId()?>">
+                                        <button class="uk-button" name="<?=$cart::GLOBAL_CART_ACTION_NAME?>"
+                                                value="<?=$cart::GLOBAL_CART_ACTION_REMOVE_PRODUCT?>">
+                                            <i class="uk-icon" uk-icon="close" ></i>
+                                            Удалить
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        <?else:?>
+                            <tr>
+
+                                <td><?=$product->getName()?></td>
+                                <td>
                                     <?if($product->getLink()):?>
-                                </a>
-                            <?endif?>
-                            </td>
-                            <td><?=$product->getDescription()?></td>
-                            <td>
-                                <form action="" class="uk-form" method="post">
-                                    <input type="hidden" name="<?=$cart::GLOBAL_CART_DATA_PRODUCT_ID?>" value="<?=$product->getId()?>">
-                                    <input type="hidden" name="oipCartActionHandler" value="<?=$component->getComponentId()?>">
-                                    <button class="uk-button" name="<?=$cart::GLOBAL_CART_ACTION_NAME?>"
-                                            value="<?=$cart::GLOBAL_CART_ACTION_REMOVE_PRODUCT?>">
-                                        <i class="uk-icon" uk-icon="close" ></i>
-                                        Удалить
-                                    </button>
-                                </form>
+                                    <a href="<?=$product->getLink()?>" title="<?=$product->getName()?>">
+                                        <?endif?>
 
-                            </td>
-                        </tr>
+                                        <img src="<?=$product->getPicture()?>" alt="<?=$product->getName()?>" width="150">
+                                        <?if($product->getLink()):?>
+                                    </a>
+                                <?endif?>
+                                </td>
+                                <td><?=$product->getDescription()?></td>
+                                <td>
+                                    <form action="" class="uk-form" method="post">
+                                        <input type="hidden" name="<?=$cart::GLOBAL_CART_DATA_PRODUCT_ID?>" value="<?=$product->getId()?>">
+                                        <input type="hidden" name="oipCartActionHandler" value="<?=$component->getComponentId()?>">
+                                        <button class="uk-button" name="<?=$cart::GLOBAL_CART_ACTION_NAME?>"
+                                                value="<?=$cart::GLOBAL_CART_ACTION_REMOVE_PRODUCT?>">
+                                            <i class="uk-icon" uk-icon="close" ></i>
+                                            Удалить
+                                        </button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        <?endif?>
+
                     <?endforeach?>
                     </tbody>
 

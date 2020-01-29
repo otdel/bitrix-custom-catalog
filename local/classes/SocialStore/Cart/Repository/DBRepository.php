@@ -43,11 +43,14 @@ class DBRepository implements RepositoryInterface
         $sql = self::getByUserIdSql($userId);
 
         foreach($this->db->query($sql)->fetchAll() as $product) {
+            $productName = (!is_null($product["name"])) ? $product["name"] : "deleted";
+            $productPicture = (!is_null($product["name"])) ? self::getFileStoreRoot().$product["picture"] : null;
+
             $products[] = new Entity\Product(
                 (int)$product["product_id"],
-                $product["name"],
+                $productName,
                 $product["code"],
-                self::getFileStoreRoot().$product["picture"],
+                $productPicture,
                 $product["description"],
                 null
             );
