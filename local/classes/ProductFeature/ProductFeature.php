@@ -172,7 +172,7 @@ class ProductFeature
      * @param bool $isFilter
      * @return $this
      */
-    public function setIsFilter(bool $isFilter)
+    public function setIsFilter($isFilter)
     {
         $this->isFilter = $isFilter;
         return $this;

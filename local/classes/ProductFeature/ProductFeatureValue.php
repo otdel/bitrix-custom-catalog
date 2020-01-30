@@ -14,6 +14,8 @@ class ProductFeatureValue
     private $value;
     /** @var int $predefinedValueId Идентификатор предопределенного значения */
     private $predefinedValueId;
+    /** @var int $sortInfo Порядок сортировки данной характеристики при выводе в информации о товаре */
+    private $sortInfo;
     /** @var int $is_disabled Признак отключения (мягкого удаления) характеристики */
     private $isDisabled;
     /** @var int $date_insert Дата добавления записи в таблицу (timestamp) */
@@ -162,6 +164,24 @@ class ProductFeatureValue
     public function setFeatureCode($featureCode)
     {
         $this->featureCode = $featureCode;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getSortInfo()
+    {
+        return $this->sortInfo;
+    }
+
+    /**
+     * @param int $sortInfo
+     * @return ProductFeatureValue
+     */
+    public function setSortInfo($sortInfo)
+    {
+        $this->sortInfo = $sortInfo;
         return $this;
     }
 

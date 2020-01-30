@@ -27,7 +27,7 @@ if (!isset($productInfo)) {
 }
 ?>
 
-<h3>Товар ID <?=array_shift($productInfo["productFeatures"])->getProductId()?></h3>
+<h3>Товар ID <?=$productInfo["productFeatures"][array_key_first($productInfo["productFeatures"])]->getProductId()?></h3>
 <p class="uk-margin-remove">Кастомные характеристики:</p>
 
 <? /** @var ProductFeatureValue $productFeatureValue */
@@ -36,7 +36,9 @@ foreach ($productInfo["productFeatures"] as $productFeatureValue): ?>
     <li>
         <?=isset($productFeatures[$productFeatureValue->getFeatureCode()]) ?
             $productFeatures[$productFeatureValue->getFeatureCode()]->getName() :
-            $productFeatureValue->getFeatureCode() ?> [код хар-ки: <?=$productFeatureValue->getFeatureCode()?>]: <?=$productFeatureValue->getValue()?>
+            $productFeatureValue->getFeatureCode() ?> [код хар-ки: <?=$productFeatureValue->getFeatureCode()?>]:
+                <?=($productFeatureValue->getValue() !== null && trim($productFeatureValue->getValue()) != "") ?
+                    $productFeatureValue->getValue() :  "Не установлено"?>
     </li>
 
 <?endforeach;?>

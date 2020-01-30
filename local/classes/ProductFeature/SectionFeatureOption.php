@@ -26,8 +26,8 @@ class SectionFeatureOption
     private $isDisabled;
     /** @var int $sortFilter Порядок вывода характеристики в списке фильтров */
     private $sortFilter;
-    /** @var int $infoFilter Порядок вывода характеристики в информации о товаре */
-    private $infoFilter;
+    /** @var int $sortInfo Порядок вывода характеристики в информации о товаре */
+    private $sortInfo;
     /** @var \DateTime $dateInsert Дата добавления настройки в таблицу */
     private $dateInsert;
     /** @var \DateTime $dateModify Дата последнего изменения настройки в таблице  */
@@ -47,7 +47,7 @@ class SectionFeatureOption
         if (isset($arParams['isInfo'])) $this->isInfo = $arParams['isInfo'];
         if (isset($arParams['isDisabled'])) $this->isDisabled = $arParams['isDisabled'];
         if (isset($arParams['sortFilter'])) $this->sortFilter = $arParams['sortFilter'];
-        if (isset($arParams['infoFilter'])) $this->infoFilter = $arParams['infoFilter'];
+        if (isset($arParams['sortInfo'])) $this->sortInfo = $arParams['sortInfo'];
         if (isset($arParams['dateInsert'])) $this->dateInsert = $arParams['dateInsert'];
         if (isset($arParams['dateModify'])) $this->dateModify = $arParams['dateModify'];
     }
@@ -191,17 +191,17 @@ class SectionFeatureOption
     /**
      * @return int
      */
-    public function getInfoFilter()
+    public function getSortInfo()
     {
-        return $this->infoFilter;
+        return $this->sortInfo;
     }
 
     /**
-     * @param int $infoFilter
+     * @param int $sortInfo
      */
-    public function setInfoFilter($infoFilter)
+    public function setSortInfo($sortInfo)
     {
-        $this->infoFilter = $infoFilter;
+        $this->sortInfo = $sortInfo;
         return $this;
     }
 

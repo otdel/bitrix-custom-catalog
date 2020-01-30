@@ -181,9 +181,12 @@ class DBRepository implements RepositoryInterface
                     "   fv.value, " .
                     "   fv.is_disabled, " .
                     "   fv.date_insert, " .
-                    "   fv.date_modify " .
+                    "   fv.date_modify, " .
+                    "   COALESCE(sf.sort_info, 0) AS sort_info " .
                     "FROM {$this->featureValueTableName} fv " .
-                    "LEFT JOIN {$this->featureTableName} f ON f.code = feature_code " .
+                    "LEFT JOIN {$this->featureTableName} f ON f.code = fv.feature_code " .
+                    "LEFT JOIN b_iblock_element el ON el.id = fv.element_id " .
+                    "LEFT JOIN {$this->sectionFeatureTableName} sf ON sf.feature_code = fv.feature_code AND sf.section_id = COALESCE(el.IBLOCK_SECTION_ID, el.IBLOCK_ID) " .
                     "WHERE fv.element_id IN (" . implode(',', $arProductId) . "); ";
 
                 // Выполняем запрос

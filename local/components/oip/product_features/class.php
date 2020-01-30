@@ -5,12 +5,15 @@ use Bitrix\Main\ArgumentException;
 use \Bitrix\Main\ArgumentNullException;
 use \Bitrix\Main\ArgumentTypeException;
 use \Bitrix\Main\LoaderException;
+use Bitrix\Main\Service\GeoIp\Data;
 use \Bitrix\Main\SystemException;
 use Oip\CacheInfo;
+use Oip\GuestUser\Repository\RepositoryInterface;
 use Oip\ProductFeature\DataWrapper;
 use Oip\ProductFeature\ProductFeature;
 use Oip\ProductFeature\ProductFeatureValue;
 use Oip\ProductFeature\Repository\DBRepository;
+use Oip\ProductFeature\SectionFeatureOption;
 
 \CBitrixComponent::includeComponentClass("oip:component");
 
@@ -20,6 +23,10 @@ class CProductFeatures extends \COipComponent
     private $cacheInfo;
     /** @var ProductFeature[] $productFeatures */
     private $productFeatures;
+    /** @var RepositoryInterface $repository Реализация репозитория для работы с данными */
+    private $repository;
+    /** @var DataWrapper $dataWrapper Обертка, которая работает с репозиторием */
+    private $dataWrapper;
 
     public function onPrepareComponentParams($arParams)
     {
@@ -45,40 +52,91 @@ class CProductFeatures extends \COipComponent
     protected function execute() {
         global $DB;
         // Создаем объект - источник данных
-        $repository = new DBRepository($DB);
+        $this->repository = new DBRepository($DB, $this->cacheInfo);
         // Создаем объект-обертку для операций над источником данных
-        $dataWrapper = new DataWrapper($repository);
+        $this->dataWrapper = new DataWrapper($this->repository);
 
         $result = array();
 
-        // Запрашиваем базовую информацию о товаре (в т.ч. характеристики из UF_ полей)
-        $arSelect = array("*", "PROPERTY_ARTICLE", "PROPERTY_BRANDS");
-        $arFilter = array("IBLOCK_ID" => $this->arParams["IBLOCK_ID"], "ID" => $this->arParams["ELEMENT_ID"]);
-//        $getElements = \CIBlockElement::GetList(array(), $arFilter, false, array(), $arSelect);
-//        while ($row = $getElements->Fetch()) {
-//            $result[$row["ID"]] = $row;
-//        }
         // Запрашиваем перечень характеристик
-        $this->productFeatures = $dataWrapper->getProductFeatures();
+        $this->productFeatures = $this->dataWrapper->getProductFeatures();
 
         // Запрашиваем кастомные характеристики
-        $customFeatures = $dataWrapper->getProductFeatureValues($this->arParams["ELEMENT_ID"]);
+        $customFeatures = $this->dataWrapper->getProductFeatureValues($this->arParams["ELEMENT_ID"]);
 
         // Для каждого товара устанавливаем кастомные характеристики в виде отдельного подмассива
         foreach ($customFeatures as $productId => &$productsFeatures) {
-            // Отсортируем характеристики согласно настройкам (поле sort_info)
-            /** @var ProductFeatureValue $productFeature */
-            foreach ($productsFeatures as &$productFeature) {
-                $productFeature->sortInfo = $this->productFeatures[$productFeature->getFeatureCode()]->getSortInfo();
+
+            $sectionFeatureOptions = $this->getProductSectionFeatures($productId);
+            /** @var ProductFeatureValue $productsFeature */
+            foreach ($productsFeatures as $feature) {
+                if (isset($sectionFeatureOptions[$feature->getFeatureCode()])) {
+                    $feature->setSortInfo($sectionFeatureOptions[$feature->getFeatureCode()]->getSortInfo());
+                }
             }
+
             $sortedProductsFeatures = $productsFeatures;
-            usort($sortedProductsFeatures, function($a, $b) { return $a->sortInfo < $b->sortInfo ? 1 : -1; });
+            usort($sortedProductsFeatures, function($a, $b) { return $a->getSortInfo() < $b->getSortInfo() ? 1 : -1; });
             $result[$productId]["productFeatures"] = $sortedProductsFeatures;
         }
 
         // Отдаем результирующий набор данных
         $this->arResult["productsInfo"] = $result;
         $this->arResult["productFeatures"] = $this->productFeatures;
+    }
+
+    /**
+     * Получение настроек характеристик внутри раздела, в котором находится товар
+     */
+    private function getProductSectionFeatures($elementId) {
+        // Получаем навигационную цепочку до раздела, в котором находится товар
+        $element = CIBlockElement::GetByID($elementId);
+        if ($element = $element->Fetch()) {
+            $navChain = CIBlockSection::GetNavChain($element["IBLOCK_ID"], $element["IBLOCK_SECTION_ID"]);
+            $sectionsChain = array();
+            // Добавляем корневой раздел - сам инфоблок
+            $sectionsChain[] = $element["IBLOCK_ID"];
+            while ($section = $navChain->Fetch()) {
+                $sectionsChain[] = $section["ID"];
+            }
+            // Формируем список характеристик, доступных для включения в фильтр
+            // Сначала смотрим на настройки текущей категории, далее поднимаемся по родительским разделам пока не дойдем до самого верха.
+            $sectionsChain = array_reverse($sectionsChain);
+            // Запрашиваем настройки зарактеристик для текущего раздела и всех его родительских разделов
+            $allSectionFeatureOptions = $this->dataWrapper->getSectionFeatureOptions($sectionsChain);
+
+            // Массив, который дудет содержать все настройки характеристик для раздела, в котором находится товар
+            /** @var SectionFeatureOption[] $sectionFeatureOptions */
+            $sectionFeatureOptions = array();
+            foreach ($sectionsChain as $section) {
+                // Фильтруем все настройки, оставляя только те, которые относятся к разделу, в котором находится товар
+                /** @var SectionFeatureOption[] $currentSectionFeatureOptions */
+                $currentSectionFeatureOptions = array_filter($allSectionFeatureOptions, function ($sectionFeatureOptions) use ($section) {
+                    /** @var SectionFeatureOption $sectionFeatureOptions */
+                    return $sectionFeatureOptions->getSectionId() == $section;
+                });
+
+                // Пробегаемся по каждой настройке характеристики, если такой еще нет - добавляем
+                foreach ($currentSectionFeatureOptions as $currentSectionFeatureOption) {
+                    $isFound = false;
+                    foreach ($sectionFeatureOptions as $sectionFeatureOption) {
+                        if ($sectionFeatureOption->getFeatureCode() == $currentSectionFeatureOption->getFeatureCode()) {
+                            $isFound = true;
+                            break;
+                        }
+                    }
+                    // Если настроек для текущей характеристики еще нет в общем наборе настроек - запишем
+                    if (!$isFound) {
+                        $sectionFeatureOptions[$currentSectionFeatureOption->getFeatureCode()] = $currentSectionFeatureOption;
+                    }
+                }
+            }
+
+            return $sectionFeatureOptions;
+        }
+        else {
+            return null;
+        }
     }
 
     /**
@@ -100,8 +158,7 @@ class CProductFeatures extends \COipComponent
             throw new ArgumentTypeException("ELEMENT_ID");
         }
 
-        // TODO: Запилить кеширование, чтобы не дергать бд каждый раз если решим вызывать компонент отдельно для каждого товара
-        /*try {
+        try {
             // Проверка на валидность параметра "CACHE_TIME"
             if (is_set($arParams["CACHE_TIME"]) && !intval($arParams["CACHE_TIME"])) {
                 throw new \Bitrix\Main\ArgumentTypeException("CACHE_TIME");
@@ -121,7 +178,7 @@ class CProductFeatures extends \COipComponent
             $arParams["CACHE"] == "Y",
             $arParams["CACHE_TIME"],
             $this->getCacheId()
-        );*/
+        );
 
         return $arParams;
     }

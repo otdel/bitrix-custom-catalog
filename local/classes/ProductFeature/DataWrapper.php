@@ -19,7 +19,7 @@ class DataWrapper
     }
 
     /**
-     * Получение описния характеристик товаров
+     * Получение описания характеристик товаров
      *
      * @return ProductFeatureValue[] | null
      * @throws \Exception
@@ -40,7 +40,7 @@ class DataWrapper
                 ->setSortFilter($queryResult["sort_filter"])
                 ->setSortInfo($queryResult["sort_info"])
                 ->setCssFilterClassname($queryResult["css_filter_classname"])
-                ->setIsFilter($queryResult["is_filter"])
+                ->setIsFilter($queryResult["is_filter"] == 1)
                 ->setIsPredefined($queryResult["is_predefined"])
                 ->setIsDisabled($queryResult["is_disabled"])
                 ->setDateInsert($queryResult["date_insert"])
@@ -75,7 +75,8 @@ class DataWrapper
                 ->setValue($queryResult["value"])
                 ->setIsDisabled($queryResult["is_disabled"])
                 ->setDateInsert($queryResult["date_insert"])
-                ->setDateModify($queryResult["date_modify"]);
+                ->setDateModify($queryResult["date_modify"])
+                ->setSortInfo($queryResult["sort_info"]);
             $productFeatureValues[] = $productFeatureValue;
         }
 
