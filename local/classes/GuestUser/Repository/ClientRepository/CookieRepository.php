@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Oip\GuestUser\Repository;
+namespace Oip\GuestUser\Repository\ClientRepository;
 
 class CookieRepository implements RepositoryInterface
 {
@@ -30,7 +30,7 @@ class CookieRepository implements RepositoryInterface
     }
 
     /**
-     * @var integer $id
+     * @var string $id
      */
     public function setData($id): void {
         setcookie($this->name, $id,time() + $this->expired, "/", $this->domain);

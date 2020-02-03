@@ -4,6 +4,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 \CBitrixComponent::includeComponentClass("oip:component");
 
 use Bitrix\Main\Application;
+use Bitrix\Main\Config\Configuration;
 
 use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\ArgumentTypeException;
@@ -60,10 +61,20 @@ class COipSocialStoreOrderAdd extends \COipComponent {
      */
     public function executeComponent()
     {
-        $repository = $this->initOrderRepository();
-        $startStatus = $this->getStartOrderStatus();
-        $order = new Order($this->arParams['USER'], $startStatus, $this->arParams['PRODUCTS']);
-        $repository->addOrder($order);
+        global $APPLICATION;
+        global $USER;
+        $loginLink = Configuration::getValue("oip_authorize_link");
+        if(!$USER->IsAuthorized()) {
+            return "You aren't logged in! Please, login to this "
+                ."<a href='$loginLink?back_url={$APPLICATION->GetCurDir()}'>link</a>";
+        }
+        else {
+            $repository = $this->initOrderRepository();
+            $startStatus = $this->getStartOrderStatus();
+            $order = new Order($this->arParams['USER'], $startStatus, $this->arParams['PRODUCTS']);
+            $repository->addOrder($order);
+            return null;
+        }
     }
 
     private function initOrderRepository(): OrderRepositoryInterface {

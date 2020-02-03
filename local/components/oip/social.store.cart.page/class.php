@@ -10,7 +10,8 @@ class COipSocialStoreCartPage extends \COipSocialStoreCart {
         $this->arResult["CART"] = $this->getProcessorResult();
 
         if(!$this->arResult["EXCEPTION"]) {
-            $this->arResult["EXCEPTION"] = $this->getOrderCreatingError();
+            $this->arResult["ERRORS"] = $this->getOrderCreatingErrors();
+            $this->arResult["EXCEPTION"] = $this->getOrderCreatingException();
             $this->arResult["SUCCESS"] = $this->getOrderCreatingSuccess();
         }
 
@@ -22,7 +23,11 @@ class COipSocialStoreCartPage extends \COipSocialStoreCart {
         return $OipSocialStoreCartOrderCreatedSuccess;
     }
 
-    private function getOrderCreatingError() {
+    private function getOrderCreatingErrors() {
+        global $OipSocialStoreCartOrderCreatingErrors;
+        return $OipSocialStoreCartOrderCreatingErrors;
+    }
+    private function getOrderCreatingException() {
         global $OipSocialStoreCartOrderCreatingErrorException;
         return $OipSocialStoreCartOrderCreatingErrorException;
     }

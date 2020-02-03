@@ -696,7 +696,7 @@ class COipIblockSectionList extends \COipComponent
                      * @var $OipGuestUser GuestService
                      */
                     global $OipGuestUser;
-                    $userID = $OipGuestUser->getUser()->getId();
+                    $userID = $OipGuestUser->getUser()->getNegativeId();
                 }
 
                 $dw->addSectionView((int)$userID, (int)$sectionID);

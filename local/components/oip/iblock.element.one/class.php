@@ -93,7 +93,7 @@ class COipIblockElementOne extends COipIblockElementList {
                  * @var $OipGuestUser GuestService
                  */
                 global $OipGuestUser;
-                $userID = $OipGuestUser->getUser()->getId();
+                $userID = $OipGuestUser->getUser()->getNegativeId();
             }
 
             $dw->addProductView((int)$userID, (int)$elementID);

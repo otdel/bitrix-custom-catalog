@@ -4,23 +4,27 @@
 namespace Oip\GuestUser;
 
 use Oip\GuestUser\Entity\User;
-use Oip\GuestUser\IdGenerator\IdGeneratorInterface;
-use Oip\GuestUser\Repository\RepositoryInterface;
+use Oip\GuestUser\Repository\ClientRepository\Exception\UserDoesntExist;
+use Oip\GuestUser\Repository\ServerRepository\RepositoryInterface as ServerRepositoryInterface;
+use Oip\GuestUser\Repository\ClientRepository\RepositoryInterface as ClientRepositoryInterface;
+
+use Oip\GuestUser\Repository\ClientRepository\Exception\UserDoesntExist as UserDoesntExistException;
+use Oip\GuestUser\Repository\ServerRepository\Exception\GettingByHashId as GettingByHashIdException;
 
 class Handler
 {
-    /** @var RepositoryInterface $repository */
-    private $repository;
-    /** @var  IdGeneratorInterface $idGenerator */
-    private $idGenerator;
+    /** @var ClientRepositoryInterface $clientRepository */
+    private $clientRepository;
+    /** @var  ServerRepositoryInterface $serverRepository */
+    private $serverRepository;
 
     /** @var $user User */
     private $user;
 
-    public function __construct(RepositoryInterface $repository, IdGeneratorInterface $idGenerator)
+    public function __construct(ClientRepositoryInterface $clientRepository, ServerRepositoryInterface $serverRepository)
     {
-        $this->repository = $repository;
-        $this->idGenerator = $idGenerator;
+        $this->clientRepository = $clientRepository;
+        $this->serverRepository = $serverRepository;
     }
 
     /**
@@ -29,28 +33,44 @@ class Handler
     public function getUser(): User {
 
         if(is_null($this->user))     {
-            $this->user = new User($this->fetchUserId());
+            $this->user = $this->fetchUser();
         }
 
         return $this->user;
     }
 
     /**
-     * @return int
+     * @return User
      */
-    private function fetchUserId(): int {
-        $id = (int)$this->repository->getData();
-        if(!$id) {
-            $id = $this->idGenerator->generateId();
+    private function fetchUser(): User {
+        $hashId = $this->clientRepository->getData();
+
+        if(!$hashId) {
+            $user = $this->serverRepository->addUser();
+        }
+        else {
+            try {
+                $user = $this->serverRepository->getUserByHashId($hashId);
+            }
+            catch (GettingByHashIdException $exception) {
+                $user = $this->serverRepository->addUser();
+            }
+
         }
 
-        return $id;
+        return $user;
     }
 
     /**
      * @return void
+     * @throws UserDoesntExistException
      */
     public function setUser(): void {
-        $this->repository->setData($this->user->getId());
+        if(is_null($this->user)) {
+            throw new UserDoesntExistException();
+        }
+        else {
+            $this->clientRepository->setData($this->user->getHashId());
+        }
     }
 }
