@@ -10,4 +10,7 @@ require($_SERVER['DOCUMENT_ROOT'] . '/local/include/init_app.php');
 $em->addEventHandlerCompatible("main","OnAfterUserAuthorize",
     ["Oip\Event\Handler\Bitrix\UserLinker\UserLinker","onAfterUserAuthorize"]);
 
+$em->addEventHandlerCompatible("main","OnAfterUserAuthorize",
+    ["Oip\Event\Handler\Bitrix\DataMover\DataMover","onAfterUserAuthorize"]);
+
 require($_SERVER['DOCUMENT_ROOT'] . '/local/include/epilog_app.php');
