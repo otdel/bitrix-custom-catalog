@@ -519,10 +519,6 @@ class DBRepository implements RepositoryInterface
                 "LIMIT {$limit} " .
                 "OFFSET {$offset}; ";
 
-            echo "<pre>";
-            var_dump($sql);
-            echo "</pre>";
-
             // Выполняем запрос
             $query = $this->db->Query($sql);
 

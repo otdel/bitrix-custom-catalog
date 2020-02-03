@@ -85,7 +85,7 @@ class CProductFeaturesFilter extends \COipComponent
         // Запрашиваем настройки зарактеристик для текущего раздела и всех его родительских разделов
         $allSectionFeatureOptions = $this->dataWrapper->getSectionFeatureOptions($sectionsChain);
 
-        // Массив, который дудет содержать все настройки характеристик для данного раздела
+        // Массив, который будет содержать все настройки характеристик для данного раздела
         /** @var SectionFeatureOption[] $sectionFeatureOptions */
         $sectionFeatureOptions = array();
         foreach ($sectionsChain as $section) {
