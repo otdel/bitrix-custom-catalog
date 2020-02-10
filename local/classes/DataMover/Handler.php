@@ -123,8 +123,13 @@ class Handler
 
         $recordIds = $this->getRecordsId($records);
 
-        return $this->repository->updateNonDuplicateRecords($this->recordType->getEntityName(), $recordIds,
-            $this->guestId, $this->userId);
+        if(empty($recordIds)) {
+           return 0;
+        }
+        else {
+            return $this->repository->updateNonDuplicateRecords($this->recordType->getEntityName(), $recordIds,
+                $this->guestId, $this->userId);
+        }
     }
 
     /** @inheritDoc */
