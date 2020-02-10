@@ -52,7 +52,7 @@ class DBDataSource implements DataSourceInterface
         elseif ($cache->startDataCache()) {
             // Собираем where условие. Первое - обязательное условие для отделения актуальных просмотренных и лайкнутых товаров
             $sqlWhere = array(
-                '(pv.date_modify IS NOT null OR pv.is_liked != 0)',
+                '(pv.date_modify IS NOT null OR pv.likes_count != 0)',
                 'pv.section_id = 0'
             );
 
@@ -70,7 +70,7 @@ class DBDataSource implements DataSourceInterface
                 "   el.IBLOCK_SECTION_ID, " .
                 "   MIN(pv.date_insert) as date_insert, " .
                 "   MAX(pv.date_modify) as date_modify, " .
-                "   SUM(CASE WHEN pv.is_liked != 0 THEN 1 ELSE 0 END) as likes_count, " .
+                "   SUM(pv.likes_count) as likes_count, " .
                 "   SUM(pv.views_count) as views_count " .
                 "FROM {$this->productViewTableName} pv " .
                 "LEFT JOIN {$this->productsTableName} el ON el.id = pv.product_id " .
@@ -116,7 +116,7 @@ class DBDataSource implements DataSourceInterface
                 "   pv.section_id, " .
                 "   MIN(pv.date_insert) as date_insert, " .
                 "   MAX(pv.date_modify) as date_modify, " .
-                "   SUM(CASE WHEN pv.is_liked != 0 THEN 1 ELSE 0 END) as likes_count, " .
+                "   SUM(pv.likes_count) as likes_count, " .
                 "   SUM(pv.views_count) as views_count " .
                 "FROM oip_product_view pv " .
                 "WHERE " . implode(' AND ', $sqlWhere) . " "  .
@@ -187,8 +187,8 @@ class DBDataSource implements DataSourceInterface
                 "   el.IBLOCK_SECTION_ID,  " .
                 "   MIN(pv.date_insert) as date_insert, " .
                 "   MAX(pv.date_modify) as date_modify, " .
-                "   SUM(CASE WHEN pv.is_liked != 0 THEN 1 ELSE 0 END) as likes_count, " .
-                "   SUM(CASE WHEN (pv.date_modify IS NOT null OR pv.is_liked != 0) THEN pv.views_count ELSE 0 END) as views_count " .
+                "   SUM(pv.likes_count) as likes_count, " .
+                "   SUM(CASE WHEN (pv.date_modify IS NOT null OR pv.likes_count != 0) THEN pv.views_count ELSE 0 END) as views_count " .
                 "FROM {$this->productsTableName} el " .
                 "LEFT JOIN {$this->productViewTableName} pv ON " . implode(' AND ', $productViewJoinClause) . " " .
                 "WHERE " . implode(' AND ', $sqlWhere) . " " .
@@ -266,8 +266,8 @@ class DBDataSource implements DataSourceInterface
                 "   el.IBLOCK_SECTION_ID,  " .
                 "   MIN(pv.date_insert) as date_insert, " .
                 "   MAX(pv.date_modify) as date_modify, " .
-                "   SUM(CASE WHEN pv.is_liked != 0 THEN 1 ELSE 0 END) as likes_count, " .
-                "   SUM(CASE WHEN (pv.date_modify IS NOT null OR pv.is_liked != 0) THEN pv.views_count ELSE 0 END) as views_count " .
+                "   SUM(pv.likes_count != 0) as likes_count, " .
+                "   SUM(CASE WHEN (pv.date_modify IS NOT null OR pv.likes_count != 0) THEN pv.views_count ELSE 0 END) as views_count " .
                 "FROM {$this->productsTableName} el " .
                 "JOIN {$this->productViewTableName} pv ON " . implode(' AND ', $productViewJoinClause) . " " .
                 "WHERE " . implode(' AND ', $sqlWhere) . " " .
@@ -347,9 +347,9 @@ class DBDataSource implements DataSourceInterface
     public function addProductLike($userId, $productId)
     {
         $sql =
-            "INSERT INTO {$this->productViewTableName} (user_id, product_id, is_liked) " .
+            "INSERT INTO {$this->productViewTableName} (user_id, product_id, likes_count) " .
             "VALUES ('{$userId}', '{$productId}', '1') " .
-            "ON DUPLICATE KEY UPDATE date_modify = NOW(), is_liked = '1'; ";
+            "ON DUPLICATE KEY UPDATE date_modify = NOW(), likes_count = '1'; ";
 
         // Выполняем запрос
         $query = $this->db->Query($sql);
@@ -366,7 +366,7 @@ class DBDataSource implements DataSourceInterface
     {
         $sql =
             "UPDATE {$this->productViewTableName} " .
-            "SET is_liked = 0 " .
+            "SET likes_count = 0 " .
             "WHERE user_id = '{$userId}' AND product_id = '{$productId}' ";
 
         // Выполняем запрос
@@ -412,9 +412,9 @@ class DBDataSource implements DataSourceInterface
     public function addSectionLike($userId, $sectionId)
     {
         $sql =
-            "INSERT INTO {$this->productViewTableName} (user_id, section_id, product_id, is_liked) " .
+            "INSERT INTO {$this->productViewTableName} (user_id, section_id, product_id, likes_count) " .
             "VALUES ('{$userId}', '{$sectionId}', 0, 1) " .
-            "ON DUPLICATE KEY UPDATE date_modify = NOW(), is_liked = 1; ";
+            "ON DUPLICATE KEY UPDATE date_modify = NOW(), likes_count = 1; ";
 
         // Выполняем запрос
         $query = $this->db->Query($sql);
@@ -431,7 +431,7 @@ class DBDataSource implements DataSourceInterface
     {
         $sql =
             "UPDATE {$this->productViewTableName} " .
-            "SET is_liked = 0 " .
+            "SET likes_count = 0 " .
             "WHERE user_id = '{$userId}' AND section_id = '{$sectionId}' ";
 
         // Выполняем запрос
@@ -464,7 +464,7 @@ class DBDataSource implements DataSourceInterface
             // Первое - обязательное условие для отделения актуальных просмотренных и лайкнутых товаров
             // Второе - отсекает просмотры разделов (без захода в деталку товара)
             $sqlWhere = array(
-                '(pv.date_modify IS NOT null OR pv.is_liked != 0)',
+                '(pv.date_modify IS NOT null OR pv.likes_count != 0)',
                 'section_id = 0'
             );
 
@@ -476,7 +476,7 @@ class DBDataSource implements DataSourceInterface
                 "   COALESCE(el.IBLOCK_SECTION_ID, IBLOCK_ID) as parent_section_id,  " .
                 "   MIN(pv.date_insert) as date_insert, " .
                 "   MAX(pv.date_modify) as date_modify, " .
-                "   SUM(CASE WHEN pv.is_liked != 0 THEN 1 ELSE 0 END) as likes_count, " .
+                "   SUM(pv.likes_count) as likes_count, " .
                 "   SUM(pv.views_count) as views_count " .
                 "FROM {$this->productViewTableName} pv " .
                 "LEFT JOIN {$this->productsTableName} el ON el.ID = pv.product_id " .
@@ -506,7 +506,7 @@ class DBDataSource implements DataSourceInterface
                 "   pv.section_id, " .
                 "   MIN(pv.date_insert) as date_insert, " .
                 "   MAX(pv.date_modify) as date_modify, " .
-                "   SUM(CASE WHEN pv.is_liked != 0 THEN 1 ELSE 0 END) as likes_count, " .
+                "   SUM(pv.likes_count) as likes_count, " .
                 "   SUM(pv.views_count) as views_count " .
                 "FROM oip_product_view pv " .
                 "WHERE pv.section_id != 0 " .
@@ -558,7 +558,7 @@ class DBDataSource implements DataSourceInterface
         elseif ($cache->startDataCache()) {
             // Собираем where условие. Первое - обязательное условие для отделения актуальных просмотренных и лайкнутых товаров
             $sqlWhere = array(
-                '(pv.date_modify IS NOT null OR pv.is_liked != 0)',
+                '(pv.date_modify IS NOT null OR pv.likes_count != 0)',
                 'pv.section_id = 0'
         );
 
@@ -570,7 +570,7 @@ class DBDataSource implements DataSourceInterface
                 "   el.IBLOCK_SECTION_ID,  " .
                 "   MIN(pv.date_insert) as date_insert, " .
                 "   MAX(pv.date_modify) as date_modify, " .
-                "   SUM(CASE WHEN pv.is_liked != 0 THEN 1 ELSE 0 END) as likes_count, " .
+                "   SUM(pv.likes_count) as likes_count, " .
                 "   SUM(pv.views_count) as views_count " .
                 "FROM {$this->productViewTableName} pv " .
                 "LEFT JOIN {$this->productsTableName} el ON el.ID = pv.product_id " .
@@ -628,8 +628,8 @@ class DBDataSource implements DataSourceInterface
                 "   el.ID as product_id,  " .
                 "   el.IBLOCK_ID, " .
                 "   el.IBLOCK_SECTION_ID, " .
-                "   SUM(CASE WHEN pv.is_liked != 0 THEN 1 ELSE 0 END) as likes_count, " .
-                "   SUM(CASE WHEN (pv.date_modify IS NOT null OR pv.is_liked != 0) THEN pv.views_count ELSE 0 END) as views_count, " .
+                "   SUM(pv.likes_count) as likes_count, " .
+                "   SUM(CASE WHEN (pv.date_modify IS NOT null OR pv.likes_count != 0) THEN pv.views_count ELSE 0 END) as views_count, " .
                 "   MIN(pv.date_insert) as date_insert, " .
                 "   MAX(pv.date_modify) as date_modify " .
                 "FROM {$this->productsTableName} el " .
