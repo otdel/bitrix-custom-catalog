@@ -2,6 +2,8 @@
 
 namespace Oip\GuestUser\Entity;
 
+use DateTime;
+
 class User
 {
     /** @var int $id */
@@ -10,10 +12,14 @@ class User
     /** @var string $hashId */
     private $hashId;
 
-    public function __construct(int $id, string $hashId)
+    /** @var DateTime $lastVisit */
+    private $lastVisit;
+
+    public function __construct(int $id, string $hashId, DateTime $lastVisit)
     {
         $this->id = $id;
         $this->hashId = $hashId;
+        $this->lastVisit = $lastVisit;
     }
 
     /** @return int $id */
@@ -30,4 +36,14 @@ class User
     public function getHashId(): string {
         return $this->hashId;
     }
+
+    /**
+     * @return DateTime
+     */
+    public function getLasVisit(): DateTime
+    {
+        return $this->lastVisit;
+    }
+
+
 }
