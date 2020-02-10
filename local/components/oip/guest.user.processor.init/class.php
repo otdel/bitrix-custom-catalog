@@ -10,6 +10,8 @@ use Oip\GuestUser\Handler as GuestUser;
 use Oip\GuestUser\Repository\ClientRepository\CookieRepository;
 use Oip\GuestUser\Repository\ServerRepository\DBRepository;
 
+use Oip\Util\Bitrix\DateTimeConverter;
+
 \CBitrixComponent::includeComponentClass("oip:component");
 
 class COipGuestUserProcessorInit extends \COipComponent
@@ -28,7 +30,8 @@ class COipGuestUserProcessorInit extends \COipComponent
         $connection = Application::getConnection();
 
         $clientRepository = new CookieRepository($cookieName, $cookieExpired, $siteName);
-        $serverRepository = new DBRepository($connection);
+        $dateTimeConverter = new DateTimeConverter();
+        $serverRepository = new DBRepository($connection, $dateTimeConverter);
 
         $user = new GuestUser($clientRepository, $serverRepository);
 
