@@ -1,6 +1,4 @@
-<?php if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
-use Bitrix\Main\Page\Asset;
-?>
+<?php if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?>
 
 <!DOCTYPE html>
 <html xml:lang="<?=LANGUAGE_ID?>" lang="<?=LANGUAGE_ID?>"  prefix="og: http://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
@@ -12,18 +10,21 @@ use Bitrix\Main\Page\Asset;
 
     <?$APPLICATION->ShowHead();?>
 
+    <title><?$APPLICATION->ShowTitle()?></title>
+
     <?
-    Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . "/css/uikit.min.css");
-
-    Asset::getInstance()->addCss(SITE_TEMPLATE_PATH . "/custom/main.css");
-
-    Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . "/js/uikit.min.js");
-    Asset::getInstance()->addJs(SITE_TEMPLATE_PATH . "/js/uikit-icons.min.js");
-
-    Asset::getInstance()->addJs("/local/js/oip-lib.js");
+        // Вендорные стили и скрипты сюда: local/src/webpack_vendor.js
+        // Кастомные -- сюда: local/src/webpack_custom.js
     ?>
 
-    <title><?$APPLICATION->ShowTitle()?></title>
+    <?require_once($_SERVER['DOCUMENT_ROOT'] . '/build/getWebpackAssets.php');?>
+    <?if ($GLOBALS['VENDOR_STYLES'] !== ''):?>
+        <link rel="stylesheet" href="/local/dist/<?=$GLOBALS['VENDOR_STYLES'];?>">
+    <?endif;?>
+    <?if ($GLOBALS['CUSTOM_STYLES'] !== ''):?>
+        <link rel="stylesheet" href="/local/dist/<?=$GLOBALS['CUSTOM_STYLES'];?>">
+    <?endif;?>
 </head>
 
 <body>
+
