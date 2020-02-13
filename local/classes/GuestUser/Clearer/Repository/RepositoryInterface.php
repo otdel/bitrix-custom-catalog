@@ -6,6 +6,11 @@ use Oip\GuestUser\Entity\User;
 use Oip\GuestUser\Clearer\Entity\ProductView\Record as ProductView;
 
 interface RepositoryInterface {
+
+    /**
+     * @return array
+     */
+    public function getAllGuestId(): array;
     /**
      * @param int $guestId
      * @return User|null

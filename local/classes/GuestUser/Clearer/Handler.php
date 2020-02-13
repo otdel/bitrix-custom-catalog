@@ -23,6 +23,11 @@ class Handler {
         $this->repository = $repository;
     }
 
+    /** @return array */
+    public function getAllGuestId(): array {
+        return $this->repository->getAllGuestId();
+    }
+
     /**
      * @param int $guestId
      * @return User

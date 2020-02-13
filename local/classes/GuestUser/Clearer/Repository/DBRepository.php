@@ -33,6 +33,20 @@ class DBRepository implements RepositoryInterface {
     /**
      * @inheritdoc
      * @throws SqlQueryException
+     */
+    public function getAllGuestId(): array
+    {
+        $ids = [];
+        $res = $this->db->query("SELECT id FROM {$this->guestUsersTableName}");
+        while($id = $res->fetch()) {
+            $ids[] =   $id["id"];
+        }
+        return $ids;
+    }
+
+    /**
+     * @inheritdoc
+     * @throws SqlQueryException
      * @throws Exception
      */
     public function getUserById(int $guestId): ?User
