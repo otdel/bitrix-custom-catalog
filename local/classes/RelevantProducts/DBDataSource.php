@@ -702,4 +702,12 @@ class DBDataSource implements DataSourceInterface
         $queryResult = $query->Fetch();
         return $queryResult["user_id"];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUserLikes(int $userId): int {
+        return (int)$this->db->Query("SELECT COUNT(1) as cnt FROM {$this->productViewTableName} WHERE user_id = $userId"
+            ."  AND likes_count > 0")->Fetch()["cnt"];
+    }
 }

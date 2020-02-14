@@ -265,4 +265,11 @@ class DataWrapper
         return $this->ds->getFreeGuestId();
     }
 
+    /**
+     * @param int $userId
+     * @return int
+     */
+    public function getUserLikes(int $userId) {
+        return $this->ds->getUserLikes($userId);
+    }
 }

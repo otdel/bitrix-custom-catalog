@@ -98,6 +98,10 @@ interface DataSourceInterface {
      */
     public function getFreeGuestId();
 
-
+    /**
+     * @param int $userId
+     * @return int
+     */
+    public function getUserLikes(int $userId): int;
 }
 
