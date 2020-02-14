@@ -48,7 +48,7 @@ class Element
         $this->id = $data["FIELDS"]["ID"];
         $this->code = $data["FIELDS"]["CODE"];
         $this->iblockId = $data["FIELDS"]["IBLOCK_ID"];
-        $this->sectionId = $data["FIELDS"]["SECTION_ID"];
+        $this->sectionId = $data["FIELDS"]["IBLOCK_SECTION_ID"];
         $this->sectionName = $data["FIELDS"]["SECTION_NAME"];
         $this->sort = $data["FIELDS"]["SORT"];
         $this->name = $data["FIELDS"]["NAME"];
