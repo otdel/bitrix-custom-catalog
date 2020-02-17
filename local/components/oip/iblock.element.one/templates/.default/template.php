@@ -73,7 +73,9 @@ $component = $this->getComponent();
                                     ])?>
                                 </div>
                                 <div>
-                                    <button class="uk-icon-button uk-margin-small-right" uk-icon="heart" uk-tooltip="Отложить"></button>
+                                    <?$APPLICATION->IncludeComponent("oip:relevant.products.likes.product.widget","",[
+                                        "PRODUCT_ID" => $element->getId()
+                                    ]);?>
                                 </div>
                             </div>
 
