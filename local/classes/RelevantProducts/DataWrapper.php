@@ -2,8 +2,15 @@
 
 namespace Oip\RelevantProducts;
 
+use Exception;
+
 class DataWrapper
 {
+    const GLOBAL_PRODUCT_LIKE_ACTION_NAME = "oipProductLikeAction";
+    const GLOBAL_PRODUCT_LIKE_ACTION_ADD = "oipProductLikeAdd";
+    const GLOBAL_PRODUCT_LIKE_ACTION_REMOVE = "oipProductLikeRemove";
+    const GLOBAL_PRODUCT_LIKE_PRODUCT_ID = "oipProductLikeProductId";
+
     /** @var \Oip\RelevantProducts\DataSourceInterface */
     private $ds;
 
@@ -61,6 +68,15 @@ class DataWrapper
      */
     public function addProductLike($userId, $productId){
         return $this->ds->addProductLike($userId, $productId);
+    }
+
+    /**
+     * @param int $userId
+     * @param int $productId
+     * @throws Exception;
+     */
+    public function removeProductLike($userId, $productId): void {
+        $this->ds->deleteProductLike($userId, $productId);
     }
 
     /**
