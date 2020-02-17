@@ -272,4 +272,21 @@ class DataWrapper
     public function getUserLikes(int $userId) {
         return $this->ds->getUserLikes($userId);
     }
+
+    /**
+     * @param int $productId
+     * @param int $userId
+     * @return bool
+     */
+    public function isProductLikedByUser(int $productId, int $userId): bool {
+        return $this->ds->isProductLikedByUser($productId, $userId);
+    }
+
+    /**
+     * @param int $productId
+     * @return int
+     */
+    public function getProductLikes(int $productId): int {
+        return $this->ds->getProductLikes($productId);
+    }
 }
