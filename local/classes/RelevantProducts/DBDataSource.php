@@ -138,6 +138,7 @@ class DBDataSource implements DataSourceInterface
                     $relevantSections[$sectionId] = new RelevantSection($sectionId);
                 }
                 $relevantSections[$sectionId]->setViewsCount($relevantSections[$sectionId]->getViewsCount() + $queryResult["views_count"]);
+                $relevantSections[$sectionId]->setLikesCount($relevantSections[$sectionId]->getLikesCount() + $queryResult["likes_count"]);
                 // Пересчитаем "вес" раздела
                 $relevantSections[$sectionId]->calcWeight();
             }
@@ -701,5 +702,35 @@ class DBDataSource implements DataSourceInterface
         // Возвращаем полученный user_id
         $queryResult = $query->Fetch();
         return $queryResult["user_id"];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSectionLikesCount($userId, $sectionId) {
+        $sectionOnClause = "";
+        if (count($sectionId) > 0) {
+            $iblockElementOnClause = " AND ibe.iblock_section_id IN (" . implode(',', $sectionId) . ") ";
+            $productViewOnClause = " AND pv.section_id IN (" . implode(',', $sectionId) . ") ";
+        }
+        $sql =
+            "SELECT SUM(tbl.likes_count) as likes_count
+             FROM (
+                 SELECT SUM(pv.likes_count) as likes_count
+                 FROM oip_product_view pv
+                 JOIN b_iblock_element ibe ON ibe.id = pv.product_id {$iblockElementOnClause}
+                 WHERE pv.user_id = {$userId}
+                 UNION ALL
+                 SELECT pv.likes_count AS likes_count
+                 FROM oip_product_view pv
+                 WHERE pv.user_id = {$userId} {$productViewOnClause}
+             ) tbl;";
+        // Выполняем запрос
+        $res = $this->db->Query($sql);
+        if ($row = $res->Fetch()) {
+            return $row["likes_count"];
+        }
+        // Если не удалось получить кол-во - возвращаем 0
+        return 0;
     }
 }

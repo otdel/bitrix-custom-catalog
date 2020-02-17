@@ -98,6 +98,12 @@ interface DataSourceInterface {
      */
     public function getFreeGuestId();
 
-
+    /**
+     * Получение количества лайков внутри категории и ее дочерних разделов по пользователю
+     * @param $userId
+     * @param $sectionId
+     * @return mixed
+     */
+    public function getSectionLikesCount($userId, $sectionId);
 }
 
