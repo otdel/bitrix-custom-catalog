@@ -125,6 +125,10 @@ $sectionName = $arResult["SECTION_NAME"];
                                     "BUTTON_ICON_REMOVE" => "close"
                             ])?>
 
+                                <?$APPLICATION->IncludeComponent("oip:relevant.products.likes.product.widget","",[
+                                    "PRODUCT_ID" => $element->getId()
+                                ]);?>
+
                             <?endif?>
 
                         </div>
