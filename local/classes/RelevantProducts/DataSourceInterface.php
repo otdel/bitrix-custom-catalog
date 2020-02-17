@@ -105,5 +105,12 @@ interface DataSourceInterface {
      * @return mixed
      */
     public function getSectionLikesCount($userId, $sectionId);
+
+    /**
+     * Получение списка идентификаторов всех подразделов конкретного раздела
+     * @param int $sectionId Идентификатор раздела
+     * @return array
+     */
+    public function getSubsectionsId($sectionId);
 }
 

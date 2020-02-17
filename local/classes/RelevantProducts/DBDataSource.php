@@ -2,6 +2,7 @@
 namespace Oip\RelevantProducts;
 
 use Bitrix\Main\Data\Cache;
+use CIBlockSection;
 use Oip\CacheInfo;
 use Oip\RelevantProducts\Config\Configuration;
 use Oip\RelevantProducts\RelevantProduct;
@@ -708,23 +709,31 @@ class DBDataSource implements DataSourceInterface
      * @inheritDoc
      */
     public function getSectionLikesCount($userId, $sectionId) {
-        $sectionOnClause = "";
-        if (count($sectionId) > 0) {
-            $iblockElementOnClause = " AND ibe.iblock_section_id IN (" . implode(',', $sectionId) . ") ";
-            $productViewOnClause = " AND pv.section_id IN (" . implode(',', $sectionId) . ") ";
+        // Если пришло просто число - сделаем из него массив
+        if (!is_array($sectionId) && is_numeric($sectionId)) {
+            $sectionId = array($sectionId);
         }
-        $sql =
-            "SELECT SUM(tbl.likes_count) as likes_count
-             FROM (
-                 SELECT SUM(pv.likes_count) as likes_count
-                 FROM oip_product_view pv
-                 JOIN b_iblock_element ibe ON ibe.id = pv.product_id {$iblockElementOnClause}
-                 WHERE pv.user_id = {$userId}
-                 UNION ALL
-                 SELECT pv.likes_count AS likes_count
-                 FROM oip_product_view pv
-                 WHERE pv.user_id = {$userId} {$productViewOnClause}
-             ) tbl;";
+        // Если идет подсчет по конкретным категориям
+        if (count($sectionId) > 0) {
+            $sql =
+                "SELECT SUM(tbl.likes_count) as likes_count
+                 FROM (
+                     SELECT SUM(pv.likes_count) as likes_count
+                     FROM oip_product_view pv
+                     JOIN b_iblock_element ibe ON ibe.id = pv.product_id AND ibe.iblock_section_id IN (" . implode(',', $sectionId) . ")
+                     WHERE pv.user_id = {$userId}
+                     UNION ALL
+                     SELECT pv.likes_count AS likes_count
+                     FROM oip_product_view pv
+                     WHERE pv.user_id = {$userId} AND pv.section_id IN (" . implode(',', $sectionId) . ")
+                 ) tbl;";
+        }
+        // Если идет подсчет по всем товарам и категориям
+        else {
+            $sql ="SELECT SUM(pv.likes_count) as likes_count
+                   FROM oip_product_view pv
+                   WHERE pv.user_id = {$userId};";
+        }
         // Выполняем запрос
         $res = $this->db->Query($sql);
         if ($row = $res->Fetch()) {
@@ -732,5 +741,24 @@ class DBDataSource implements DataSourceInterface
         }
         // Если не удалось получить кол-во - возвращаем 0
         return 0;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSubsectionsId($sectionId) {
+        // Получаем все ID дочерних разделов
+        $arSections = array();
+        $rsParentSection = CIBlockSection::GetByID($sectionId);
+        if ($arParentSection = $rsParentSection->GetNext())
+        {
+            $arFilter = array('IBLOCK_ID' => $arParentSection['IBLOCK_ID'],'>LEFT_MARGIN' => $arParentSection['LEFT_MARGIN'],'<RIGHT_MARGIN' => $arParentSection['RIGHT_MARGIN'],'>DEPTH_LEVEL' => $arParentSection['DEPTH_LEVEL']); // выберет потомков без учета активности
+            $rsSect = CIBlockSection::GetList(array('left_margin' => 'asc'),$arFilter);
+            while ($arSect = $rsSect->GetNext())
+            {
+                $arSections[] = $arSect["ID"];
+            }
+        }
+        return $arSections;
     }
 }

@@ -265,8 +265,18 @@ class DataWrapper
         return $this->ds->getFreeGuestId();
     }
 
+    /**
+     * @see DataSourceInterface::getSectionLikesCount()
+     */
     public function getSectionLikesCount($userId, $sectionId) {
         return $this->ds->getSectionLikesCount($userId, $sectionId);
+    }
+
+    /**
+     * @see DataSourceInterface::getSubsectionsId()
+     */
+    public function getSubsectionsId($sectionId) {
+        return $this->ds->getSubsectionsId($sectionId);
     }
 
 }
