@@ -77,6 +77,11 @@ $component = $this->getComponent();
                                         "PRODUCT_ID" => $element->getId()
                                     ]);?>
                                 </div>
+                                <div>
+                                    <?$APPLICATION->IncludeComponent("oip:relevant.products.views.product.count","",[
+                                        "PRODUCT_ID" => $element->getId()
+                                    ]);?>
+                                </div>
                             </div>
 
                             <?include_once (__DIR__."/include/bottom.php")?>
