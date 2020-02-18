@@ -722,4 +722,10 @@ class DBDataSource implements DataSourceInterface
         return (bool)$this->db->Query("SELECT 1 as is_liked FROM {$this->productViewTableName} WHERE product_id = $productId "
             ." AND user_id = $userId AND likes_count > 0")->Fetch()["is_liked"];
     }
+
+    /** @inheritdoc */
+    public function getProductViews(int $productId): int {
+        return (int)$this->db->Query("SELECT SUM(views_count) as views FROM {$this->productViewTableName} WHERE product_id = $productId")
+            ->Fetch()["views"];
+    }
 }

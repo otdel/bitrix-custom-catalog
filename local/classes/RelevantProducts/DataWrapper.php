@@ -305,4 +305,12 @@ class DataWrapper
     public function getProductLikes(int $productId): int {
         return $this->ds->getProductLikes($productId);
     }
+
+    /**
+     * @param int $productId
+     * @return int
+     */
+    public function getProductViews(int $productId): int {
+        return $this->ds->getProductViews($productId);
+    }
 }

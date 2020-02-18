@@ -116,5 +116,11 @@ interface DataSourceInterface {
      * @return bool
      */
     public function isProductLikedByUser(int $productId, int $userId): bool;
+
+    /**
+     * @param int $productId
+     * @return int
+     */
+    public function getProductViews(int $productId): int;
 }
 
