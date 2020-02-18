@@ -8,6 +8,8 @@ class RelevantSection
 {
     /** @var int */
     private $id;
+    /** @var string */
+    private $name;
     /** @var RelevantProduct[] $relevantProducts */
     private $relevantProducts;
     /** @var int */
@@ -18,11 +20,11 @@ class RelevantSection
     private $weight;
 
     /**
-     * @param int $sectionId
+     * @param int $id
      */
-    public function __construct($sectionId)
+    public function __construct($id)
     {
-        $this->id = $sectionId;
+        $this->id = $id;
     }
 
     /**
@@ -31,6 +33,30 @@ class RelevantSection
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
     }
 
     /**
@@ -129,8 +155,11 @@ class RelevantSection
         // Обнуляем вес
         $this->weight = 0;
 
-        $this->weight += $this->viewsCount * Configuration::PRODUCT_VIEW_WEIGHT;
-        $this->weight += $this->likesCount * Configuration::PRODUCT_LIKE_WEIGHT;
+        // Пробегаемся по всем товарам в категории и считаем вес
+        foreach ($this->relevantProducts as $relevantProduct) {
+            $this->weight += $relevantProduct->getViewsCount() * Configuration::PRODUCT_VIEW_WEIGHT;
+            $this->weight += $relevantProduct->getLikesCount() * Configuration::PRODUCT_LIKE_WEIGHT;
+        }
 
         return $this->weight;
     }

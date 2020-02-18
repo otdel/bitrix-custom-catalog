@@ -32,7 +32,7 @@ class DataWrapper
 
         // Оставляем только категории с id > 0
         $viewedCategories = array_filter($viewedCategories, function($obj){
-            /** @var RelevantCategory $obj */
+            /** @var RelevantSection $obj */
             return $obj->getId() > 0;
         });
 
@@ -141,7 +141,7 @@ class DataWrapper
         $mostViewedCategories = $this->ds->getMostViewedSections();
         // Оставляем только категории с id > 0
         $mostViewedCategories = array_filter($mostViewedCategories, function($obj){
-            /** @var RelevantCategory $obj */
+            /** @var RelevantSection $obj */
             return $obj->getId() > 0;
         });
         // Если ни в одной категории нет просмотров
@@ -163,7 +163,7 @@ class DataWrapper
         $mostLikedCategories = $this->ds->getMostViewedSections();
         // Оставляем только категории с id > 0
         $mostLikedCategories = array_filter($mostLikedCategories, function($obj){
-            /** @var RelevantCategory $obj */
+            /** @var RelevantSection $obj */
             return $obj->getId() > 0;
         });
         // Если ни в одной категории нет просмотров
@@ -219,7 +219,7 @@ class DataWrapper
         $newProductCategories = $this->ds->getNewProductCategories();
         // Оставляем только категории с id > 0
         $newProductCategories = array_filter($newProductCategories, function($obj){
-            /** @var RelevantCategory $obj */
+            /** @var RelevantSection $obj */
             return $obj->getId() > 0;
         });
         // Если ни в одной категории нет новых товаров
@@ -242,7 +242,7 @@ class DataWrapper
         $newProductCategories = $this->ds->getNewProductCategories();
         // Оставляем только категории с id > 0
         $newProductCategories = array_filter($newProductCategories, function($obj){
-            /** @var RelevantCategory $obj */
+            /** @var RelevantSection $obj */
             return $obj->getId() > 0;
         });
         // Если ни в одной категории нет новых товаров
@@ -267,7 +267,7 @@ class DataWrapper
         }
 
         // Удостоверимся, что нам пришел именно массив id, состоящий только из чисел
-        if (count($userIds) == 0 || !($userIds === array_filter($userIds,'is_int'))) {
+        if (count($userIds) == 0 || !($userIds === array_filter($userIds,'is_numeric'))) {
             throw new \Exception("Ошибка входных данных. Идентификаторы пользователей некорректны.");
         }
 
@@ -312,5 +312,18 @@ class DataWrapper
      */
     public function getProductViews(int $productId): int {
         return $this->ds->getProductViews($productId);
+    }
+    /**
+     * @see DataSourceInterface::getSectionLikesCount()
+     */
+    public function getSectionLikesCount($userId, $sectionId) {
+        return $this->ds->getSectionLikesCount($userId, $sectionId);
+    }
+
+    /**
+     * @see DataSourceInterface::getSubsectionsId()
+     */
+    public function getSubsectionsId($sectionId) {
+        return $this->ds->getSubsectionsId($sectionId);
     }
 }
