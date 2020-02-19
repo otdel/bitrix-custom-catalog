@@ -124,11 +124,10 @@ interface DataSourceInterface {
     public function getProductViews(int $productId): int;
     /**
      * Получение количества лайков внутри категории и ее дочерних разделов по пользователю
-     * @param $userId
      * @param $sectionId
      * @return mixed
      */
-    public function getSectionLikesCount($userId, $sectionId);
+    public function getSectionLikesCount($sectionId);
 
     /**
      * Получение списка идентификаторов всех подразделов конкретного раздела

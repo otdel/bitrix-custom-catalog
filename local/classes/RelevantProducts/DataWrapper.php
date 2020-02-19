@@ -316,8 +316,8 @@ class DataWrapper
     /**
      * @see DataSourceInterface::getSectionLikesCount()
      */
-    public function getSectionLikesCount($userId, $sectionId) {
-        return $this->ds->getSectionLikesCount($userId, $sectionId);
+    public function getSectionLikesCount($sectionId) {
+        return $this->ds->getSectionLikesCount($sectionId);
     }
 
     /**

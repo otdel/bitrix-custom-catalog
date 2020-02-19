@@ -734,7 +734,7 @@ class DBDataSource implements DataSourceInterface
     /**
      * @inheritDoc
      */
-    public function getSectionLikesCount($userId, $sectionId) {
+    public function getSectionLikesCount($sectionId) {
         // Если пришло просто число - сделаем из него массив
         if (!is_array($sectionId) && is_numeric($sectionId)) {
             $sectionId = array($sectionId);
@@ -747,18 +747,16 @@ class DBDataSource implements DataSourceInterface
                      SELECT SUM(pv.likes_count) as likes_count
                      FROM oip_product_view pv
                      JOIN b_iblock_element ibe ON ibe.id = pv.product_id AND ibe.iblock_section_id IN (" . implode(',', $sectionId) . ")
-                     WHERE pv.user_id = {$userId}
                      UNION ALL
                      SELECT pv.likes_count AS likes_count
                      FROM oip_product_view pv
-                     WHERE pv.user_id = {$userId} AND pv.section_id IN (" . implode(',', $sectionId) . ")
+                     WHERE pv.section_id IN (" . implode(',', $sectionId) . ")
                  ) tbl;";
         }
         // Если идет подсчет по всем товарам и категориям
         else {
             $sql ="SELECT SUM(pv.likes_count) as likes_count
-                   FROM oip_product_view pv
-                   WHERE pv.user_id = {$userId};";
+                   FROM oip_product_view pv";
         }
         // Выполняем запрос
         $res = $this->db->Query($sql);
