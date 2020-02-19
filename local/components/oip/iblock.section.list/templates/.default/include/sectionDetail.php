@@ -15,6 +15,10 @@ use Oip\Custom\Component\Iblock\Section;
 <p>Иконка категории: <?=$section->getPropValue("UF_CATEGORY_ICON") ?></p>
 <p>Видео: <?=$section->getPropValue("UF_VIDEO") ?></p>
 
+<?$APPLICATION->IncludeComponent("oip:relevant.products.likes.category.widget","",[
+        "SECTION_ID" => $section->getId()
+])?>
+
 <?if ($files = $section->getPropValue("UF_DOCUMENTS")):
     foreach ($files as $file):?>
         <p>Документ: <?=$file ?></p>
