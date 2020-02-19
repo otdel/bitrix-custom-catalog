@@ -11,6 +11,11 @@ class DataWrapper
     const GLOBAL_PRODUCT_LIKE_ACTION_REMOVE = "oipProductLikeRemove";
     const GLOBAL_PRODUCT_LIKE_PRODUCT_ID = "oipProductLikeProductId";
 
+    const GLOBAL_CATEGORY_LIKE_ACTION_NAME = "oipCategoryLikeAction";
+    const GLOBAL_CATEGORY_LIKE_ACTION_ADD = "oipCategoryLikeAdd";
+    const GLOBAL_CATEGORY_LIKE_ACTION_REMOVE = "oipCategoryLikeRemove";
+    const GLOBAL_CATEGORY_LIKE_CATEGORY_ID = "oipCategoryLikeCategoryId";
+
     /** @var \Oip\RelevantProducts\DataSourceInterface */
     private $ds;
 

@@ -28,6 +28,7 @@ class CRelevantProductsLikesProcessor extends \CRelevantProducts
      */
     private function handleAction(): void {
         $this->handleProductAction();
+        $this->handleCategoryAction();
     }
 
     /**
@@ -49,6 +50,30 @@ class CRelevantProductsLikesProcessor extends \CRelevantProducts
 
                 case $this->dw::GLOBAL_PRODUCT_LIKE_ACTION_REMOVE:
                     $this->dw->removeProductLike($this->getUserId(), $actionProductId);
+                break;
+            }
+        }
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function handleCategoryAction(): void {
+        $action = Application::getInstance()->getContext()->getRequest()
+            ->getPost($this->dw::GLOBAL_CATEGORY_LIKE_ACTION_NAME);
+        $actionCategoryId = (int)Application::getInstance()->getContext()
+            ->getRequest()->getPost($this->dw::GLOBAL_CATEGORY_LIKE_CATEGORY_ID);
+
+        if(is_set($action)) {
+            switch ($action) {
+
+                case $this->dw::GLOBAL_CATEGORY_LIKE_ACTION_ADD:
+                    $this->dw->addSectionLike($this->getUserId(), $actionCategoryId);
+                break;
+
+                case $this->dw::GLOBAL_CATEGORY_LIKE_ACTION_REMOVE:
+                    $this->dw->deleteSectionLike($this->getUserId(), $actionCategoryId);
                 break;
             }
         }
