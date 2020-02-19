@@ -326,4 +326,13 @@ class DataWrapper
     public function getSubsectionsId($sectionId) {
         return $this->ds->getSubsectionsId($sectionId);
     }
+
+    /**
+     * @param int $sectionId
+     * @param int $userId
+     * @return bool
+     */
+    public function isSectionLikedByUser(int $sectionId, int $userId): bool {
+        return $this->ds->isSectionLikedByUser($sectionId, $userId);
+    }
 }

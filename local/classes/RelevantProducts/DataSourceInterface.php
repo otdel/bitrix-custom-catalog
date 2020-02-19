@@ -135,5 +135,12 @@ interface DataSourceInterface {
      * @return array
      */
     public function getSubsectionsId($sectionId);
+
+    /**
+     * @param int $sectionId
+     * @param int $userId
+     * @return bool
+     */
+    public function isSectionLikedByUser(int $sectionId, int $userId): bool;
 }
 
