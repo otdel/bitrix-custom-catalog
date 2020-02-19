@@ -21,12 +21,20 @@ class CRelevantProductsLikesProcessor extends \CRelevantProducts
         }
 
     }
-
-
+    
     /**
-     * @throws Exception;
+     * @return void
+     * @throws Exception
      */
     private function handleAction(): void {
+        $this->handleProductAction();
+    }
+
+    /**
+     * @return void
+     * @throws Exception
+     */
+    private function handleProductAction(): void {
         $action = Application::getInstance()->getContext()->getRequest()
             ->getPost($this->dw::GLOBAL_PRODUCT_LIKE_ACTION_NAME);
         $actionProductId = (int)Application::getInstance()->getContext()
@@ -44,6 +52,5 @@ class CRelevantProductsLikesProcessor extends \CRelevantProducts
                 break;
             }
         }
-
     }
 }
