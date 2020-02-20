@@ -125,9 +125,9 @@ interface DataSourceInterface {
     /**
      * Получение количества лайков внутри категории и ее дочерних разделов по пользователю
      * @param $sectionId
-     * @return mixed
+     * @return int
      */
-    public function getSectionLikesCount($sectionId);
+    public function getSectionLikesCount($sectionId): int;
 
     /**
      * Получение списка идентификаторов всех подразделов конкретного раздела
