@@ -714,14 +714,36 @@ class DBDataSource implements DataSourceInterface
      * @inheritdoc
      */
     public function getUserLikes(int $userId): int {
-        return (int)$this->db->Query("SELECT COUNT(1) as cnt FROM {$this->productViewTableName} WHERE user_id = $userId"
-            ."  AND likes_count > 0")->Fetch()["cnt"];
+
+        $queryFunc = function () use ($userId) {
+            return (int)$this->db->Query("SELECT COUNT(1) as cnt FROM {$this->productViewTableName} WHERE user_id = $userId"
+                . "  AND likes_count > 0")->Fetch()["cnt"];
+        };
+        $cacheKey = $this->cacheInfo->getCacheKey() . ".userLikes_" . $userId;
+
+        return $this->cacheService::getCacheVariable(
+            $cacheKey,
+            $this->cacheInfo->getCacheLifeTime(),
+            "userLikes_".$userId,
+            $queryFunc
+        );
     }
 
     /** @inheritdoc */
     public function getProductLikes(int $productId): int {
-    return (int)$this->db->Query("SELECT SUM(likes_count) as likes FROM {$this->productViewTableName} WHERE product_id = $productId")
-        ->Fetch()["likes"];
+
+        $queryFunc = function () use ($productId) {
+            return (int)$this->db->Query("SELECT SUM(likes_count) as likes FROM {$this->productViewTableName} WHERE product_id = $productId")
+                ->Fetch()["likes"];
+        };
+        $cacheKey = $this->cacheInfo->getCacheKey() . ".productLikes_" . $productId;
+
+        return $this->cacheService::getCacheVariable(
+            $cacheKey,
+            $this->cacheInfo->getCacheLifeTime(),
+            "productLikes_".$productId,
+            $queryFunc
+            );
     }
 
     /** @inheritdoc */
@@ -733,21 +755,33 @@ class DBDataSource implements DataSourceInterface
     /** @inheritdoc */
     public function getProductViews(int $productId): int
     {
-        return (int)$this->db->Query("SELECT SUM(views_count) as views FROM {$this->productViewTableName} WHERE product_id = $productId")
-            ->Fetch()["views"];
+        $queryFunc = function () use ($productId) {
+            return (int)$this->db->Query("SELECT SUM(views_count) as views FROM {$this->productViewTableName} WHERE product_id = $productId")
+                ->Fetch()["views"];
+        };
+        $cacheKey = $this->cacheInfo->getCacheKey() . ".productViews_" . $productId;
+
+        return $this->cacheService::getCacheVariable(
+            $cacheKey,
+            $this->cacheInfo->getCacheLifeTime(),
+            "productViews_".$productId,
+            $queryFunc
+        );
     }
     /**
      * @inheritDoc
      */
-    public function getSectionLikesCount($sectionId) {
+    public function getSectionLikesCount($sectionId): int {
         // Если пришло просто число - сделаем из него массив
         if (!is_array($sectionId) && is_numeric($sectionId)) {
             $sectionId = array($sectionId);
         }
-        // Если идет подсчет по конкретным категориям
-        if (count($sectionId) > 0) {
-            $sql =
-                "SELECT SUM(tbl.likes_count) as likes_count
+
+        $queryFunc = function () use($sectionId): int {
+            // Если идет подсчет по конкретным категориям
+            if (count($sectionId) > 0) {
+                $sql =
+                    "SELECT SUM(tbl.likes_count) as likes_count
                  FROM (
                      SELECT SUM(pv.likes_count) as likes_count
                      FROM oip_product_view pv
@@ -757,19 +791,26 @@ class DBDataSource implements DataSourceInterface
                      FROM oip_product_view pv
                      WHERE pv.section_id IN (" . implode(',', $sectionId) . ")
                  ) tbl;";
-        }
-        // Если идет подсчет по всем товарам и категориям
-        else {
-            $sql ="SELECT SUM(pv.likes_count) as likes_count
+            }
+            // Если идет подсчет по всем товарам и категориям
+            else {
+                $sql ="SELECT SUM(pv.likes_count) as likes_count
                    FROM oip_product_view pv";
-        }
-        // Выполняем запрос
-        $res = $this->db->Query($sql);
-        if ($row = $res->Fetch()) {
-            return $row["likes_count"];
-        }
-        // Если не удалось получить кол-во - возвращаем 0
-        return 0;
+            }
+
+            // Выполняем запрос
+            return (int)$this->db->Query($sql)->Fetch()["likes_count"];
+        };
+
+        // Формируем ключ кеша
+        $cacheKey = $this->cacheInfo->getCacheKey() . ".getSectionLikesCount_" . md5(serialize(func_get_args()));
+        return $this->cacheService::getCacheVariable(
+            $cacheKey,
+            $this->cacheInfo->getCacheLifeTime(),
+            "getSectionLikesCount",
+            $queryFunc
+        );
+
     }
 
     /**
