@@ -4,6 +4,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
+use Oip\Util\Cache\BXCacheService;
 
 \CBitrixComponent::includeComponentClass("oip:component");
 
@@ -18,7 +19,8 @@ abstract class CRelevantProducts extends \COipComponent
 
         global $DB;
         $cacheInfo = new CacheInfo();
-        $ds = new DBDataSource($DB, $cacheInfo);
+        $cacheService = new BXCacheService();
+        $ds = new DBDataSource($DB, $cacheInfo, $cacheService);
         $this->dw = new DataWrapper($ds);
     }
 

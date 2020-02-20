@@ -6,6 +6,7 @@ use Oip\Custom\Component\Iblock\Element;
 use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 use Oip\CacheInfo;
+use Oip\Util\Cache\BXCacheService;
 
 use Oip\GuestUser\Handler as GuestService;
 
@@ -83,7 +84,8 @@ class COipIblockElementOne extends COipIblockElementList {
             global $USER;
 
             $cacheInfo = new CacheInfo();
-            $ds = new DBDataSource($DB, $cacheInfo);
+            $cacheService = new BXCacheService();
+            $ds = new DBDataSource($DB, $cacheInfo, $cacheService);
             $dw = new DataWrapper($ds);
 
             $userID = $USER->GetID();

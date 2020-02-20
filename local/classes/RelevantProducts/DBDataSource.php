@@ -6,6 +6,7 @@ use CIBlockSection;
 use Oip\CacheInfo;
 use Oip\RelevantProducts\Config\Configuration;
 use Oip\RelevantProducts\RelevantProduct;
+use Oip\Util\Cache\CacheServiceInterface;
 
 class DBDataSource implements DataSourceInterface
 {
@@ -18,16 +19,20 @@ class DBDataSource implements DataSourceInterface
     /** @var CacheInfo $cacheInfo */
     private $cacheInfo;
 
+    /** @var CacheServiceInterface $cacheService */
+    private $cacheService;
     /**
      * DBDataSource constructor.
      * @param \CDatabase $db
      * @param CacheInfo $cacheInfo
+     * @param CacheServiceInterface $cacheService
      */
-    public function __construct(\CDatabase $db, CacheInfo $cacheInfo = null) {
+    public function __construct(\CDatabase $db, CacheInfo $cacheInfo = null, CacheServiceInterface $cacheService) {
         if (!isset($cacheInfo)) $cacheInfo = new CacheInfo();
 
         $this->db = $db;
         $this->cacheInfo = $cacheInfo;
+        $this->cacheService = $cacheService;
     }
 
     /**

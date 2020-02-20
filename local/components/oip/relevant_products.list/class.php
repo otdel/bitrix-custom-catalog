@@ -7,6 +7,7 @@ use \Bitrix\Main\ArgumentTypeException;
 use \Bitrix\Main\LoaderException;
 use \Bitrix\Main\SystemException;
 use Oip\CacheInfo;
+use Oip\Util\Cache\BXCacheService;
 use Oip\RelevantProducts\DataWrapper;
 use Oip\RelevantProducts\DBDataSource;
 
@@ -39,7 +40,7 @@ class COipRelevantProducts extends \CBitrixComponent
     protected function execute() {
         global $DB;
         // Создаем объект - источник данных
-        $dataSource = new DBDataSource($DB, $this->cacheInfo);
+        $dataSource = new DBDataSource($DB, $this->cacheInfo, new BXCacheService());
         // Создаем объект-обертку для операций над источником данных
         $dataWrapper = new DataWrapper($dataSource);
 
