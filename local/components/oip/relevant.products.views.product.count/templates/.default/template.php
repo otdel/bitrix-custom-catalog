@@ -19,5 +19,5 @@ $views = (is_null($exception)) ? $arResult["VIEWS"] : null;
 <?else:?>
    <?=$views?>&nbsp;<span class="uk-icon-button uk-margin-small-right"
             uk-icon="star"
-            uk-tooltip="<?=$component->getNumWord($views, ["просмотр","просмотра","просмотров"])?>"></span>
+            uk-tooltip="<?=$component->getNumWord($views, ["просмотр","просмотра","просмотров"], true)?>"></span>
 <?endif?>
