@@ -340,4 +340,13 @@ class DataWrapper
     public function isSectionLikedByUser(int $sectionId, int $userId): bool {
         return $this->ds->isSectionLikedByUser($sectionId, $userId);
     }
+
+    /**
+     * @param int $sectionId
+     * @return int
+     * @see DataSourceInterface::getSectionViewsCount()
+     */
+    public function getSectionViewsCount(int $sectionId): int  {
+        return $this->ds->getSectionViewsCount($sectionId);
+    }
 }

@@ -142,5 +142,12 @@ interface DataSourceInterface {
      * @return bool
      */
     public function isSectionLikedByUser(int $sectionId, int $userId): bool;
+
+    /**
+     * Получение количества просмотров внутри категории и ее дочерних разделов по пользователю
+     * @param int $sectionId
+     * @return int
+     */
+    public function getSectionViewsCount(int $sectionId): int;
 }
 

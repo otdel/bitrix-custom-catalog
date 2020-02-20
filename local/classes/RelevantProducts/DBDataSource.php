@@ -796,4 +796,48 @@ class DBDataSource implements DataSourceInterface
         return (bool)$this->db->Query("SELECT 1 as is_liked FROM {$this->productViewTableName} WHERE section_id = $sectionId "
             ." AND user_id = $userId AND likes_count > 0")->Fetch()["is_liked"];
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getSectionViewsCount(int $sectionId): int {
+        // Если пришло просто число - сделаем из него массив
+        if (!is_array($sectionId) && is_numeric($sectionId)) {
+            $sectionId = array($sectionId);
+        }
+
+
+        $queryFunc = function() use ($sectionId) {
+            // Если идет подсчет по конкретным категориям
+            if (count($sectionId) > 0) {
+                $sql =
+                    "SELECT SUM(tbl.views_count) as views_count
+                         FROM (
+                             SELECT SUM(pv.views_count) as views_count
+                             FROM oip_product_view pv
+                             JOIN b_iblock_element ibe ON ibe.id = pv.product_id AND ibe.iblock_section_id IN (" . implode(',', $sectionId) . ")
+                             UNION ALL
+                             SELECT pv.views_count AS views_count
+                             FROM oip_product_view pv
+                             WHERE pv.section_id IN (" . implode(',', $sectionId) . ")
+                         ) tbl;";
+            } // Если идет подсчет по всем товарам и категориям
+            else {
+                $sql = "SELECT SUM(pv.views_count) as views_count
+                   FROM oip_product_view pv;";
+            }
+            // Выполняем запрос
+            return  $this->db->Query($sql)->Fetch()["views_count"];
+        };
+
+        // Формируем ключ кеша
+        $cacheKey = $this->cacheInfo->getCacheKey() . ".getSectionViewsCount_" . md5(serialize(func_get_args()));
+        $sectionViewsCount = $this->cacheService::getCacheVariable(
+            $cacheKey,
+            $this->cacheInfo->getCacheLifeTime(),
+            "sectionViewsCount",
+            $queryFunc
+            );
+        return (int)$sectionViewsCount;
+    }
 }
