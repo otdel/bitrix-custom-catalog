@@ -19,6 +19,10 @@ use Oip\Custom\Component\Iblock\Section;
         "SECTION_ID" => $section->getId()
 ])?>
 
+<?$APPLICATION->IncludeComponent("oip:relevant.products.views.category.count","",[
+    "SECTION_ID" => $section->getId()
+])?>
+
 <?if ($files = $section->getPropValue("UF_DOCUMENTS")):
     foreach ($files as $file):?>
         <p>Документ: <?=$file ?></p>
