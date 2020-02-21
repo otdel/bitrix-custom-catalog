@@ -1,10 +1,10 @@
-  
-import { observable, action, computed, reaction } from 'mobx';
+import { observable, action, computed, reaction, runInAction } from 'mobx';
 import { createContext } from 'react';
-
+//mobx.configure({ enforceActions: "observed" })
 class CartStore {
     @observable productsInCart = [];
-    @observable counter = 0;
+    @observable state = "pending" // "pending" / "done" / "error"
+    @observable msg = "" // "pending" / "done" / "error"
 
     @computed get count() {
         return this.productsInCart.length;
@@ -27,11 +27,32 @@ class CartStore {
         this.productsInCart.splice(index, 1);
       }
     }
-    @action.bound
-    fetchCart() {
-        return this.productsInCart;
+
+    async fetchCart() {
+      let apiCart = await fetch(`http://www.mocky.io/v2/5e4d11932d00007f00c0d983`);
+      let jsonCart = await apiCart.json();
+      return jsonCart.data.items;
+    }
+
+    @action
+    async fetchProjects() {
+        this.productsInCart = []
+        this.state = "pending"
+        try {
+            const projects = await this.fetchCart();
+            runInAction(() => {
+                this.state = "done"
+                this.productsInCart = projects
+            })
+        } catch (error) {
+            runInAction(() => {
+                this.state = "error"
+                console.log(error)
+            })
+        }
     }
 } 
 
-export default new CartStore(); // для классов
+const cartStore = new CartStore();
+export default cartStore; // для классов
 export const CartStoreContext = createContext(new CartStore()); // для функциональных компонентов
