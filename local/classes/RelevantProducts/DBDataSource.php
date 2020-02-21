@@ -841,7 +841,7 @@ class DBDataSource implements DataSourceInterface
     /**
      * @inheritDoc
      */
-    public function getSectionViewsCount(int $sectionId): int {
+    public function getSectionViewsCount($sectionId): int {
         // Если пришло просто число - сделаем из него массив
         if (!is_array($sectionId) && is_numeric($sectionId)) {
             $sectionId = array($sectionId);

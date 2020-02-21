@@ -342,11 +342,11 @@ class DataWrapper
     }
 
     /**
-     * @param int $sectionId
+     * @param mixed $sectionId
      * @return int
      * @see DataSourceInterface::getSectionViewsCount()
      */
-    public function getSectionViewsCount(int $sectionId): int  {
+    public function getSectionViewsCount($sectionId): int  {
         return $this->ds->getSectionViewsCount($sectionId);
     }
 }

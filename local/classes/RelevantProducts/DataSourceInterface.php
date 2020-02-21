@@ -145,9 +145,9 @@ interface DataSourceInterface {
 
     /**
      * Получение количества просмотров внутри категории и ее дочерних разделов по пользователю
-     * @param int $sectionId
+     * @param mixed $sectionId
      * @return int
      */
-    public function getSectionViewsCount(int $sectionId): int;
+    public function getSectionViewsCount($sectionId): int;
 }
 
