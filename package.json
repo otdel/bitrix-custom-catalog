@@ -16,15 +16,15 @@
   "author": "OIP",
   "license": "ISC",
   "dependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
     "classnames": "^2.2.6",
     "esm": "3.2.25",
-    "mobx": "^5.15.4",
-    "mobx-react": "^6.1.7",
+    "mobx": "^4.15.4",
+    "mobx-react": "^6.1.8",
     "mobx-react-lite": "^1.5.2",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "react-scripts": "3.3.1",
     "uikit": "^3.3.1"
   },
   "devDependencies": {

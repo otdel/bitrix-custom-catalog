@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { Provider } from 'mobx-react';
 
-import CartStore from './stores/CartStore';
+import cartStore from './stores/CartStore';
 
 const stores = {
-  CartStore
+  cartStore
 };
 
 // For easier debugging
