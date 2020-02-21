@@ -1,7 +1,7 @@
 {
     "name": "oip/custom",
     "description": "Standard product catalog for Bitrix CMS from ООО \"Отдел Интернет-проектов\"",
-    "version": "0.28.1",
+    "version": "0.29.0",
     "type": "project",
     "keywords": ["bitrix", "catalog"],
     "authors": [
@@ -23,7 +23,8 @@
     ],
     "homepage": "https://github.com/otdel/bitrix-custom-catalog",
     "require": {
-        "arrilot/bitrix-migrations": "^2.6"
+        "arrilot/bitrix-migrations": "^2.6",
+        "ext-json": "*"
     },
     "autoload": {
         "psr-4": {"Oip\\": "local/classes/"}
