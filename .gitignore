@@ -6,3 +6,11 @@
 
 !/migrations/
 !/local/
+
+!package.json
+!package-lock.json
+!.babelrc
+!.browserlistrc
+!jsconfig.json
+!/build/
+!/custom/
