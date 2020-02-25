@@ -4,12 +4,16 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 \CBitrixComponent::includeComponentClass("oip:component");
 
 use Bitrix\Main\Application;
+use Bitrix\Main\Config\Configuration;
 use Bitrix\Main\DB\SqlQueryException;
+use Bitrix\Main\SystemException;
 
 use Oip\SocialStore\Cart\Handler as Cart;
 use Oip\SocialStore\User\Entity\User as CartUser;
 use Oip\SocialStore\Cart\Repository\RepositoryInterface;
 use Oip\SocialStore\Cart\Repository\DBRepository as CartRepository;
+
+use Oip\Util\Bitrix\Iblock\ElementPath\Helper as PathHelper;
 
 use Oip\Util\Collection\Factory\CollectionsFactory as ProductsFactory;
 use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
@@ -22,6 +26,7 @@ abstract class COipSocialStoreCart extends \COipComponent {
     /**
      * @return Cart
      * @throws InvalidSubclassException
+     * @throws SystemException
      * @throws NonUniqueIdCreatingException
      */
     public function executeComponent()
@@ -32,6 +37,7 @@ abstract class COipSocialStoreCart extends \COipComponent {
     /**
      * @return Cart
      * @throws InvalidSubclassException
+     * @throws SystemException
      * @throws NonUniqueIdCreatingException
      */
     protected function getCart() {
@@ -53,10 +59,20 @@ abstract class COipSocialStoreCart extends \COipComponent {
 
     }
 
-    /** @return RepositoryInterface */
+    /**
+     * @return RepositoryInterface
+     * @throws SystemException
+     */
     private function initCartRepository(): RepositoryInterface {
         $connection = Application::getConnection();
-        return new CartRepository($connection);
+        $catalogIblockId = (int)Configuration::getValue("oip_catalog_iblock_id");
+        if(!$catalogIblockId) {
+            throw new SystemException("Invalid or non-existing config variable \"oip_catalog_iblock_id\". Check if it exists.");
+        }
+
+        $pathHelper = new PathHelper($connection, $catalogIblockId);
+
+        return new CartRepository($connection, $pathHelper);
     }
 
     /** @return CartUser */

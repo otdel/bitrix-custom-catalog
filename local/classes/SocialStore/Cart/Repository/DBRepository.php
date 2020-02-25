@@ -14,6 +14,8 @@ use Oip\SocialStore\Cart\Exception\ItemDoesntExist;
 use Oip\SocialStore\Cart\Exception\ItemsDontExist;
 use Oip\SocialStore\Cart\Exception\ItemDuplicates;
 
+use Oip\Util\Bitrix\Iblock\ElementPath\Helper as ElementPath;
+
 class DBRepository implements RepositoryInterface
 {
     private $cartsTableName = "oip_carts";
@@ -22,11 +24,13 @@ class DBRepository implements RepositoryInterface
 
     /** @var Main\DB\Connection $db */
     private $db;
+    /** @var ElementPath $pathHelper */
+    private $pathHelper;
 
-    /** @var Main\DB\Connection $connection */
-    public function __construct(Main\DB\Connection $connection)
+    public function __construct(Main\DB\Connection $connection, ElementPath $pathHelper)
     {
         $this->db = $connection;
+        $this->pathHelper = $pathHelper;
     }
 
     /**
@@ -52,7 +56,7 @@ class DBRepository implements RepositoryInterface
                 $product["code"],
                 $productPicture,
                 $product["description"],
-                null
+                $this->pathHelper->makeUrl((int)$product["product_id"])
             );
         }
 
