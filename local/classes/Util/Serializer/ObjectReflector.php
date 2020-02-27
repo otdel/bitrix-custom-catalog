@@ -1,8 +1,8 @@
 <?php
 
-namespace Oip\Util\Serializer\JsonSerializer;
+namespace Oip\Util\Serializer;
 
-class JsonSerializer
+class ObjectReflector
 {
 
     /**

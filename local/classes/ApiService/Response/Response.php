@@ -2,7 +2,7 @@
 
 namespace Oip\ApiService\Response;
 
-use Oip\Util\Serializer\JsonSerializer\JsonSerializer;
+use Oip\Util\Serializer\ObjectReflector;
 use Oip\ApiService\Response\Exception\InvalidResponseStatus as InvalidResponseStatusException;
 
 class Response
@@ -16,11 +16,11 @@ class Response
     private $message;
     /** @var mixed $data Набор данных */
     private $data;
-    /** @var JsonSerializer $serializer */
+    /** @var ObjectReflector $serializer */
     private $serializer;
 
     private function __construct(
-        JsonSerializer $serializer,
+        ObjectReflector $serializer,
         string $status,
         string $data = null,
         $message = null
@@ -33,7 +33,7 @@ class Response
     }
 
     /**
-     * @param JsonSerializer $serializer
+     * @param ObjectReflector $serializer
      * @param string $status Статус
      * @param mixed|null $data Набор данных
      * @param string|null $message Техническое сообщение
@@ -41,7 +41,7 @@ class Response
      * @return self
      */
     public static function create(
-        JsonSerializer $serializer,
+        ObjectReflector $serializer,
         string $status,
         $data = null,
         string $message = null
