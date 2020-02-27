@@ -2,6 +2,8 @@
 
 namespace Oip\ApiService\Response;
 
+use Oip\Util\Serializer\JsonSerializer\JsonSerializer;
+
 class Response
 {
     /** @var array RESPONSE_STATUSES Возможные статусы */
@@ -13,6 +15,8 @@ class Response
     private $message;
     /** @var mixed $data Набор данных */
     private $data;
+    /** @var JsonSerializer $serializer */
+    private $serializer;
 
     /**
      * Response constructor.
@@ -21,11 +25,12 @@ class Response
      * @param string|null $message Техническое сообщение
      * @throws \Exception
      */
-    public function __construct($status, $data = null, $message = null)
+    public function __construct($status, $data = null, $message = null, JsonSerializer $serializer)
     {
         $this->setStatus($status);
         $this->setData($data);
         $this->setMessage($message);
+        $this->serializer = $serializer;
     }
 
     /**
@@ -106,21 +111,8 @@ class Response
      */
     public function setData($data)
     {
-        $this->data = $data;
+        $this->data = $this->serializer->serialize($data);
         return $this;
-    }
-
-    /**
-     * Так как фронт будет ждать валидный json в качестве ответа,нельзя выкидывать обычное исключение.
-     * Данная функция - замена throw Exception, чтобы прервать выполнение скрипта и отдать
-     * ошибку в формате json во время выполнения.
-     * @param $message
-     */
-    protected function throwError($message) {
-        die(json_encode([
-            "status" => "error",
-            "message" => $message
-        ]));
     }
 
 }
