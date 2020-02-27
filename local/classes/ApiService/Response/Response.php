@@ -3,6 +3,7 @@
 namespace Oip\ApiService\Response;
 
 use Oip\Util\Serializer\JsonSerializer\JsonSerializer;
+use Oip\ApiService\Response\Exception\InvalidResponseStatus as InvalidResponseStatusException;
 
 class Response
 {
@@ -18,19 +19,43 @@ class Response
     /** @var JsonSerializer $serializer */
     private $serializer;
 
+    private function __construct(
+        JsonSerializer $serializer,
+        string $status,
+        string $data = null,
+        $message = null
+    )
+    {
+        $this->serializer = $serializer;
+        $this->status = $status;
+        $this->data = $data;
+        $this->message = $message;
+    }
+
     /**
-     * Response constructor.
+     * @param JsonSerializer $serializer
      * @param string $status Статус
      * @param mixed|null $data Набор данных
      * @param string|null $message Техническое сообщение
      * @throws \Exception
+     * @return self
      */
-    public function __construct($status, $data = null, $message = null, JsonSerializer $serializer)
-    {
-        $this->setStatus($status);
-        $this->setData($data);
-        $this->setMessage($message);
-        $this->serializer = $serializer;
+    public static function create(
+        JsonSerializer $serializer,
+        string $status,
+        $data = null,
+        string $message = null
+    ): self {
+        if(is_null($data)) {
+            return null;
+        }
+
+        if (!in_array($status, self::RESPONSE_STATUSES)) {
+            throw new InvalidResponseStatusException($status);
+        }
+
+        $strData = json_encode($serializer->serialize($data));
+        return new self($serializer, $status, $strData, $message);
     }
 
     /**
@@ -66,35 +91,11 @@ class Response
     }
 
     /**
-     * @param mixed $status
-     * @return Response
-     * @throws \Exception
-     */
-    public function setStatus($status)
-    {
-        if (!in_array($status, self::RESPONSE_STATUSES)) {
-            throw new \Exception("Некорректный статус для ответа API");
-        }
-        $this->status = $status;
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getMessage()
     {
         return $this->message;
-    }
-
-    /**
-     * @param mixed $message
-     * @return Response
-     */
-    public function setMessage($message)
-    {
-        $this->message = $message;
-        return $this;
     }
 
     /**
@@ -104,15 +105,4 @@ class Response
     {
         return $this->data;
     }
-
-    /**
-     * @param mixed $data
-     * @return Response
-     */
-    public function setData($data)
-    {
-        $this->data = $this->serializer->serialize($data);
-        return $this;
-    }
-
 }
