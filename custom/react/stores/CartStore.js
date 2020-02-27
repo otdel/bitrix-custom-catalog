@@ -3,8 +3,8 @@ import { createContext } from 'react';
 //mobx.configure({ enforceActions: "observed" })
 class CartStore {
     @observable productsInCart = [];
-    @observable state = "pending" // "pending" / "done" / "error"
-    @observable msg = "" // "pending" / "done" / "error"
+    @observable state = "pending"; // "pending" / "done" / "error"
+    @observable msg = ""; // "pending" / "done" / "error"
 
     @computed get count() {
         return this.productsInCart.length;
@@ -12,7 +12,7 @@ class CartStore {
     @computed get totalAmount() {
         let total = 0;
         for (let item of this.productsInCart) {
-          total = total + (item.price)
+            total = total + item.price
         }
         return total;
     }
@@ -22,16 +22,24 @@ class CartStore {
     }
     @action.bound
     removeFromCart(product) {
-      const index = this.productsInCart.indexOf(product);
-      if (index >= 0) {
-        this.productsInCart.splice(index, 1);
-      }
+        const index = this.productsInCart.indexOf(product);
+        if (index >= 0) {
+            this.productsInCart.splice(index, 1);
+        }
+    }
+    @action.bound
+    removeAllFromCart() {
+        this.productsInCart = [];
+    }
+    @action.bound
+    checkout() {
+        console.log("checkout!");
     }
 
     async fetchCart() {
-      let apiCart = await fetch(`http://www.mocky.io/v2/5e4d11932d00007f00c0d983`);
-      let jsonCart = await apiCart.json();
-      return jsonCart.data.items;
+        let apiCart = await fetch(`http://www.mocky.io/v2/5e4d11932d00007f00c0d983`);
+        let jsonCart = await apiCart.json();
+        return jsonCart.data.items;
     }
 
     @action
