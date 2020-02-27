@@ -3,14 +3,10 @@
 namespace Oip\ApiService\Response;
 
 use Oip\Util\Serializer\ObjectReflector;
-use Oip\ApiService\Response\Exception\InvalidResponseStatus as InvalidResponseStatusException;
 
 class Response
 {
-    /** @var array RESPONSE_STATUSES Возможные статусы */
-    private const RESPONSE_STATUSES = ["success", "error"];
-
-    /** @var string $status Статус ответа */
+    /** @var Status $status Статус ответа */
     private $status;
     /** @var string|null $message Техническое сообщение */
     private $message;
@@ -19,9 +15,9 @@ class Response
     /** @var ObjectReflector $serializer */
     private $serializer;
 
-    private function __construct(
+    public function __construct(
         ObjectReflector $serializer,
-        string $status,
+        Status $status,
         string $data = null,
         $message = null
     )
@@ -34,7 +30,7 @@ class Response
 
     /**
      * @param ObjectReflector $serializer
-     * @param string $status Статус
+     * @param Status $status Статус
      * @param mixed|null $data Набор данных
      * @param string|null $message Техническое сообщение
      * @throws \Exception
@@ -42,16 +38,12 @@ class Response
      */
     public static function create(
         ObjectReflector $serializer,
-        string $status,
+        Status $status,
         $data = null,
         string $message = null
     ): self {
         if(is_null($data)) {
             return null;
-        }
-
-        if (!in_array($status, self::RESPONSE_STATUSES)) {
-            throw new InvalidResponseStatusException($status);
         }
 
         $strData = json_encode($serializer->serialize($data));
@@ -83,9 +75,9 @@ class Response
     }
 
     /**
-     * @return mixed
+     * @return Status
      */
-    public function getStatus()
+    public function getStatus(): Status
     {
         return $this->status;
     }
@@ -93,7 +85,7 @@ class Response
     /**
      * @return mixed
      */
-    public function getMessage()
+    public function getMessage(): ?string
     {
         return $this->message;
     }
