@@ -6,6 +6,7 @@
 
 !/migrations/
 !/local/
+!/api/
 
 !package.json
 !package-lock.json
