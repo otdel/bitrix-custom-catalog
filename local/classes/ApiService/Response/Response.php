@@ -6,23 +6,19 @@ use Oip\Util\Serializer\ObjectReflector;
 
 class Response
 {
-    /** @var Status $status Статус ответа */
+    /** @var string $status Статус ответа */
     private $status;
     /** @var string|null $message Техническое сообщение */
     private $message;
     /** @var mixed $data Набор данных */
     private $data;
-    /** @var ObjectReflector $serializer */
-    private $serializer;
 
     public function __construct(
-        ObjectReflector $serializer,
-        Status $status,
+        $status,
         string $data = null,
         $message = null
     )
     {
-        $this->serializer = $serializer;
         $this->status = $status;
         $this->data = $data;
         $this->message = $message;
@@ -31,23 +27,23 @@ class Response
     /**
      * @param ObjectReflector $serializer
      * @param Status $status Статус
-     * @param mixed|null $data Набор данных
-     * @param string|null $message Техническое сообщение
-     * @throws \Exception
+     * @param mixed $data Набор данных
      * @return self
      */
     public static function create(
         ObjectReflector $serializer,
         Status $status,
-        $data = null,
-        string $message = null
+        $data
     ): self {
-        if(is_null($data)) {
-            return null;
-        }
-
         $strData = json_encode($serializer->serialize($data));
-        return new self($serializer, $status, $strData, $message);
+        return new self($status->getValue(), $strData, null);
+    }
+
+    public static function createError(
+        Status $status,
+        string $message
+    ): self {
+        return new self($status->getValue(), null, $message);
     }
 
     /**
@@ -75,9 +71,9 @@ class Response
     }
 
     /**
-     * @return Status
+     * @return string
      */
-    public function getStatus(): Status
+    public function getStatus(): string
     {
         return $this->status;
     }
