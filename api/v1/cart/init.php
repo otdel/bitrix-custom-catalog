@@ -2,7 +2,7 @@
 
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
-require __DIR__ . "/../../../common/connection.php";
+require __DIR__ . "/../../common/connection.php";
 
 use Bitrix\Main\Config\Configuration;
 use Oip\SocialStore\Cart\Handler as Cart;

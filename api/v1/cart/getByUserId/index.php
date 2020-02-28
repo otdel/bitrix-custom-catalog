@@ -6,11 +6,9 @@ use Oip\ApiService\Response\Response;
 use Oip\ApiService\Response\Status;
 use Oip\Util\Serializer\ObjectReflector;
 
-set_exception_handler("Oip\ApiService\ExceptionHandler\ExceptionHandler::throwJsonException");
-
 $userId = (int)$_REQUEST["cartUserId"];
 
-require  __DIR__ . "/init.php";
+require  __DIR__ . "/../init.php";
 
 $cart->getProducts();
 $products = $cart->getProducts()->getArray();
