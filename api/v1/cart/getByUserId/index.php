@@ -8,6 +8,7 @@ use Oip\Util\Serializer\ObjectReflector;
 
 $userId = (int)$_REQUEST["cartUserId"];
 
+require  __DIR__ . "/../throws/userId.php";
 require  __DIR__ . "/../init.php";
 
 $cart->getProducts();
