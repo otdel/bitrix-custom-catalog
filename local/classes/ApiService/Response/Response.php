@@ -30,7 +30,7 @@ class Response
      * @param mixed $data Набор данных
      * @return self
      */
-    public static function create(
+    public static function createWithReflection(
         ObjectReflector $serializer,
         Status $status,
         $data

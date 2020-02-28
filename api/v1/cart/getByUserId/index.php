@@ -13,7 +13,7 @@ require  __DIR__ . "/../init.php";
 $cart->getProducts();
 $products = $cart->getProducts()->getArray();
 
-$response = Response::create(new ObjectReflector(), Status::createSuccess(), $products);
+$response = Response::createWithReflection(new ObjectReflector(), Status::createSuccess(), $products);
 
 echo $response->toJSON();
 exit();
