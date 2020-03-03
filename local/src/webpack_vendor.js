@@ -8,5 +8,5 @@ import UIkit from 'uikit'
 window.UIkit = UIkit;
 
 // custom icons
-//import Icons from '../../node_modules/uikit/dist/js/uikit-icons';
-//UIkit.use(Icons);
+import Icons from '../../node_modules/uikit/dist/js/uikit-icons';
+UIkit.use(Icons);

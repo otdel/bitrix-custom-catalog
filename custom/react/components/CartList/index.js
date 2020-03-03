@@ -16,7 +16,7 @@ export default class extends React.Component {
     //var items = this.props.cartStore.fetchCart;
     //this.setState({ items: items });
     const store = this.props.сartStore;
-    store.fetchProjects();
+    //store.fetchProjects();
   }
   handleClick = e => {
     this.props.сartStore.addToCart(e);
