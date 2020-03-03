@@ -5,6 +5,7 @@ class CartStore {
     @observable productsInCart = [];
     @observable state = "pending"; // "pending" / "done" / "error"
     @observable msg = ""; // "pending" / "done" / "error"
+    @observable userId = undefined;
 
     @computed get count() {
         return this.productsInCart.length;
@@ -15,6 +16,10 @@ class CartStore {
             total = total + item.price
         }
         return total;
+    }
+    @action.bound
+    setUserId(userId) {
+        this.userId = userId;
     }
     @action.bound
     addToCart(product) {
@@ -37,13 +42,14 @@ class CartStore {
     }
 
     async fetchCart() {
-        let apiCart = await fetch(`http://www.mocky.io/v2/5e4d11932d00007f00c0d983`);
+        let apiCart = await fetch(`/api/v1/cart/getByUserId?cartUserId=${this.userId}`);
         let jsonCart = await apiCart.json();
-        return jsonCart.data.items;
+        //console.log(JSON.parse(jsonCart.data));
+        return JSON.parse(jsonCart.data);
     }
 
     @action
-    async fetchProjects() {
+    async fetchCartStart() {
         this.productsInCart = []
         this.state = "pending"
         try {

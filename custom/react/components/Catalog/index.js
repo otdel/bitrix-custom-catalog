@@ -12,7 +12,6 @@ import Cart from '../Cart';
 export default class extends React.Component {
   render() {
     const store = this.props.cartStore
-    console.log(store)
     return (
       <Provider сartStore={store}>
         {this.props.cartStore.count}

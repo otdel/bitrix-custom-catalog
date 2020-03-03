@@ -5,14 +5,23 @@ import classNames from 'classnames';
 
 import CartList from '../CartList';
 import CartFooter from '../CartFooter';
-import CartTest from '../CartTest';
 
 @inject('cartStore')
 @observer
 export default class extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {}
+  }
+
+  componentDidMount(){
+    const store = this.props.cartStore;
+    store.setUserId(this.props.userId); // записываем ID пользователя в хранилище!
+    store.fetchCartStart(); // получаем данные о корзине пользователя и пишем в стор
+  }
+
   render() {
     const store = this.props.cartStore;
-    //console.log(this.props.userId);
 
     return (
       <Provider сartStore={store}>

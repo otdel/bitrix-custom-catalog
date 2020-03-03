@@ -18,9 +18,6 @@ export default class extends React.Component {
     return (
       <tfoot>
       <tr>
-      <td colSpan="2">
-
-      </td>
         <td>
             <input type="hidden" name="oipCartActionHandler" value="$component->getComponentId()" />
             <button className="uk-button" name="GLOBAL_CART_ACTION_NAME?"
@@ -32,7 +29,7 @@ export default class extends React.Component {
             </button>
           
         </td>
-        <td>
+        <td colSpan="3">
           <input type="hidden" name="oipCartActionHandler" value="component->getComponentId()" />
           <button className="uk-button uk-button-primary" name="GLOBAL_CART_ACTION_NAME"
             value="GLOBAL_CART_ACTION_CREATE_ORDER"

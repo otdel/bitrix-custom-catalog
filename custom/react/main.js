@@ -31,7 +31,7 @@ if(document.getElementById("mobx-example")) {
 
 if(document.getElementById("react-cart")) {
   const Cart = require('./components/Cart').default;
-  const userId = document.getElementById("react-cart").getAttribute("data-userId");
+  const userId = document.getElementById("react-cart").getAttribute("data-userid");
   ReactDOM.render(
     <Provider {...stores}>
       <Cart userId={userId} />

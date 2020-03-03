@@ -14,8 +14,8 @@ export default class extends React.Component {
             <tr>
                 <td>{item.name}</td>
                 <td>
-                    <a href="#">
-                        <img src="https://via.placeholder.com/150" width="150" height="auto" />
+                    <a href={item.link}>
+                        <img src={item.picture} width="150" height="auto" />
                     </a>
                 </td>
                 <td>{item.price}</td>
