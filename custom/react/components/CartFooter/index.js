@@ -5,11 +5,13 @@ import classNames from 'classnames';
 @inject('cartStore')
 @observer
 export default class extends React.Component {
-  handleCleckRemoveAll = e => {
-    this.props.cartStore.removeAllFromCart();
+  handleClickRemoveAll = e => {
+    this.props.cartStore.removeAllCart();
+    this.refs.btnRemoveAll.setAttribute("disabled", "disabled");
   }
-  handleCleckCheckout = e => {
+  handleClickCheckout = e => {
     this.props.cartStore.checkout();
+    this.refs.btnCheckout.setAttribute("disabled", "disabled");
   }
 
   render() {
@@ -19,10 +21,10 @@ export default class extends React.Component {
       <tfoot>
       <tr>
         <td>
-            <input type="hidden" name="oipCartActionHandler" value="$component->getComponentId()" />
-            <button className="uk-button" name="GLOBAL_CART_ACTION_NAME?"
-              value="GLOBAL_CART_ACTION_REMOVE_ALL"
-              onClick = {() => this.handleCleckRemoveAll()}
+            <button 
+              className="uk-button"
+              ref="btnRemoveAll"
+              onClick = {() => this.handleClickRemoveAll()}
             >
               <i className="uk-icon" uk-icon="trash"></i>
               Очистить корзину
@@ -30,10 +32,9 @@ export default class extends React.Component {
           
         </td>
         <td colSpan="3">
-          <input type="hidden" name="oipCartActionHandler" value="component->getComponentId()" />
-          <button className="uk-button uk-button-primary" name="GLOBAL_CART_ACTION_NAME"
-            value="GLOBAL_CART_ACTION_CREATE_ORDER"
-            onClick = {() => this.handleCleckCheckout()}
+          <button className="uk-button uk-button-primary"
+            ref="btnCheckout"
+            onClick = {() => this.handleClickCheckout()}
           >
             <i className="uk-icon" uk-icon="credit-card" ></i>
               Оформить заказ

@@ -36,7 +36,7 @@ export default class extends React.Component {
         <tbody>
           {
             store.productsInCart.map((item, idx) => {
-              return (<CartItem item={item} key={idx}/>)
+              return (<CartItem item={item} key={item.id}/>)
             })
           }
         </tbody>

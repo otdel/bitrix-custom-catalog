@@ -4,6 +4,8 @@ import { createContext } from 'react';
 class CartStore {
     @observable productsInCart = [];
     @observable state = "pending"; // "pending" / "done" / "error"
+    @observable stateRemove = "pending"; // "pending" / "done" / "error"
+    @observable stateRemoveAll = "pending"; // "pending" / "done" / "error"
     @observable msg = ""; // "pending" / "done" / "error"
     @observable userId = undefined;
 
@@ -32,31 +34,82 @@ class CartStore {
             this.productsInCart.splice(index, 1);
         }
     }
-    @action.bound
-    removeAllFromCart() {
-        this.productsInCart = [];
-    }
-    @action.bound
-    checkout() {
-        console.log("checkout!");
+
+    /* remove All */
+    async fetchRemoveAllCart() {
+        let api = await fetch(`/api/v1/cart/removeAll?cartUserId=${this.userId}`);
+        let json = await api.json();
+        return json;
     }
 
-    async fetchCart() {
-        let apiCart = await fetch(`/api/v1/cart/getByUserId?cartUserId=${this.userId}`);
-        let jsonCart = await apiCart.json();
-        //console.log(JSON.parse(jsonCart.data));
-        return JSON.parse(jsonCart.data);
+    @action.bound
+    async removeAllCart() {
+        this.stateRemoveAll = "pending"
+        try {
+            const response = await this.fetchRemoveAllCart();
+            runInAction(() => {
+                if (response.status === "success") {
+                    this.stateRemoveAll = "done"
+                    this.productsInCart = []
+                } else {
+                    this.stateRemoveAll = "error"
+                }
+            })
+        } catch (error) {
+            runInAction(() => {
+                this.stateRemoveAll = "error"
+                console.log(error)
+            })
+        }
+    }
+
+    /* remove product */
+    async fetchRemoveProduct(productId) {
+        let api = await fetch(`/api/v1/cart/remove?cartUserId=${this.userId}&productId=${productId}`);
+        let json = await api.json();
+        return JSON.parse(json.data);
     }
 
     @action
-    async fetchCartStart() {
+    async removeProduct(product) {
+        this.stateRemove = "pending"
+        try {
+            const response = await this.fetchRemoveProduct(product.id);
+            runInAction(() => {
+                if (response.status === "success") {
+                    this.stateRemove = "done"
+                    const index = this.productsInCart.indexOf(product);
+                    if (index >= 0) {
+                        this.productsInCart.splice(index, 1);
+                    }
+                } else {
+                    this.stateRemove = "error"
+                }
+            })
+        } catch (error) {
+            runInAction(() => {
+                this.stateRemove = "error"
+                console.log(error)
+            })
+        }
+    }
+
+    /* get current Cart by user */
+    async fetchCart() {
+        let api = await fetch(`/api/v1/cart/getByUserId?cartUserId=${this.userId}`);
+        let json = await api.json();
+        return JSON.parse(json.data);
+    }
+
+    @action
+    async getCart() {
         this.productsInCart = []
         this.state = "pending"
         try {
-            const projects = await this.fetchCart();
+            const products = await this.fetchCart();
             runInAction(() => {
                 this.state = "done"
-                this.productsInCart = projects
+                this.productsInCart = products
             })
         } catch (error) {
             runInAction(() => {
@@ -64,6 +117,11 @@ class CartStore {
                 console.log(error)
             })
         }
+    }
+
+    @action.bound
+    checkout() {
+        console.log("checkout!");
     }
 } 
 

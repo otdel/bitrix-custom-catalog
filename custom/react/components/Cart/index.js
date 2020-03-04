@@ -17,7 +17,7 @@ export default class extends React.Component {
   componentDidMount(){
     const store = this.props.cartStore;
     store.setUserId(this.props.userId); // записываем ID пользователя в хранилище!
-    store.fetchCartStart(); // получаем данные о корзине пользователя и пишем в стор
+    store.getCart(); // получаем данные о корзине пользователя и пишем в стор
   }
 
   render() {
