@@ -25,11 +25,21 @@ export default class extends React.Component {
 
     return (
       <Provider сartStore={store}>
+        {
+          store.state === "pending" && <div uk-spinner="true"></div>
+        }
         <table className="uk-table">
-            <caption>Товаров в вашей корзине: {store.count} на сумму {store.totalAmount}</caption>
-            <CartList />
-            <CartFooter />
-
+          { store.count > 0 && 
+            <Fragment>
+              <caption>Товаров в вашей корзине: {store.count} на сумму {store.totalAmount}</caption>
+              <CartList />
+              <CartFooter />
+            </Fragment>
+          }
+          {
+            store.state === "done" && store.count === 0 &&
+            <caption>Корзина пуста</caption>
+          }
         </table>
       </Provider>
     );
