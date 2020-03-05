@@ -39,7 +39,6 @@ export default class extends React.Component {
             <i className="uk-icon" uk-icon="credit-card" ></i>
               Оформить заказ
             </button>
-          
         </td>
       </tr>
       </tfoot>

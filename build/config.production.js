@@ -24,12 +24,13 @@ module.exports = merge(baseConfig, {
         chunkFilename: '[name].[chunkhash].js',
     },
     optimization: {
+        minimize: true,
         minimizer: [
-            new UglifyJSWebpackPlugin({
+            /*new UglifyJSWebpackPlugin({
                 cache: true,
                 parallel: true,
                 sourceMap: true
-            }),
+            }),*/
             new OptimizeCSSAssetsPlugin({})
         ]
     },
