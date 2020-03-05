@@ -5,6 +5,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 use Bitrix\Main\Application;
 use Bitrix\Main\Config\Configuration;
+use Bitrix\Main\Event;
 
 use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\ArgumentTypeException;
@@ -72,7 +73,10 @@ class COipSocialStoreOrderAdd extends \COipComponent {
             $repository = $this->initOrderRepository();
             $startStatus = $this->getStartOrderStatus();
             $order = new Order($this->arParams['USER'], $startStatus, $this->arParams['PRODUCTS']);
-            $repository->addOrder($order);
+            if($repository->addOrder($order)) {
+                $this->throwOrderCreatedEvent($order);
+            }
+
             return null;
         }
     }
@@ -96,4 +100,7 @@ class COipSocialStoreOrderAdd extends \COipComponent {
         return $statusRep->getByCode(Status::START_STATUS_CODE);
     }
 
+    private function throwOrderCreatedEvent(Order $order): void {
+        (new Event("","OnOipSocialStoreOrderCreated", ["order" => $order]))->send();
+    }
 }

@@ -31,6 +31,8 @@ else {
     $affectedCount = $orderRepository->addOrder($order);
     if($affectedCount) {
         $cart->removeAll();
+
+        require __DIR__ . "/../events/onOrderCreated.php";
     }
 
     $response = new Response(Status::createSuccess()->getValue());
