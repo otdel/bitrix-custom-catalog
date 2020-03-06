@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import { Provider } from 'mobx-react';
-require("es6-object-assign").polyfill(); // для IE11
+require('es6-object-assign').polyfill(); // для IE11
 
 import cartStore from './stores/CartStore';
 import catalogStore from './stores/CatalogStore';
