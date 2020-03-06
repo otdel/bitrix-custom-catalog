@@ -6,6 +6,7 @@ class CartStore {
     @observable state = "pending"; // "pending" / "done" / "error"
     @observable stateRemove = "pending"; // "pending" / "done" / "error"
     @observable stateRemoveAll = "pending"; // "pending" / "done" / "error"
+    @observable stateOrder = "pending"; // "pending" / "done" / "error"
     @observable msg = ""; // "pending" / "done" / "error"
     @observable userId = undefined;
 
@@ -41,7 +42,6 @@ class CartStore {
         let json = await api.json();
         return json;
     }
-
     @action.bound
     async removeAllCart() {
         this.stateRemoveAll = "pending"
@@ -53,6 +53,7 @@ class CartStore {
                     this.productsInCart = []
                 } else {
                     this.stateRemoveAll = "error"
+                    this.msg = response.msg
                 }
             })
         } catch (error) {
@@ -67,9 +68,8 @@ class CartStore {
     async fetchRemoveProduct(productId) {
         let api = await fetch(`/api/v1/cart/remove?cartUserId=${this.userId}&productId=${productId}`);
         let json = await api.json();
-        return JSON.parse(json.data);
+        return json;
     }
-
     @action
     async removeProduct(product) {
         this.stateRemove = "pending"
@@ -84,6 +84,7 @@ class CartStore {
                     }
                 } else {
                     this.stateRemove = "error"
+                    this.msg = response.msg
                 }
             })
         } catch (error) {
@@ -98,18 +99,23 @@ class CartStore {
     async fetchCart() {
         let api = await fetch(`/api/v1/cart/getByUserId?cartUserId=${this.userId}`);
         let json = await api.json();
-        return JSON.parse(json.data);
+        return json;
     }
-
     @action
     async getCart() {
         this.productsInCart = []
         this.state = "pending"
         try {
-            const products = await this.fetchCart();
+            const response = await this.fetchCart();
+            const products = JSON.parse(response.data);
             runInAction(() => {
-                this.state = "done"
-                this.productsInCart = products
+                if (response.status === "success") {
+                    this.state = "done"
+                    this.productsInCart = products
+                } else {
+                    this.stateOrder = "error"
+                    this.msg = response.msg
+                }
             })
         } catch (error) {
             runInAction(() => {
@@ -119,9 +125,30 @@ class CartStore {
         }
     }
 
+    /* checkout (order) */
+    async fetchOrder() {
+        let api = await fetch(`/api/v1/cart/createOrder?cartUserId=${this.userId}`);
+        let json = await api.json();
+        return json;
+    }
     @action.bound
-    checkout() {
-        console.log("checkout!");
+    async createOrder() {
+        const response = await this.fetchOrder();
+        this.stateOrder = "pending"
+        try {
+            if (response.status === "success") {
+                this.stateOrder = "done"
+                this.productsInCart = []
+            } else {
+                this.stateOrder = "error"
+                this.msg = response.msg
+            }
+        } catch (error) {
+            runInAction(() => {
+                this.stateOrder = "error"
+                console.log(error)
+            })
+        }
     }
 } 
 

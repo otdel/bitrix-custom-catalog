@@ -37,6 +37,10 @@ export default class extends React.Component {
             </Fragment>
           }
           {
+            store.stateOrder === "done" && store.count === 0 &&
+            <caption>Заказ успешно создан</caption>
+          }
+          {
             store.state === "done" && store.count === 0 &&
             <caption>Корзина пуста</caption>
           }

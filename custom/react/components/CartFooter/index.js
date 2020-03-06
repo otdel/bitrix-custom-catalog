@@ -9,9 +9,9 @@ export default class extends React.Component {
     this.props.cartStore.removeAllCart();
     this.refs.btnRemoveAll.setAttribute("disabled", "disabled");
   }
-  handleClickCheckout = e => {
-    this.props.cartStore.checkout();
-    this.refs.btnCheckout.setAttribute("disabled", "disabled");
+  handleClickOrder = e => {
+    this.props.cartStore.createOrder();
+    this.refs.btnOrder.setAttribute("disabled", "disabled");
   }
 
   render() {
@@ -33,8 +33,8 @@ export default class extends React.Component {
         </td>
         <td colSpan="3">
           <button className="uk-button uk-button-primary"
-            ref="btnCheckout"
-            onClick = {() => this.handleClickCheckout()}
+            ref="btnOrder"
+            onClick = {() => this.handleClickOrder()}
           >
             <i className="uk-icon" uk-icon="credit-card" ></i>
               Оформить заказ
