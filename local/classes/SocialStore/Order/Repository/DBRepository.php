@@ -114,7 +114,7 @@ class DBRepository implements RepositoryInterface
             throw new OrderCreatingErrorException();
         }
 
-        return $this->db->getAffectedRowsCount();
+        return $this->db->getInsertedId();
     }
 
     /**
