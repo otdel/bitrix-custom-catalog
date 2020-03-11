@@ -73,7 +73,8 @@ class COipSocialStoreOrderAdd extends \COipComponent {
             $repository = $this->initOrderRepository();
             $startStatus = $this->getStartOrderStatus();
             $order = new Order($this->arParams['USER'], $startStatus, $this->arParams['PRODUCTS']);
-            if($repository->addOrder($order)) {
+            if($newOrderId = $repository->addOrder($order)) {
+                $order = $repository->getById($newOrderId);
                 $this->throwOrderCreatedEvent($order);
             }
 

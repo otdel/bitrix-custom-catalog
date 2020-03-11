@@ -28,10 +28,10 @@ else {
     $startStatus = $statusRepository->getByCode(OrderStatus::START_STATUS_CODE);
     $order = new Order($user, $startStatus, $products);
 
-    $affectedCount = $orderRepository->addOrder($order);
-    if($affectedCount) {
+    $newOrderId = $orderRepository->addOrder($order);
+    if($newOrderId) {
         $cart->removeAll();
-
+        $order = $orderRepository->getById($newOrderId);
         require __DIR__ . "/../events/onOrderCreated.php";
     }
 
