@@ -26,10 +26,10 @@ class RuleHandler implements RuleHandlerInterface
 
         $stepTwoAction = $rule->getStep("Oip\DataMover\Rule\DB\ProductView\StepTwo");
         $userIsLiked = $this->repository
-            ->executeQuery($stepTwoAction($uniqueSet["product_id"], $uniqueSet["section_id"], $userId))->fetch()["is_liked"];
+            ->executeQuery($stepTwoAction($uniqueSet["product_id"], $uniqueSet["section_id"], $userId))->fetch()["likes_count"];
 
         $guestIsLiked = $this->repository
-            ->executeQuery($stepTwoAction($uniqueSet["product_id"], $uniqueSet["section_id"], $guestId))->fetch()["is_liked"];
+            ->executeQuery($stepTwoAction($uniqueSet["product_id"], $uniqueSet["section_id"], $guestId))->fetch()["likes_count"];
 
         $stepThreeAction = $rule->getStep("Oip\DataMover\Rule\DB\ProductView\StepThree");
         $viewsSum = $stepThreeAction((int)$guestViewsCount, (int)$userViewsCount);
