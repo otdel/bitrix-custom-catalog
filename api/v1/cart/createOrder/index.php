@@ -5,7 +5,7 @@ use Oip\ApiService\Response\Response;
 use Oip\ApiService\Response\Status;
 use Oip\SocialStore\Order\Entity\Order;
 use Oip\SocialStore\Order\Status\Entity\Status as OrderStatus;
-
+use Oip\SocialStore\Order\Handler as OrderHandler;
 global $USER;
 
 if(!$USER->IsAuthorized()) {
@@ -25,18 +25,19 @@ else {
 
     require __DIR__ . "/../../order/initRepository.php";
 
+
+    $handler = new OrderHandler($orderRepository, $statusRepository);
     $startStatus = $statusRepository->getByCode(OrderStatus::START_STATUS_CODE);
     $order = new Order($user, $startStatus, $products);
 
-    $newOrderId = $orderRepository->addOrder($order);
-    if($newOrderId) {
+    $addedOrder = $handler->addOrder($order);
+    if($addedOrder->getId()) {
         $cart->removeAll();
-        $order = $orderRepository->getById($newOrderId);
         require __DIR__ . "/../events/onOrderCreated.php";
     }
 
     $response = new Response(Status::createSuccess()->getValue());
 }
 
-echo $response->toJSON();
-exit();
+//echo $response->toJSON();
+exit(json_encode($addedOrder));
