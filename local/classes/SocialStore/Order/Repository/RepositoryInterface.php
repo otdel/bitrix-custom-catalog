@@ -30,4 +30,11 @@ interface RepositoryInterface
      * @return int
     */
     public function removeOrder(int $orderId): int;
+
+    /**
+     * @param int $orderId
+     * @param int $statusId
+     * @return void
+     */
+    public function updateStatus(int $orderId, int $statusId): void;
 }
