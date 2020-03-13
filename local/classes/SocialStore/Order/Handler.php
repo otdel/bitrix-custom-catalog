@@ -5,6 +5,7 @@ namespace Oip\SocialStore\Order;
 use Oip\SocialStore\Order\Entity\Order;
 use Oip\SocialStore\Order\Repository\RepositoryInterface as OrderRepository;
 use Oip\SocialStore\Order\Status\Repository\RepositoryInterface as StatusRepository;
+use Oip\SocialStore\Order\Entity\OrderCollection;
 
 class Handler
 {
@@ -19,7 +20,25 @@ class Handler
         $this->statusRepository = $statusRepository;
     }
 
-   public function updateOrderStatus(Order $order, string $statusCode): Order {
+    public function getById(int $orderId): Order {
+        return $this->orderRepository->getById($orderId);
+    }
+
+
+    public function getAllByUserId(int $userId): OrderCollection {
+        return $this->orderRepository->getAllByUserId($userId);
+    }
+
+    public function addOrder(Order $order): Order {
+        $insertedId = $this->orderRepository->addOrder($order);
+        return $this->getById($insertedId);
+    }
+
+    public function removeOrder(int $orderId): int {
+        return $this->orderRepository->removeOrder($orderId);
+    }
+
+    public function updateOrderStatus(Order $order, string $statusCode): Order {
         $orderId = $order->getId();
         $statusId = $this->statusRepository->getByCode($statusCode)->getId();
 
