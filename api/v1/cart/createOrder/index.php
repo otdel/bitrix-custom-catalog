@@ -39,5 +39,4 @@ else {
     $response = new Response(Status::createSuccess()->getValue());
 }
 
-//echo $response->toJSON();
-exit(json_encode($addedOrder));
+echo $response->toJSON();
