@@ -39,3 +39,18 @@ if(document.getElementById("react-cart")) {
     , document.querySelector("#react-cart")
   );
 }
+
+if(document.getElementsByClassName("react-add-to-cart-button").length) {
+  const userId = document.getElementById("userid").getAttribute("data-userid");
+  const AddToCartButton = require('./components/AddToCartBtn').default;
+  document.querySelectorAll('.react-add-to-cart-button').forEach(function(button) {
+    const productId = button.getAttribute("data-productid");
+    const inCart = button.getAttribute("data-incart");
+    ReactDOM.render(
+      <Provider {...stores}>
+        <AddToCartButton userId={userId} productId={productId} inCart={inCart} />
+      </Provider>
+      , button
+    );
+  });
+}

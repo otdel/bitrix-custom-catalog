@@ -3,11 +3,12 @@ import { createContext } from 'react';
 //mobx.configure({ enforceActions: "observed" })
 class CartStore {
     @observable productsInCart = [];
-    @observable state = "pending"; // "pending" / "done" / "error"
-    @observable stateRemove = "pending"; // "pending" / "done" / "error"
+    @observable state = "pending";          // "pending" / "done" / "error"
+    @observable stateRemove = "pending";    // "pending" / "done" / "error"
     @observable stateRemoveAll = "pending"; // "pending" / "done" / "error"
-    @observable stateOrder = "pending"; // "pending" / "done" / "error"
-    @observable msg = ""; // "pending" / "done" / "error"
+    @observable stateOrder = "pending";     // "pending" / "done" / "error"
+    @observable stateAdding = "pending";    // "pending" / "done" / "error"
+    @observable msg = "";
     @observable userId = undefined;
 
     @computed get count() {
@@ -24,15 +25,44 @@ class CartStore {
     setUserId(userId) {
         this.userId = userId;
     }
-    @action.bound
+    //@action.bound
+    /*
     addToCart(product) {
         this.productsInCart.push(product);
-    }
+    }*/
     @action.bound
     removeFromCart(product) {
         const index = this.productsInCart.indexOf(product);
         if (index >= 0) {
             this.productsInCart.splice(index, 1);
+        }
+    }
+
+    /* add to cart */
+    async fetchAddToCart(productId) {
+        let api = await fetch(`/api/v1/cart/add?cartUserId=${this.userId}&productId=${productId}`);
+        let json = await api.json();
+        return json;
+    }
+    @action.bound
+    async addToCart(productId) {
+        this.stateAdding = "pending"
+        try {
+            const response = await this.fetchAddToCart(productId);
+            runInAction(() => {
+                if (response.status === "success") {
+                    this.stateAdding = "done"
+                    //this.productsInCart.push(product);
+                } else {
+                    this.stateAdding = "error"
+                    this.msg = response.msg
+                }
+            })
+        } catch (error) {
+            runInAction(() => {
+                this.stateAdding = "error"
+                console.log(error)
+            })
         }
     }
 
