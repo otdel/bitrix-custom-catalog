@@ -5,7 +5,10 @@ namespace Oip\SocialStore\Order\Status\Entity;
 
 class Status
 {
-    const START_STATUS_CODE = "created";
+    const STATUS_CREATED = "created";
+    const STATUS_TRANSFERRED = "transferred";
+    const START_STATUS_CODE = self::STATUS_CREATED;
+
 
     /** @var int */
     private $id;

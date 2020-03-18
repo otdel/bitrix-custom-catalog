@@ -8,6 +8,8 @@ use Bitrix\Main\ArgumentTypeException;
 use Bitrix\Main\ArgumentException;
 
 use Oip\SocialStore\Order\Repository\DBRepository as OrderRepository;
+use Oip\SocialStore\Order\Status\Repository\DBRepository as StatusRepository;
+use Oip\SocialStore\Order\Handler as OrderHandler;
 
 use Oip\Util\Serializer\ObjectSerializer\Base64Serializer;
 use Oip\Util\Bitrix\DateTimeConverter;
@@ -38,10 +40,13 @@ class COipSocialStoreOrderList extends \COipComponent {
     public function executeComponent()
     {
         $connection = Application::getConnection();
-        $repository = new OrderRepository($connection, new Base64Serializer(),
+        $orderRepository = new OrderRepository($connection, new Base64Serializer(),
             new DateTimeConverter(), new CollectionsFactory());
+        $statusRepository = new StatusRepository($connection);
 
-        $this->arResult["ORDERS"] = $repository->getAllByUserId($this->arParams["USER_ID"]);
+        $handler = new OrderHandler($orderRepository, $statusRepository);
+
+        $this->arResult["ORDERS"] = $handler->getAllByUserId((int)$this->arParams["USER_ID"]);
 
         $this->includeComponentTemplate();
     }

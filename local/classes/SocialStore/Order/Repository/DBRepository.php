@@ -5,6 +5,7 @@ namespace Oip\SocialStore\Order\Repository;
 use Exception;
 use Oip\SocialStore\Order\Repository\Exception\OrderCreatingError as OrderCreatingErrorException;
 use Oip\SocialStore\Order\Repository\Exception\OrderDeletingError as OrderDeletingErrorException;
+use Oip\SocialStore\Order\Repository\Exception\OrderUpdatingStatusError as OrderUpdatingStatusErrorException;
 use Oip\Util\Collection\Factory\NonUniqueIdCreating as NonUniqueIdCreatingException;
 use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
 use Bitrix\Main;
@@ -114,7 +115,7 @@ class DBRepository implements RepositoryInterface
             throw new OrderCreatingErrorException();
         }
 
-        return $this->db->getAffectedRowsCount();
+        return $this->db->getInsertedId();
     }
 
     /**
@@ -132,6 +133,21 @@ class DBRepository implements RepositoryInterface
        }
 
        return $this->db->getAffectedRowsCount();
+    }
+
+    /**
+     * @inheritDoc
+     * @throws Main\DB\SqlQueryException
+     * @throws OrderUpdatingStatusErrorException
+     */
+    public function updateStatus(int $orderId, int $statusId): void {
+        $sql = "UPDATE {$this->ordersTableName} SET status_id = $statusId WHERE id = $orderId";
+        $this->db->query($sql);
+
+        if ($this->db->getAffectedRowsCount() == 0) {
+            throw new OrderUpdatingStatusErrorException(
+                "An error occurred while updating status to '$statusId' of the order '$orderId'");
+        }
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Oip\SocialStore\Order\Status\Repository;
 
 use Bitrix\Main;
 use Oip\SocialStore\Order\Status\Entity;
+use Oip\SocialStore\Order\Status\Repository\Exception\InvalidStatusCode as InvalidStatusCodeException;
 
 class DBRepository implements RepositoryInterface
 {
@@ -21,11 +22,16 @@ class DBRepository implements RepositoryInterface
     /**
      * @inheritdoc
      * @throws Main\DB\SqlQueryException
+     * @throws InvalidStatusCodeException
      */
     public function getByCode(string $statusCode): Entity\Status
     {
         $sql = $this->getByCodeSql($statusCode);
         $status = $this->db->query($sql)->fetch();
+
+        if(!$status) {
+            throw new InvalidStatusCodeException("Invalid status code '$statusCode'.");
+        }
 
         return new Entity\Status($status["id"], $status["code"], $status["label"]);
     }

@@ -748,8 +748,8 @@ class DBDataSource implements DataSourceInterface
 
     /** @inheritdoc */
     public function isProductLikedByUser(int $productId, int $userId): bool {
-        return (bool)$this->db->Query("SELECT 1 as is_liked FROM {$this->productViewTableName} WHERE product_id = $productId "
-            ." AND user_id = $userId AND likes_count > 0")->Fetch()["is_liked"];
+        return (bool)$this->db->Query("SELECT 1 as likes_count FROM {$this->productViewTableName} WHERE product_id = $productId "
+            ." AND user_id = $userId AND likes_count > 0")->Fetch()["likes_count"];
     }
 
     /** @inheritdoc */
@@ -834,8 +834,8 @@ class DBDataSource implements DataSourceInterface
 
     /** @inheritdoc */
     public function isSectionLikedByUser(int $sectionId, int $userId): bool {
-        return (bool)$this->db->Query("SELECT 1 as is_liked FROM {$this->productViewTableName} WHERE section_id = $sectionId "
-            ." AND user_id = $userId AND likes_count > 0")->Fetch()["is_liked"];
+        return (bool)$this->db->Query("SELECT 1 as likes_count FROM {$this->productViewTableName} WHERE section_id = $sectionId "
+            ." AND user_id = $userId AND likes_count > 0")->Fetch()["likes_count"];
     }
 
     /**
