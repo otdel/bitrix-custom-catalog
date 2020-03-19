@@ -25,11 +25,6 @@ class CartStore {
     setUserId(userId) {
         this.userId = userId;
     }
-    //@action.bound
-    /*
-    addToCart(product) {
-        this.productsInCart.push(product);
-    }*/
     @action.bound
     removeFromCart(product) {
         const index = this.productsInCart.indexOf(product);
@@ -55,7 +50,7 @@ class CartStore {
                     //this.productsInCart.push(product);
                 } else {
                     this.stateAdding = "error"
-                    this.msg = response.msg
+                    this.msg = response.message
                 }
             })
         } catch (error) {
@@ -83,7 +78,7 @@ class CartStore {
                     this.productsInCart = []
                 } else {
                     this.stateRemoveAll = "error"
-                    this.msg = response.msg
+                    this.msg = response.message
                 }
             })
         } catch (error) {
@@ -114,7 +109,7 @@ class CartStore {
                     }
                 } else {
                     this.stateRemove = "error"
-                    this.msg = response.msg
+                    this.msg = response.message
                 }
             })
         } catch (error) {
@@ -144,7 +139,7 @@ class CartStore {
                     this.productsInCart = products
                 } else {
                     this.stateOrder = "error"
-                    this.msg = response.msg
+                    this.msg = response.message
                 }
             })
         } catch (error) {
@@ -171,7 +166,8 @@ class CartStore {
                 this.productsInCart = []
             } else {
                 this.stateOrder = "error"
-                this.msg = response.msg
+                this.msg = response.message
+                console.log(response)
             }
         } catch (error) {
             runInAction(() => {

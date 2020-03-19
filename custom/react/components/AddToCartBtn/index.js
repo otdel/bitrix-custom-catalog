@@ -13,14 +13,14 @@ export default class extends React.Component {
   componentDidMount() {
     const store = this.props.cartStore;
     const inCart = this.props.inCart;
+    if (!store.userId) {
+      store.setUserId(this.props.userId); // записываем ID пользователя в хранилище
+    }
+
     if (inCart === "true") {
       this.paramsAddedToCart();
     } else {
       this.defaultParamsAddToCart();
-    }
-
-    if (!store.userId) {
-      store.setUserId(this.props.userId); // записываем ID пользователя в хранилище
     }
   }
 
