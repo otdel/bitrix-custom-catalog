@@ -5,10 +5,12 @@ require('es6-object-assign').polyfill(); // для IE11
 
 import cartStore from './stores/CartStore';
 import catalogStore from './stores/CatalogStore';
+import likeStore from './stores/LikeStore';
 
 const stores = {
   cartStore,
   catalogStore,
+  likeStore,
 };
 
 // For easier debugging
@@ -40,6 +42,7 @@ if(document.getElementById("react-cart")) {
   );
 }
 
+// Добавляем кнопки "Добавить в корзину" на страницу
 if(document.getElementsByClassName("react-add-to-cart-button").length) {
   const userId = document.getElementById("userid").getAttribute("data-userid");
   const AddToCartButton = require('./components/AddToCartBtn').default;
@@ -49,6 +52,23 @@ if(document.getElementsByClassName("react-add-to-cart-button").length) {
     ReactDOM.render(
       <Provider {...stores}>
         <AddToCartButton userId={userId} productId={productId} inCart={inCart} />
+      </Provider>
+      , button
+    );
+  });
+}
+
+// Добавляем лайки на страницу
+if(document.getElementsByClassName("react-like-button").length) {
+  const userId = document.getElementById("userid").getAttribute("data-userid");
+  const LikeButton = require('./components/LikeBtn').default;
+  document.querySelectorAll('.react-like-button').forEach(function(button) {
+    const productId = button.getAttribute("data-productid");
+    const isLiked = button.getAttribute("data-isliked");
+    const likes = button.getAttribute("data-likes");
+    ReactDOM.render(
+      <Provider {...stores}>
+        <LikeButton userId={userId} productId={productId} isLiked={isLiked} likes={likes} />
       </Provider>
       , button
     );

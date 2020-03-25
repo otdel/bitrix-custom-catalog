@@ -7,7 +7,12 @@ import classNames from 'classnames';
 export default class extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {}
+    this.state = {
+      inCart: "",
+      iconButton: "",
+      textButton: "",
+      colorButton: "",
+    }
   }
 
   componentDidMount() {
