@@ -47,7 +47,7 @@ class CartStore {
             runInAction(() => {
                 if (response.status === "success") {
                     this.stateAdding = "done"
-                    //this.productsInCart.push(product);
+                    // если мини-корзина будет в каталоге, то здесь нужно будет вызывать получение корзины
                 } else {
                     this.stateAdding = "error"
                     this.msg = response.message
@@ -152,6 +152,7 @@ class CartStore {
 
     /* checkout (order) */
     async fetchOrder() {
+        //let api = await fetch('http://www.mocky.io/v2/5e7b11e02d00006100119bda'); // error менеджер не найден
         let api = await fetch(`/api/v1/cart/createOrder?cartUserId=${this.userId}`);
         let json = await api.json();
         return json;
@@ -167,6 +168,10 @@ class CartStore {
             } else {
                 this.stateOrder = "error"
                 this.msg = response.message
+                // в случае ошибки, когда не найден менеджер следует очищать корзину:
+                if (response.message.includes("менеджер") && response.message.includes("самостоятельно")) {
+                    this.productsInCart = []
+                }
                 console.log(response)
             }
         } catch (error) {

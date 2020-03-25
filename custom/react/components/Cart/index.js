@@ -36,15 +36,30 @@ export default class extends React.Component {
               <CartFooter />
             </Fragment>
           }
-          {
-            store.stateOrder === "done" && store.count === 0 &&
-            <caption>Заказ успешно создан</caption>
-          }
-          {
-            store.state === "done" && store.count === 0 &&
-            <caption>Корзина пуста</caption>
-          }
         </table>
+        {
+          store.stateOrder === "done" && store.count === 0 &&
+          <div ref="orderMsg" className="uk-alert-success" uk-alert="true">
+            <a className="uk-alert-close" uk-close="true"></a>
+            <div ref="orderMsgText">Заказ успешно оформлен и отправлен менеджеру</div>
+          </div>
+        }
+        {
+          store.stateOrder === "error" && store.count === 0 && store.msg.includes('самостоятельно') &&
+          <div ref="orderMsg" className="uk-alert-danger" uk-alert="true">
+            <a className="uk-alert-close" uk-close="true"></a>
+            <div ref="orderMsgText">{store.msg}</div>
+          </div>
+        }
+        {
+          store.state === "done" && store.count === 0 &&
+          <div>Корзина пуста</div>
+        }
+        {
+          store.state === "error" && store.count === 0 &&
+          <div>Произошла ошибка: {store.msg}</div>
+        }
+
       </Provider>
     );
   }

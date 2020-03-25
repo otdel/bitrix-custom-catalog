@@ -31,15 +31,15 @@ export default class extends React.Component {
       this.addSpinner()
     }
     const checkStateOrder = () => {
-      if (store.stateOrder !== "pending") {
+      // обработка ошибок при которых не следует очищать корзину (пользователь не вошел, нет соединения и т.д.)
+      // обработка ошибок, когда менеджер не найден происходит в компоненте Cart.js 
+      if (store.stateOrder === "error" && !store.msg.includes('самостоятельно')) {
         this.removeSpinner()
-        if (store.stateOrder === "done") {
-          this.refs.orderMsgText.textContent = "Заказ успешно создан и отправлен вашему менеджеру";
-        } else { // "error"
-          this.refs.orderMsgText.textContent = store.msg;
-          console.log(store.msg);
-          store.msg = "";
-        }
+        this.refs.orderMsgText.textContent = store.msg;
+        console.log(store.msg);
+        store.msg = "";
+        clearInterval(checkingInterval);
+      } else if (store.stateOrder === "done") { // сообщение об успехе в Cart.js, т.к. весь <tfoot> убирается из DOM 
         clearInterval(checkingInterval);
       }
     }
