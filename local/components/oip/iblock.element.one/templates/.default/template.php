@@ -59,6 +59,10 @@ $component = $this->getComponent();
                             <?endif?>
 
                             <p class="uk-margin-medium-top uk-text-large uk-text-nowrap price-detail">15 555&nbsp;₽</p>
+                            <?$APPLICATION->IncludeComponent("oip:product_features","", [
+                                    "IBLOCK_ID" => (int)$element->getIblockId(),
+                                    "ELEMENT_ID" => (int)$element->getId(),
+                            ])?>
 
                             <p>
                                 <?=$element->getPreviewText()?>
