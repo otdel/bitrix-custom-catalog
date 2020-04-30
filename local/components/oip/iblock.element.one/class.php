@@ -77,7 +77,7 @@ class COipIblockElementOne extends COipIblockElementList {
         return $filter;
     }
 
-    private function addElementView($elementID) {
+    protected function addElementView($elementID) {
         try {
 
             global $DB;
