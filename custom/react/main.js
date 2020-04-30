@@ -33,7 +33,7 @@ if(document.getElementById("mobx-example")) {
 
 if(document.getElementById("react-cart")) {
   const Cart = require('./components/Cart').default;
-  const userId = document.getElementById("react-cart").getAttribute("data-userid");
+  const userId = document.getElementById("shopuserid").getAttribute("data-userid");
   ReactDOM.render(
     <Provider {...stores}>
       <Cart userId={userId} />
@@ -44,7 +44,7 @@ if(document.getElementById("react-cart")) {
 
 // Добавляем кнопки "Добавить в корзину" на страницу
 if(document.getElementsByClassName("react-add-to-cart-button").length) {
-  const userId = document.getElementById("userid").getAttribute("data-userid");
+  const userId = document.getElementById("shopuserid").getAttribute("data-userid");
   const AddToCartButton = require('./components/AddToCartBtn').default;
   document.querySelectorAll('.react-add-to-cart-button').forEach(function(button) {
     const productId = button.getAttribute("data-productid");
@@ -60,7 +60,7 @@ if(document.getElementsByClassName("react-add-to-cart-button").length) {
 
 // Добавляем лайки на страницу
 if(document.getElementsByClassName("react-like-button").length) {
-  const userId = document.getElementById("userid").getAttribute("data-userid");
+  const userId = document.getElementById("shopuserid").getAttribute("data-userid");
   const LikeButton = require('./components/LikeBtn').default;
   document.querySelectorAll('.react-like-button').forEach(function(button) {
     const productId = button.getAttribute("data-productid");
