@@ -28,3 +28,5 @@
 
 <body>
 
+<?$userId = ($USER->IsAuthorized()) ? $USER->GetID() : "-".$OipGuestUser->getUser()->getId();?>
+<span id="shopuserid" data-userid="<?=$userId?>"></span>

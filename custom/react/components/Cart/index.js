@@ -31,7 +31,7 @@ export default class extends React.Component {
         <table className="uk-table">
           { store.count > 0 && 
             <Fragment>
-              <caption>Товаров в вашей корзине: {store.count} на сумму {store.totalAmount}</caption>
+              <caption className="uk-hidden">Товаров в вашей корзине: {store.count} на сумму {store.totalAmount}</caption>
               <CartList />
               <CartFooter />
             </Fragment>
