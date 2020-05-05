@@ -30,3 +30,21 @@
 
 <?$userId = ($USER->IsAuthorized()) ? $USER->GetID() : "-".$OipGuestUser->getUser()->getId();?>
 <span id="shopuserid" data-userid="<?=$userId?>"></span>
+
+<nav class="uk-navbar-container" uk-navbar>
+    <div class="uk-navbar-left">
+
+        <ul class="uk-navbar-nav">
+            <li><a href="/catalog/">Каталог</a></li>
+            <li><a href="/cart/">Корзина</a></li>
+            <li><a href="/shop/orders/">Заказы</a></li>
+        </ul>
+
+    </div>
+    <div class="uk-navbar-right">
+        <?if($USER->IsAuthorized()):?>
+            <a href="?logout=yes">Выйти</a>
+        <?endif?>
+        <?$APPLICATION->IncludeComponent("oip:social.store.cart.widget","",[])?>
+    </div>
+</nav>
