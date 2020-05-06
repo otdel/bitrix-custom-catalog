@@ -21,7 +21,7 @@ class DataWrapper
     /**
      * Получение описания характеристик товаров
      *
-     * @return ProductFeatureValue[] | null
+     * @return ProductFeature[] | null
      * @throws \Exception
      */
     public function getProductFeatures() {
