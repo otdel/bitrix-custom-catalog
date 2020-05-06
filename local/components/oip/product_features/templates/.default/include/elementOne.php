@@ -30,16 +30,21 @@ if (!isset($productInfo)) {
 <h3>Товар ID <?=$productInfo["productFeatures"][array_key_first($productInfo["productFeatures"])]->getProductId()?></h3>
 <p class="uk-margin-remove">Кастомные характеристики:</p>
 
-<? /** @var ProductFeatureValue $productFeatureValue */
-foreach ($productInfo["productFeatures"] as $productFeatureValue): ?>
+<table class="uk-table uk-table-small uk-table-striped">
+    <? /** @var ProductFeatureValue $productFeatureValue */
+    foreach ($productInfo["productFeatures"] as $productFeatureValue): ?>
 
-    <li>
-        <?=isset($productFeatures[$productFeatureValue->getFeatureCode()]) ?
-            $productFeatures[$productFeatureValue->getFeatureCode()]->getName() :
-            $productFeatureValue->getFeatureCode() ?> [код хар-ки: <?=$productFeatureValue->getFeatureCode()?>]:
-                <?=($productFeatureValue->getValue() !== null && trim($productFeatureValue->getValue()) != "") ?
-                    $productFeatureValue->getValue() :  "Не установлено"?>
-    </li>
+        <tr>
+            <td>
+                <?=isset($productFeatures[$productFeatureValue->getFeatureCode()]) ?
+                    $productFeatures[$productFeatureValue->getFeatureCode()]->getName() :
+                    $productFeatureValue->getFeatureCode() ?>
+                <br>(<?=$productFeatureValue->getFeatureCode()?>)
+            </td>
+            <td><?=($productFeatureValue->getValue() !== null && trim($productFeatureValue->getValue()) != "") ?
+                    $productFeatureValue->getValue() :  "Не установлено"?></td>
+        </tr>
 
-<?endforeach;?>
+    <?endforeach;?>
+</table>
 

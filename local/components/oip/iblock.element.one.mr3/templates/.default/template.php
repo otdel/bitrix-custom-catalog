@@ -59,10 +59,6 @@ $component = $this->getComponent();
                             <?endif?>
 
                             <p class="uk-margin-medium-top uk-text-large uk-text-nowrap price-detail">15 555&nbsp;₽</p>
-                            <?$APPLICATION->IncludeComponent("oip:product_features","", [
-                                    "IBLOCK_ID" => (int)$element->getIblockId(),
-                                    "ELEMENT_ID" => (int)$element->getId(),
-                            ])?>
 
                             <p>
                                 <?=$element->getPreviewText()?>
@@ -77,20 +73,15 @@ $component = $this->getComponent();
                                     ])?>
                                 </div>
                                 <div>
-                                    <?$APPLICATION->IncludeComponent("oip:relevant.products.likes.product.widget","",[
-                                        "PRODUCT_ID" => $element->getId()
-                                    ]);?>
-                                </div>
-                                <div>
-                                    <?$APPLICATION->IncludeComponent("oip:relevant.products.views.product.count","",[
-                                        "PRODUCT_ID" => $element->getId()
-                                    ]);?>
+                                    <button class="uk-icon-button uk-margin-small-right" uk-icon="heart" uk-tooltip="Отложить"></button>
                                 </div>
                             </div>
 
                             <?include_once (__DIR__."/include/bottom.php")?>
 
                             <?include_once (__DIR__."/include/tags.php")?>
+
+                            <?include_once (__DIR__."/include/featuresSelector.php")?>
 
                         </div>
                     </div>
