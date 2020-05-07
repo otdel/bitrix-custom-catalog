@@ -21,6 +21,14 @@ if(document.getElementById("react-example")) {
   ReactDOM.render(<Example />, document.querySelector("#react-example"));
 }
 
+if(document.getElementById("react-counter-widget")) {
+  const CountWidget = require('./components/CountWidget').default;
+  const userId = document.getElementById("shopuserid").getAttribute("data-userid");
+  ReactDOM.render(<Provider {...stores}>
+    <CountWidget userId={userId} />
+  </Provider>, document.querySelector("#react-counter-widget"));
+}
+
 if(document.getElementById("mobx-example")) {
   const Catalog = require('./components/Catalog').default;
   ReactDOM.render(

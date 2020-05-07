@@ -1,7 +1,11 @@
 {
     "name": "oip/custom",
     "description": "Standard product catalog for Bitrix CMS from ООО \"Отдел Интернет-проектов\"",
+<<<<<<< HEAD
     "version": "0.42.0",
+=======
+    "version": "0.41.5",
+>>>>>>> #react_countr (mlk_249) строка навигации и счетчик товаров для корзины и заготовка для каталога
     "type": "project",
     "keywords": ["bitrix", "catalog"],
     "authors": [
