@@ -1,6 +1,7 @@
-import { observable, action, computed, reaction, runInAction } from 'mobx';
+import { observable, action, computed, reaction, runInAction, configure } from 'mobx';
 import { createContext } from 'react';
-//mobx.configure({ enforceActions: "observed" })
+configure({ enforceActions: "observed" })
+
 class CartStore {
     @observable productsInCart = [];
     @observable state = "pending";          // "pending" / "done" / "error"
@@ -46,6 +47,7 @@ class CartStore {
             const response = await this.fetchAddToCart(productId);
             runInAction(() => {
                 if (response.status === "success") {
+                    this.getCart();
                     this.stateAdding = "done"
                     // если мини-корзина будет в каталоге, то здесь нужно будет вызывать получение корзины
                 } else {
@@ -74,8 +76,8 @@ class CartStore {
             const response = await this.fetchRemoveAllCart();
             runInAction(() => {
                 if (response.status === "success") {
-                    this.stateRemoveAll = "done"
                     this.productsInCart = []
+                    this.stateRemoveAll = "done"
                 } else {
                     this.stateRemoveAll = "error"
                     this.msg = response.message
@@ -102,11 +104,13 @@ class CartStore {
             const response = await this.fetchRemoveProduct(product.id);
             runInAction(() => {
                 if (response.status === "success") {
-                    this.stateRemove = "done"
                     const index = this.productsInCart.indexOf(product);
                     if (index >= 0) {
                         this.productsInCart.splice(index, 1);
+                        console.log("this.count cartSRORE", this.count);
                     }
+                    this.getCart();
+                    this.stateRemove = "done"
                 } else {
                     this.stateRemove = "error"
                     this.msg = response.message
@@ -135,8 +139,9 @@ class CartStore {
             const products = JSON.parse(response.data);
             runInAction(() => {
                 if (response.status === "success") {
-                    this.state = "done"
+                    
                     this.productsInCart = products
+                    this.state = "done"
                 } else {
                     this.stateOrder = "error"
                     this.msg = response.message

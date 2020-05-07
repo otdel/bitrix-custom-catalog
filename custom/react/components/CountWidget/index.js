@@ -1,5 +1,6 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
+import { observable, action, computed, reaction, runInAction, configure } from 'mobx';
 import { Provider } from 'mobx-react';
 import getNumWord from '../../../js/getNumWord';
 
@@ -18,11 +19,10 @@ export default class extends React.Component {
   }
 
   render() {
-    const store = this.props.cartStore
-    console.log("this.props.cartStore.count", store.count)
-    const goods = getNumWord(store.count, ["товар","товара","товаров"])
+    const store = this.props.cartStore;
+    const goods = getNumWord(store.count, ["товар","товара","товаров"]);
+
     return (
-      <Provider сartStore={store}>
         <div className="uk-padding">
           {
             store.state === "pending" && <div uk-spinner="true"></div>
@@ -34,7 +34,6 @@ export default class extends React.Component {
             store.state === "done" && store.count === 0 && <span>Корзина пуста</span>
           }
         </div>
-      </Provider>
     );
   }
 }

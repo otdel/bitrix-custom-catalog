@@ -118,7 +118,7 @@ export default class extends React.Component {
   }
 
   render() {
-    const store = this.props.сartStore;
+    const store = this.props.cartStore;
     const productId = this.props.productId;
 
     return (
