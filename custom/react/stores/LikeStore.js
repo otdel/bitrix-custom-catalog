@@ -16,8 +16,7 @@ class LikeStore {
 
   /* пользователь ставит лайк */
   async fetchLike(productId) {
-    console.log(`http://www.mocky.io/v2/5e730f5730000069002e61f2?cartUserId=${this.userId}&productId=${productId}`)
-    let api = await fetch(`http://www.mocky.io/v2/5e730f5730000069002e61f2?cartUserId=${this.userId}&productId=${productId}`)  //await fetch(`/api/v1/cart/add?cartUserId=${this.userId}&productId=${productId}`);
+    let api = await fetch(`/api/v1/like/action/product/add.php?userId=${this.userId}&productId=${productId}`);
     let json = await api.json();
     return json;
   }
@@ -44,8 +43,7 @@ class LikeStore {
   }
   /* пользователь ставит дизлайк  */
   async fetchDislike(productId) {
-    console.log(`http://www.mocky.io/v2/5e730f5730000069002e61f2?cartUserId=${this.userId}&productId=${productId}`)
-    let api = await fetch(`http://www.mocky.io/v2/5e730f5730000069002e61f2?cartUserId=${this.userId}&productId=${productId}`);
+    let api = await fetch(`/api/v1/like/action/product/remove.php?userId=${this.userId}&productId=${productId}`);
     let json = await api.json();
     return json;
   }
@@ -56,11 +54,11 @@ class LikeStore {
       const response = await this.fetchDislike(product.id);
       runInAction(() => {
         if (response.status === "success") {
-          this.stateDislike = "done"
           const index = this.likesProducts.indexOf(product);
           if (index >= 0) {
             this.likesProducts.splice(index, 1);
           }
+          this.stateDislike = "done"
         } else {
           this.stateDislike = "error"
           this.msg = response.message
@@ -73,6 +71,36 @@ class LikeStore {
       })
     }
   }
+
+
+  /* получаем количество лайков товара */
+  async fetchAllLikes(productId) {
+    let api = await fetch(`/api/v1/like/product/getAll.php?userId=${this.userId}&productId=${productId}`);
+    let json = await api.json();
+    return json;
+  }
+  @action.bound
+  async allLikes(productId) {
+    this.stateLike = "pending"
+    try {
+      const response = await this.fetchAllLikes(productId);
+        runInAction(() => {
+          if (response.status === "success") {
+            this.stateLike = "done"
+            //this.likesProducts.push(product);
+          } else {
+            this.stateLike = "error"
+            this.msg = response.message
+          }
+        })
+    } catch (error) {
+      runInAction(() => {
+        this.stateLike = "error"
+        console.log(error)
+      })
+    }
+  }
+
 }
 
 const likeStore = new LikeStore();

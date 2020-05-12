@@ -18,7 +18,7 @@ export default class extends React.Component {
 
   componentDidMount() {
     const store = this.props.likeStore;
-    const isLiked = this.props.isLiked; // 
+    const isLiked = this.props.isLiked;
     const likes = this.props.likes;
 
     if (!store.userId) {
@@ -30,7 +30,6 @@ export default class extends React.Component {
     }));
 
     if (isLiked === "true") {
-      console.log("isLiked")
       this.paramsLike();
     } else {
       this.paramsDislike();

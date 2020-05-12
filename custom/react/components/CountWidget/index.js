@@ -1,9 +1,5 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
-<<<<<<< HEAD
-import { observable, action, computed, reaction, runInAction, configure } from 'mobx';
-=======
->>>>>>> master
 import { Provider } from 'mobx-react';
 import getNumWord from '../../../js/getNumWord';
 

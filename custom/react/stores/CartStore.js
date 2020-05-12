@@ -107,7 +107,6 @@ class CartStore {
                     const index = this.productsInCart.indexOf(product);
                     if (index >= 0) {
                         this.productsInCart.splice(index, 1);
-                        console.log("this.count cartSRORE", this.count);
                     }
                     this.getCart();
                     this.stateRemove = "done"
