@@ -15,16 +15,20 @@ class LikeStore {
   }
 
   /* пользователь ставит лайк */
-  async fetchLike(productId) {
+  async fetchLike(productId, isCategory) {
     let api = await fetch(`/api/v1/like/action/product/add.php?userId=${this.userId}&productId=${productId}`);
+    if (isCategory) {
+      api = await fetch(`/api/v1/like/action/category/add.php?userId=${this.userId}&sectionId=${productId}`);
+    }
     let json = await api.json();
     return json;
   }
+
   @action.bound
-  async like(productId) {
+  async like(productId, isCategory=false) {
     this.stateLike = "pending"
     try {
-      const response = await this.fetchLike(productId);
+      const response = await this.fetchLike(productId, isCategory);
         runInAction(() => {
           if (response.status === "success") {
             this.stateLike = "done"
@@ -42,16 +46,20 @@ class LikeStore {
     }
   }
   /* пользователь ставит дизлайк  */
-  async fetchDislike(productId) {
+  async fetchDislike(productId, isCategory) {
     let api = await fetch(`/api/v1/like/action/product/remove.php?userId=${this.userId}&productId=${productId}`);
+    if (isCategory) {
+      api = await fetch(`/api/v1/like/action/category/remove.php?userId=${this.userId}&sectionId=${productId}`);
+    }
     let json = await api.json();
     return json;
   }
+
   @action
-  async dislike(product) {
+  async dislike(product, isCategory=false) {
     this.stateDislike = "pending"
     try {
-      const response = await this.fetchDislike(product.id);
+      const response = await this.fetchDislike(product.id, isCategory);
       runInAction(() => {
         if (response.status === "success") {
           const index = this.likesProducts.indexOf(product);

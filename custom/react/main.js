@@ -74,9 +74,10 @@ if(document.getElementsByClassName("react-like-button").length) {
     const productId = button.getAttribute("data-productid");
     const isLiked = button.getAttribute("data-isliked");
     const likes = button.getAttribute("data-likes");
+    const isCategory = button.getAttribute("data-iscategory");
     ReactDOM.render(
       <Provider {...stores}>
-        <LikeButton userId={userId} productId={productId} isLiked={isLiked} likes={likes} />
+        <LikeButton userId={userId} productId={productId} isLiked={isLiked} likes={likes} isCategory={isCategory} />
       </Provider>
       , button
     );

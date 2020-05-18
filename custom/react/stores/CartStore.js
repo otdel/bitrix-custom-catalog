@@ -36,7 +36,7 @@ class CartStore {
 
     /* add to cart */
     async fetchAddToCart(productId) {
-        let api = await fetch(`/api/v1/cart/add?cartUserId=${this.userId}&productId=${productId}`);
+        let api = await fetch(`/api/v1/cart/add/?cartUserId=${this.userId}&productId=${productId}`);
         let json = await api.json();
         return json;
     }
@@ -65,7 +65,7 @@ class CartStore {
 
     /* remove All */
     async fetchRemoveAllCart() {
-        let api = await fetch(`/api/v1/cart/removeAll?cartUserId=${this.userId}`);
+        let api = await fetch(`/api/v1/cart/removeAll/?cartUserId=${this.userId}`);
         let json = await api.json();
         return json;
     }
@@ -93,7 +93,7 @@ class CartStore {
 
     /* remove product */
     async fetchRemoveProduct(productId) {
-        let api = await fetch(`/api/v1/cart/remove?cartUserId=${this.userId}&productId=${productId}`);
+        let api = await fetch(`/api/v1/cart/remove/?cartUserId=${this.userId}&productId=${productId}`);
         let json = await api.json();
         return json;
     }
@@ -125,7 +125,7 @@ class CartStore {
 
     /* get current Cart by user */
     async fetchCart() {
-        let api = await fetch(`/api/v1/cart/getByUserId?cartUserId=${this.userId}`);
+        let api = await fetch(`/api/v1/cart/getByUserId/?cartUserId=${this.userId}`);
         let json = await api.json();
         return json;
     }
@@ -138,7 +138,7 @@ class CartStore {
             const products = JSON.parse(response.data);
             runInAction(() => {
                 if (response.status === "success") {
-                    
+
                     this.productsInCart = products
                     this.state = "done"
                 } else {
@@ -156,8 +156,7 @@ class CartStore {
 
     /* checkout (order) */
     async fetchOrder() {
-        //let api = await fetch('http://www.mocky.io/v2/5e7b11e02d00006100119bda'); // error менеджер не найден
-        let api = await fetch(`/api/v1/cart/createOrder?cartUserId=${this.userId}`);
+        let api = await fetch(`/api/v1/cart/createOrder/?cartUserId=${this.userId}`);
         let json = await api.json();
         return json;
     }
@@ -185,7 +184,7 @@ class CartStore {
             })
         }
     }
-} 
+}
 
 const cartStore = new CartStore();
 export default cartStore; // для классов

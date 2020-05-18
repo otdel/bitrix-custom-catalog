@@ -24,11 +24,14 @@ $actionValue = ($isLiked) ? DataWrapper::GLOBAL_CATEGORY_LIKE_ACTION_REMOVE
         "EXCEPTION" => $exception
     ])?>
 <?else:?>
-    <form action="" method="post">
-        <input type="hidden" name="<?=DataWrapper::GLOBAL_CATEGORY_LIKE_ACTION_NAME?>" value="<?=$actionValue?>">
-        <input type="hidden" name="<?=DataWrapper::GLOBAL_CATEGORY_LIKE_CATEGORY_ID?>"
-               value="<?=$component->getParam("SECTION_ID")?>">
-        <?=$likes?>&nbsp;<button class="uk-icon-button uk-margin-small-right <?=$isLikedCss?>"
-                                 uk-icon="heart" uk-tooltip="<?=$isLikedTooltip?>"></button>
-    </form>
+  <form action="" method="post" onsubmit="return false">
+    <div
+        class="react-like-button"
+        data-productid="<?=$component->getParam("SECTION_ID")?>"
+        data-isliked="<?=$isLiked === true ? "true" : "false";?>"
+        data-likes="<?=$likes === null ? "0" : $likes ?>"
+        data-iscategory="true"
+    >
+    </div>
+  </form>
 <?endif?>

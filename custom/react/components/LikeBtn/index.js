@@ -13,6 +13,7 @@ export default class extends React.Component {
       iconButton: "heart",
       tooltip: "",
       colorButton: "",
+      isCategory: false,
     }
   }
 
@@ -20,17 +21,22 @@ export default class extends React.Component {
     const store = this.props.likeStore;
     const isLiked = this.props.isLiked;
     const likes = this.props.likes;
+    const isCategory = this.props.category;
 
     if (!store.userId) {
       store.setUserId(this.props.userId); // записываем ID пользователя в хранилище
     }
 
     this.setState((state, props) => ({
-      likes: state.likes + Number(likes)
+      likes: state.likes + Number(likes),
+      isCategory: isCategory !== null,
     }));
 
     if (isLiked === "true") {
       this.paramsLike();
+      if (this.state.likes === 0) {
+        this.plusLike();
+      }
     } else {
       this.paramsDislike();
     }
@@ -39,7 +45,7 @@ export default class extends React.Component {
   paramsLike() {
     this.setState((state) => {
       return {
-        isLiked: true, 
+        isLiked: true,
         iconButton: "heart",
         tooltip: "Убрать из отложенных",
         colorButton: classNames({'uk-icon-button': true, 'uk-margin-small-right': true, 'uk-button-primary': true})
@@ -86,13 +92,13 @@ export default class extends React.Component {
 
   minusLike = () => {
     this.setState((state, props) => ({
-      likes: state.likes - 1
+      likes: state.likes === 0 ? 0 : state.likes - 1
     }));
   }
 
   handleLike = (productId) => {
     const store = this.props.likeStore;
-    store.like(productId);
+    store.like(productId, this.props.isCategory);
     if (store.stateLike === "pending") {
       this.addSpinner();
     }
@@ -115,7 +121,7 @@ export default class extends React.Component {
 
   handleDislike = (productId) => {
     const store = this.props.likeStore;
-    store.dislike({id: productId});
+    store.dislike({id: productId}, this.props.isCategory);
     if (store.stateRemove === "pending") {
       this.addSpinner();
     }
@@ -142,16 +148,16 @@ export default class extends React.Component {
     return (
       <div>
         <span ref="likes">{this.state.likes} </span>
-        <button 
+        <button
           onClick = {e => this.handleClick(e, productId)}
-          ref="likeBtn" 
+          ref="likeBtn"
           className={this.state.colorButton}
-          uk-icon={this.state.iconButton} 
+          uk-icon={this.state.iconButton}
           uk-tooltip={this.state.tooltip}
         >
         </button>
       </div>
-      
+
     )
   }
 }

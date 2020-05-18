@@ -23,11 +23,12 @@ $actionValue = ($isLiked) ? DataWrapper::GLOBAL_PRODUCT_LIKE_ACTION_REMOVE
     ])?>
 <?else:?>
     <form action="" method="post" onsubmit="return false">
-        <div 
+        <div
             class="react-like-button"
             data-productid="<?=$component->getParam("PRODUCT_ID")?>"
             data-isliked="<?=$isLiked === true ? "true" : "false";?>"
             data-likes="<?=$likes === null ? "0" : $likes ?>"
+            data-iscategory="false"
         >
         </div>
     </form>
