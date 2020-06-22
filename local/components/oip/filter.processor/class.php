@@ -121,6 +121,11 @@ class COipFilterProcessor extends \COipComponent
                 $paramName = "PROPERTY_".$paramName;
             }
 
+            if($paramType == self::PARAM_TYPE_SORT) {
+                $finalIblockFilter["BY_1"] = $paramValue;
+                $finalIblockFilter["SORT_1"] = $paramName;
+            }
+
             if($paramName == "SECTION_ID") {
                 $finalIblockFilter["INCLUDE_SUBSECTIONS"] = "Y";
             }
