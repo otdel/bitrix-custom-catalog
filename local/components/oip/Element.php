@@ -21,6 +21,8 @@ class Element
     private $name;
     /** @var string $active */
     private $active;
+    /** @var \DateTime|null $created */
+    private $created;
     /** @var string $activeFrom */
     private $activeFrom;
     /** @var string $activeFrom */
@@ -53,6 +55,8 @@ class Element
         $this->sort = $data["FIELDS"]["SORT"];
         $this->name = $data["FIELDS"]["NAME"];
         $this->active = $data["FIELDS"]["ACTIVE"];
+        $this->created = ($created = \DateTime::createFromFormat("d.m.Y H:i:s", $data["FIELDS"]["DATE_CREATE"]))
+            ? $created : null;
         $this->activeFrom = $data["FIELDS"]["ACTIVE_FROM"];
         $this->activeTo = $data["FIELDS"]["ACTIVE_TO"];
         $this->listUrl = $data["FIELDS"]["LIST_PAGE_URL"];
@@ -103,7 +107,7 @@ class Element
     {
         return $this->sectionId;
     }
-    
+
     /**
      * @return string
      */
@@ -142,6 +146,11 @@ class Element
     public function isActive()
     {
         return ($this->getActive() === "Y");
+    }
+
+    /** @return \DateTime|null */
+    public function getCreated() {
+        return $this->created;
     }
 
     /**
