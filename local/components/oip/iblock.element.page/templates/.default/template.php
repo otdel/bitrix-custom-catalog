@@ -1,21 +1,16 @@
 <?php
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
+include_once (__DIR__."/include/init.php");
+
 /** @var $this \CBitrixComponentTemplate */
 /** @var $component \COipIblockElementPage */
 /** @var $returnedData \Oip\Custom\Component\Iblock\ReturnedData */
-$component = $this->getComponent();
-$filterId = $component->getComponentId();
+/** @var $arrSort array */
+/** @var $arrFilterPure array */
+/** @var $arFilterTemplate array */
+
 ?>
-
-<?$arrFilter = $APPLICATION->IncludeComponent("oip:filter.processor","",[
-    "FILTER_ID" => $filterId,
-])?>
-
-<?$arFilterTemplate = $APPLICATION->IncludeComponent("oip:filter.processor","",[
-    "FILTER_ID" => $filterId,
-    "MODE" => "TEMPLATE"
-])?>
 
 <div class="uk-section uk-section-<?=$component->getParam("LIST_VIEW_WRAP_COLOR")?>
             uk-section-<?=$component->getParam("LIST_VIEW_WRAP_SIZE")?>
