@@ -10,6 +10,11 @@ use \Bitrix\Main\SystemException;
 use Oip\Custom\Component\Iblock\Element;
 use Oip\Custom\Component\Iblock\ReturnedData;
 
+use Oip\RelevantProducts\DataWrapper;
+use Oip\RelevantProducts\DBDataSource;
+use Oip\CacheInfo;
+use Oip\Util\Cache\BXCacheService;
+
 \CBitrixComponent::includeComponentClass("oip:iblock.element");
 
 class COipIblockElementList extends \COipIblockElement
@@ -101,12 +106,71 @@ class COipIblockElementList extends \COipIblockElement
         return $filter;
     }
 
+    /**
+     * @param string $sortParam
+     * @return array
+     * @throws Exception
+     */
+    protected function getRelevantSorterValue($sortParam) {
+
+        switch ($sortParam) {
+            case "Recommend": //по рекомендациям - лайки
+
+                global $DB;
+                $ds = new DBDataSource($DB, new CacheInfo(), new BXCacheService());
+                $dw = new DataWrapper($ds);
+
+                return array_map(function ($product) {
+                    return (int)$product->getId();
+                }, $dw->getMostLikedProducts());
+
+                break;
+
+            case "Rating": // по популярности - просмотры
+
+                global $DB;
+                $ds = new DBDataSource($DB, new CacheInfo(), new BXCacheService());
+                $dw = new DataWrapper($ds);
+
+                return array_map(function ($product) {
+                    return (int)$product->getId();
+                }, $dw->getMostViewedProducts());
+
+                break;
+        }
+
+        return [];
+    }
+    /**
+     * @param array $relevantSorter
+     * @return array
+     */
+    protected function mergeRelevantRestSorter($relevantSorter) {
+        $restSorter = [];
+
+        $dbRestSorter = \CIBlockElement::GetList(
+            ["sort" => "asc"],
+            ["!ID" => $relevantSorter],
+            false, false,
+            ["ID","IBLOCK_ID"]
+        );
+
+        while($rest = $dbRestSorter->GetNext()) {
+            $restSorter[] = (int)$rest["ID"];
+        }
+
+        return array_merge($relevantSorter, $restSorter);
+    }
+
     /** @return ReturnedData */
     protected function consistReturnedData() {
         return new ReturnedData($this->pagination, $this->componentId);
     }
 
-    /** @return self */
+    /**
+     * @return self
+     * @throws Exception
+     */
     protected function fetchCommonData()
     {
 
@@ -117,6 +181,19 @@ class COipIblockElementList extends \COipIblockElement
             $this->getParam("SORT_2") => $this->getParam("SORT_2")
         ];
         $filter = $this->consistFilter();
+
+        // если применена сортировка по релевантным признакам - добавить в сортировку и фильтр
+        // массив id товаров со строгим порядком следования
+
+        // сначала - получить массив id товаров, отсортированных по лайкам и просмотрам
+        if($relevantSorter = $this->getRelevantSorterValue($this->getParam("SORT_1"))) {
+
+            // затем - добавить все остальные товары, не вошедшие в сортировку по релевантности
+            $relevantSorter = $this->mergeRelevantRestSorter($relevantSorter);
+
+            $order = ["ID" => $relevantSorter];
+            $filter = array_merge($filter, ["ID" => $relevantSorter]);
+        }
 
         $group = false;
 
