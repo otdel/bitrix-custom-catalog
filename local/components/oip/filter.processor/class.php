@@ -130,7 +130,9 @@ class COipFilterProcessor extends \COipComponent
                 $finalIblockFilter["INCLUDE_SUBSECTIONS"] = "Y";
             }
 
-            $finalIblockFilter[$paramName] = $this->getIblockFilterParamValue($this->replaceRangeValueMode($paramName, $paramValue));
+            if($paramType != self::PARAM_TYPE_SORT) {
+                $finalIblockFilter[$paramName] = $this->getIblockFilterParamValue($this->replaceRangeValueMode($paramName, $paramValue));
+            }
         }
 
         return $finalIblockFilter;

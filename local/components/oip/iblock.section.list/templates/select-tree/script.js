@@ -1,20 +1,18 @@
-document.addEventListener("DOMContentLoaded",function() {
-
+$(function() {
     var
-        container = document.getElementById("oip-section-filter"),
-        filterId = container.getAttribute("data-filter-id");
+        ajaxFormContainer = $("#oip-ajax-filter-form-container"),
+        filterId = $("#oip-section-filter").data("filer-id");
 
     OIP.Store.init(filterId, "SECTION_ID");
 
-    container.addEventListener("change", function (event) {
+    ajaxFormContainer.on("change", "#oip-section-filter", function () {
         var
-            name = event.target.name,
-            value = event.target.value;
+            name = $(this).attr("name"),
+            value = $(this).val();
 
         if(value) {
             OIP.Store.setItem(name, value);
-        }
-        else {
+        } else {
             OIP.Store.unsetItem(name, value);
         }
 

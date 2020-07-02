@@ -2,8 +2,9 @@
 /** @var $component \COipIblockElementList */
 /** @var \Oip\Custom\Component\Iblock\Element $element */
 /** @var array $arFilterTemplate */
+/** @var array $tagsFilter */
 ?>
-<?if($component->getParam("TAGS_IBLOCK_ID")):?>
+<?if($component->getParam("TAGS_IBLOCK_ID") && $tagsFilter):?>
     <?$APPLICATION->IncludeComponent(
         "oip:iblock.element.list","tags-in-filter",
         [
@@ -12,7 +13,8 @@
             "IS_CACHE" => $component->getParam("IS_CACHE"),
             "CACHE_TIME" => $component->getParam("CACHE_TIME"),
             "FILTER_ID" => $filterId,
-            "FILTER_PARAMS" => $arFilterTemplate
+            "FILTER_PARAMS" => $arFilterTemplate,
+            "FILTER" =>  ["ID" => $tagsFilter]
         ]
     )?>
 <?endif?>

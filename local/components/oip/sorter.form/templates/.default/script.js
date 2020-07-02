@@ -1,62 +1,60 @@
-document.addEventListener("DOMContentLoaded",function() {
-
+$(function() {
     var
-        sortFilterId = parseInt(document.getElementById("sort-filter-id").value, 10),
-        sortItem = document.querySelectorAll(".oip-filter-sort-item"),
-        sortItemReset = document.getElementById("oip-filter-sort-reset");
+        ajaxContainer = $("#oip-ajax-container"),
+        sortFilterId = parseInt($("#sort-filter-id").val());
 
     OIP.Store.init(sortFilterId, "Rating");
     OIP.Store.init(sortFilterId, "Recommend");
     OIP.Store.init(sortFilterId, "created");
 
-    if(sortItem.length > 0) {
+    ajaxContainer.on("click", ".oip-filter-sort-item", function () {
+        var
+            self = $(this),
+            sortName = self.data("sort-name"),
+            paramName = "f" + sortFilterId + "_s"  + sortName;
 
-        OIP.Helpers.List.addEventListener(sortItem, "click", function () {
-            var
-                self = event.target,
-                sortName = self.getAttribute("data-sort-name"),
-                paramName = "f" + sortFilterId + "_s"  + sortName;
+        if(self.parent().hasClass("uk-active")) {
+            return;
+        }
 
-            for(var i = 0; i < sortItem.length; i++) {
-                sortItem[i].closest("li").classList.remove("uk-active");
-            }
-            self.closest("li").classList.add("uk-active");
-
-            switch(sortName) {
-                case "Rating":
-                    OIP.Store.unsetItem("f" + sortFilterId + "_sRecommend");
-                    OIP.Store.unsetItem("f" + sortFilterId + "_screated");
-                    break;
-
-                case "Recommend":
-                    OIP.Store.unsetItem("f" + sortFilterId + "_sRating");
-                    OIP.Store.unsetItem("f" + sortFilterId + "_screated");
-                    break;
-
-                case "created":
-                    OIP.Store.unsetItem("f" + sortFilterId + "_sRating");
-                    OIP.Store.unsetItem("f" + sortFilterId + "_sRecommend");
-                    break;
-            }
-
-            // на сайте сейчас направление сортировки не подразумевает asc
-            OIP.Store.setItem(paramName, "desc");
-            OIP.Filter.apply(sortFilterId);
+        $(".oip-filter-sort-item").each(function () {
+            $(this).removeClass("uk-active");
         });
-    }
 
-    if(sortItemReset) {
-        sortItemReset.addEventListener("click", function () {
+        self.closest("li").addClass("uk-active");
 
-            OIP.Store.unsetItem("f" + sortFilterId + "_sRating");
-            OIP.Store.unsetItem("f" + sortFilterId + "_sRecommend");
-            OIP.Store.unsetItem("f" + sortFilterId + "_screated");
+        switch(sortName) {
+            case "Rating":
+                OIP.Store.unsetItem("f" + sortFilterId + "_sRecommend");
+                OIP.Store.unsetItem("f" + sortFilterId + "_screated");
+                break;
 
-            for(var i = 0; i < sortItem.length; i++) {
-                sortItem[i].closest("li").classList.remove("uk-active");
-            }
+            case "Recommend":
+                OIP.Store.unsetItem("f" + sortFilterId + "_sRating");
+                OIP.Store.unsetItem("f" + sortFilterId + "_screated");
+                break;
 
-            OIP.Filter.apply(sortFilterId);
-        })
-    }
+            case "created":
+                OIP.Store.unsetItem("f" + sortFilterId + "_sRating");
+                OIP.Store.unsetItem("f" + sortFilterId + "_sRecommend");
+                break;
+        }
+
+        // на сайте сейчас направление сортировки не подразумевает asc
+        OIP.Store.setItem(paramName, "desc");
+        OIP.Filter.apply(sortFilterId);
+    });
+
+    ajaxContainer.on("click", "#oip-filter-sort-reset", function () {
+
+        OIP.Store.unsetItem("f" + sortFilterId + "_sRating");
+        OIP.Store.unsetItem("f" + sortFilterId + "_sRecommend");
+        OIP.Store.unsetItem("f" + sortFilterId + "_screated");
+
+        $(".oip-filter-sort-item").each(function () {
+            $(this).removeClass("uk-active");
+        });
+
+        OIP.Filter.apply(sortFilterId);
+    });
 });

@@ -1,58 +1,53 @@
-document.addEventListener("DOMContentLoaded",function() {
-
+$(function() {
     var
-        filterId = document.getElementById("data-filter-id").value,
-        brandItem = document.querySelectorAll(".oip-filter-brand-item"),
-        brandsFilterApply = document.getElementById("oip-filter-brands-apply"),
-        brandsFilterReset = document.getElementById("oip-filter-brands-reset"),
-        brandSelectHandler = function (event) {
-
-            var
-                self = event.target,
-                paramName = OIP.Filter.getCheckboxName(self.name),
-                paramValue = OIP.Filter.getCheckboxValue(self.name),
-                paramChecked = self.checked;
-
-
-            if(paramChecked) {
-                OIP.Store.setItem(paramName, paramValue, true);
-                self.closest("li").classList.add("uk-active");
-            }
-            else {
-                OIP.Store.unsetItem(paramName, paramValue, true);
-                self.closest("li").classList.remove("uk-active");
-            }
-        };
+        filterId = $("#data-filter-id"),
+        ajaxContainer = $("#oip-ajax-container");
 
     OIP.Store.init(filterId, "BRANDS");
 
-    if(brandItem.length > 0) {
-        OIP.Helpers.List.addEventListener(brandItem,"click", brandSelectHandler);
-    }
+    ajaxContainer.on("click", ".oip-filter-brand-item", function() {
+        var
+            self = $(this),
+            paramName = OIP.Filter.getCheckboxName(self.attr("name")),
+            paramValue = OIP.Filter.getCheckboxValue(self.attr("name")),
+            paramChecked = self.attr("checked");
 
-    brandsFilterApply.addEventListener("click",function (event) {
-        OIP.Filter.apply(event.target.getAttribute("data-filter-id"));
+
+        if(paramChecked) {
+            OIP.Store.setItem(paramName, paramValue, true);
+            self.closest("li").addClass("uk-active");
+        }
+        else {
+            OIP.Store.unsetItem(paramName, paramValue, true);
+            self.closest("li").removeClass("uk-active");
+        }
     });
 
-    if(brandsFilterReset) {
-        brandsFilterReset.addEventListener("click", function () {
+    ajaxContainer.on("click", "#oip-filter-brands-apply", function () {
+        var self = $(this);
+
+        OIP.Filter.apply(self.data("filter-id"));
+    });
+
+    ajaxContainer.on("click", "#oip-filter-brands-reset", function () {
+        var
+            self = $(this),
+            container =  $("#oip-filter-brands-container"),
+            items = container.find(".oip-filter-brand-item");
+
+        items.each(function(key, item) {
             var
-                container =  document.getElementById("oip-filter-brands-container"),
-                items = container.getElementsByClassName("oip-filter-brand-item");
+                current = $(item),
+                paramName = OIP.Filter.getCheckboxName(current.attr("name")),
+                paramValue = OIP.Filter.getCheckboxValue(current.attr("name"));
 
-            OIP.Helpers.List.each(items, function (listItem) {
-                var
-                    paramName = OIP.Filter.getCheckboxName(listItem.name),
-                    paramValue = OIP.Filter.getCheckboxValue(listItem.name);
+            current.prop("checked", false);
+            current.closest("li").removeClass("uk-active");
 
-                listItem.checked = false;
-                listItem.closest("li").classList.remove("uk-active");
-
-                OIP.Store.unsetItem(paramName, paramValue, true);
-            });
-
-            this.classList.add("uk-invisible");
-            OIP.Filter.apply(this.getAttribute("data-filter-id"));
+            OIP.Store.unsetItem(paramName, paramValue, true);
         });
-    }
+
+        self.addClass("uk-invisible");
+        OIP.Filter.apply(self.data("filter-id"));
+    });
 });

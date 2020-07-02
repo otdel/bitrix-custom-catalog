@@ -25,6 +25,34 @@ if($selectedCount == 1) {
 }
 ?>
 
+<style>
+    .oip-filter-brands-container.uk-nav > li >  a {
+        color: #999;
+    }
+    .oip-filter-brands-container.uk-nav > li >  a:hover,
+    .oip-filter-brands-container.uk-nav > li >  a:focus
+    {
+        color: #666;
+    }
+    .oip-filter-brands-container.uk-nav .uk-checkbox {
+       background-color: transparent;
+        border: 1px solid #ccc;
+    }
+    .oip-filter-brands-container.uk-nav .uk-checkbox:focus {
+        outline: 0;
+        border-color: #1e87f0;
+    }
+
+    .oip-filter-brands-container.uk-nav .uk-checkbox:checked {
+        background-color: #1e87f0;
+        border-color: transparent;
+    }
+
+    .oip-filter-brands-container.uk-nav .uk-checkbox:checked:focus {
+        background-color: #0e6dcd;
+    }
+</style>
+
 <?if($exception):?>
     <p><?=$exception?></p>
 <?else:?>
@@ -35,7 +63,7 @@ if($selectedCount == 1) {
         <?endforeach?>
     <?endif?>
 
-    <input type="hidden" name="data-filter-id" id="data-filter-id" value="<?=$filterId?>">
+    <input type="hidden" name="data-form-filter-id" id="data-form-filter-id" value="<?=$filterId?>">
 
     <?if($elements):?>
         <div class="uk-inline">
@@ -54,7 +82,7 @@ if($selectedCount == 1) {
 
             <div uk-dropdown="mode: click">
                 <form>
-                    <ul class="uk-nav uk-dropdown-nav" id="oip-filter-brands-container">
+                    <ul class="uk-nav uk-dropdown-nav oip-filter-brands-container" id="oip-filter-brands-container">
                          <?foreach($elements as $element):?>
 
                             <?

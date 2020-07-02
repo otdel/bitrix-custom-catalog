@@ -15,6 +15,10 @@ class COipFilterForm extends \COipComponent {
             throw new ArgumentNullException("FILTER_ID");
         }
 
+        if(!is_set($arParams["IBLOCK_ID"])) {
+            throw new ArgumentNullException("IBLOCK_ID");
+        }
+
         $this->setDefaultParam($arParams["SOURCE"],"get");
         $this->setDefaultParam($arParams["MODE"],"iblock");
 

@@ -3,9 +3,10 @@
 /** @var \Oip\Custom\Component\Iblock\Element $element */
 /** @var int $filterId */
 /** @var array $arFilterTemplate */
+/** @var array $brandsFilter */
 ?>
 
-<?if($component->getParam("BRANDS_IBLOCK_ID")):?>
+<?if($component->getParam("BRANDS_IBLOCK_ID") && $brandsFilter):?>
     <?$APPLICATION->IncludeComponent(
         "oip:iblock.element.list","brands-in-filter",
         [
@@ -14,7 +15,8 @@
             "IS_CACHE" => $component->getParam("IS_CACHE"),
             "CACHE_TIME" => $component->getParam("CACHE_TIME"),
             "FILTER_ID" => $filterId,
-            "FILTER_PARAMS" => $arFilterTemplate
+            "FILTER_PARAMS" => $arFilterTemplate,
+            "FILTER" =>  ["ID" => $brandsFilter]
         ]
     )?>
 <?endif?>

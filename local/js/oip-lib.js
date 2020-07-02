@@ -1,10 +1,16 @@
 var OIP  = (function () {
 
-
+    const oipCatalogFilterName = "oipCatalogFilter";
+    const sessionMode = true;
+    const ajaxMode = true;
 /* ---------------------------------------------------------------------------------------- */
     var
         data = {},
 
+/* ---------------------------------------------------------------------------------------- */
+        isAjaxMode = function() {
+            return ajaxMode || sessionMode;
+        },
 /* ---------------------------------------------------------------------------------------- */
         objectIsEmpty = function(object) {
             return (JSON.stringify(object) == "{}") ? true : false;
@@ -44,23 +50,71 @@ var OIP  = (function () {
             return arParams = string.split("_")[2];
         },
 
-        applyFilter = function(filterId) {
+        applyFilter = function(filterId, page = null) {
 
             if(filterId) {
 
                 var
                     url = location.pathname;
                     store = getStore(),
-                    params = getGetParams(),
+                    params = getParams(),
                     concat = mergeParams(store, params, filterId),
                     newSearch = encodeGetParams(concat),
                     redirect = (newSearch) ? url+"?"+newSearch : url;
 
+                    if(page) {
+                        redirect = (newSearch) ? url + "?" + newSearch + "&page_" + filterId + "=" + page
+                            : url + "?page_" + filterId + "=" + page;
+                    }
 
-                location.replace(redirect);
+                if(ajaxMode || sessionMode) {
+                    sessionStorage.setItem(oipCatalogFilterName, (newSearch) ? newSearch : "");
+
+                    if(ajaxMode) {
+                        applyXhrFilter(redirect);
+                    }
+                    else {
+                        location.replace(redirect);
+                    }
+                }
+                else {
+                    location.replace(redirect);
+                }
             }
 
             return false;
+        },
+
+        applyXhrFilter = function(redirect) {
+            xhr = new XMLHttpRequest();
+
+            xhr.open("GET", redirect);
+            xhr.responseType = "document";
+            xhr.send();
+
+            document.getElementById("oip-ajax-loader").classList.add("active");
+            document.getElementById("oip-ajax-form-loader").classList.add("active");
+
+            xhr.onload = function() {
+                var
+                    oldContent = document.getElementById("oip-ajax-inner"),
+                    newContent = xhr.response.getElementById("oip-ajax-inner"),
+                    ajaxContainer = document.getElementById("oip-ajax-container"),
+
+                    oldFilterForm = document.getElementById("oip-ajax-filter-form-inner"),
+                    newFilterForm = xhr.response.getElementById("oip-ajax-filter-form-inner"),
+                    ajaxFilterFormContainer = document.getElementById("oip-ajax-filter-form-container");
+
+                ajaxContainer.replaceChild(newContent, oldContent);
+                ajaxFilterFormContainer.replaceChild(newFilterForm, oldFilterForm);
+
+                document.getElementById("oip-ajax-loader").classList.remove("active");
+                document.getElementById("oip-ajax-form-loader").classList.remove("active");
+            }
+
+        //  @todo возможно, стоит перенести вставку результирующей верстки в вызывающие данный метод скрипты
+        // @todo если встанет задача сделать ajax-подгрузку в несколько независимых блоков на странице, начать стоит с этого
+
         },
 
 /* ---------------------------------------------------------------------------------------- */
@@ -68,8 +122,12 @@ var OIP  = (function () {
         initStore = function(filterId, paramNames = null) {
             if(!filterId) return false;
 
+            if(ajaxMode || sessionMode) {
+                sessionStorage.setItem(oipCatalogFilterName, "");
+            }
+
             var
-                params = getGetParams(),
+                params = getParams(),
                 initAction = function(name, value) {
                     values = value.split(",");
                     for (var i = 0; i < values.length; i++) {
@@ -166,6 +224,15 @@ var OIP  = (function () {
         }
 /* ---------------------------------------------------------------------------------------- */
 
+        getParams = function() {
+           if(ajaxMode || sessionMode) {
+               return getSessionParams();
+           }
+           else {
+               return getGetParams();
+           }
+        },
+
         getGetParams = function () {
 
            var search = window.location.search;
@@ -187,6 +254,26 @@ var OIP  = (function () {
                   );
                 }
            },
+
+        getSessionParams = function() {
+            if(!sessionStorage.getItem(oipCatalogFilterName)) {
+                return {};
+            }
+
+            var
+                sesStorage = sessionStorage.getItem(oipCatalogFilterName);
+
+            return sesStorage
+                .split('&')
+                .reduce(
+                    function(p,e) {
+                        var a = e.split('=');
+                        p[ decodeURIComponent(a[0])] = decodeURIComponent(a[1]);
+                        return p;
+                    },
+                    {}
+                );
+        },
 
         mergeParams = function (store, getParams, filterId) {
 
@@ -279,7 +366,9 @@ var OIP  = (function () {
         ;
 /* -------------------------------------------------------------------------------------- */
      return {
-
+        State: {
+            isAjaxMode: isAjaxMode
+        },
         Helpers: {
             Object: {
                 isEmpty: objectIsEmpty

@@ -1,73 +1,68 @@
-document.addEventListener("DOMContentLoaded",function() {
+$(function() {
 
     var
-        oipFilterApply = document.getElementById("oip-filter-apply"),
-        oipFilterForm = document.querySelectorAll(".oip-filter-form"),
-        filterId = oipFilterApply.getAttribute("data-filter-id"),
-        oipFilterSimpleItem = document.querySelectorAll(".oip-filter-simple-item"),
-        filterReset = document.getElementById("oip-filter-reset")
-    ;
+        ajaxFormContainer = $("#oip-ajax-filter-form-container"),
+        filterId = $("#oip-filter-apply").data("filter-id");
 
-    OIP.Store.init(filterId, "NAME");
+     OIP.Store.init(filterId, "NAME");
 
-    oipFilterApply.addEventListener("click",function (event) {
+    ajaxFormContainer.on("click", "#oip-filter-apply", function () {
+        var
+            target = $(this),
+            filterId = target.data("filter-id");
 
-        var filterId = event.target.getAttribute("data-filter-id");
+        $(".oip-filter-simple-item").each(function (key, element) {
 
-        if(oipFilterSimpleItem.length > 0) {
-            OIP.Helpers.List.each(oipFilterSimpleItem, function (element) {
+            var
+                element = $(element),
+                elementFilterId = element.data("filter-id");
 
-                var elementFilterId = element.getAttribute("data-filter-id");
+            if(elementFilterId == filterId) {
 
-                if(elementFilterId == filterId) {
-
-                    if(element.value) {
-                        OIP.Store.setItem(element.name, element.value, false);
-                    }
-                    else {
-                        OIP.Store.unsetItem(element.name, element.value, false);
-                    }
-
+                if(element.val()) {
+                    OIP.Store.setItem(element.attr("name"), element.val(), false);
                 }
-            })
-        }
+                else {
+                    OIP.Store.unsetItem(element.attr("name"), element.val(), false);
+                }
+
+            }
+        });
 
         OIP.Filter.apply(filterId);
     });
 
-    if(filterReset) {
-        filterReset.addEventListener("click", function () {
-            OIP.Store.unsetFilter(filterId);
+    ajaxFormContainer.on("click", "#oip-filter-reset", function() {
+        OIP.Store.unsetFilter(filterId);
 
-            this.classList.add("uk-invisible");
-            OIP.Filter.apply(this.getAttribute("data-filter-id"));
-        });
-    }
+        $(this).addClass("uk-invisible");
+        OIP.Filter.apply($(this).data("filter-id"));
+    });
 
-    OIP.Helpers.List.addEventListener(oipFilterForm, "submit", function (event) {
+    ajaxFormContainer.on("submit", ".oip-filter-form", function (event) {
         event.preventDefault();
     });
 
-    OIP.Helpers.List.addEventListener(oipFilterSimpleItem, "keyup", function (event) {
-
+    ajaxFormContainer.on("keyup", ".oip-filter-simple-item", function (event) {
         if(event.code === "Enter") {
 
             var
-                elementFilterId = event.target.getAttribute("data-filter-id");
+                target = $(this),
+                elementFilterId = target.data("filter-id");
 
             if(elementFilterId == filterId) {
 
-                if(event.target.value) {
-                    OIP.Store.setItem(event.target.name, event.target.value, false);
+                if(target.val()) {
+                    OIP.Store.setItem(target.attr("name"),target.val(), false);
                 }
                 else {
-                    OIP.Store.unsetItem(event.target.name, event.target .value, false);
+                    OIP.Store.unsetItem(target.attr("name"), target.val(), false);
                 }
 
             }
 
             OIP.Filter.apply(filterId);
         }
-
     });
+
 });

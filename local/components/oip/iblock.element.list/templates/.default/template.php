@@ -129,6 +129,10 @@ $sectionName = $arResult["SECTION_NAME"];
                                     "PRODUCT_ID" => $element->getId()
                                 ]);?>
 
+                                <?$APPLICATION->IncludeComponent("oip:relevant.products.views.product.count","",[
+                                    "PRODUCT_ID" => $element->getId()
+                                ]);?>
+
                             <?endif?>
 
                         </div>
