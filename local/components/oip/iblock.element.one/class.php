@@ -74,6 +74,8 @@ class COipIblockElementOne extends COipIblockElementList {
            unset($filter["SECTION_ID"]);
         }
 
+        unset($filter["!PROPERTY_" . $this->getParam("QUANTITY_PROP")]);
+
         return $filter;
     }
 

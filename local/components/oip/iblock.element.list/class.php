@@ -78,6 +78,9 @@ class COipIblockElementList extends \COipIblockElement
 
         $this->setDefaultParam($arParams["FILTER"],[]);
         $this->setDefaultBooleanParam($arParams["SHOW_ALL"]);
+        $this->setDefaultBooleanParam($arParams["SHOW_ZERO_QUANTITY"]);
+        $this->setDefaultParam($arParams["QUANTITY_PROP"],"");
+
 
         return $arParams;
     }
@@ -97,6 +100,10 @@ class COipIblockElementList extends \COipIblockElement
 
         if ($this->arParams["SHOW_INACTIVE"] !== "Y") {
             $filter["ACTIVE"] = "Y";
+        }
+
+        if(!$this->isParam("SHOW_ZERO_QUANTITY") && $this->getParam("QUANTITY_PROP")) {
+            $filter["!PROPERTY_" . $this->getParam("QUANTITY_PROP")] = false;
         }
 
         if(!empty($this->arParams["FILTER"])) {
