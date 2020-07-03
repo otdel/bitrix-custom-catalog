@@ -13,6 +13,8 @@ $exception = $arResult["EXCEPTION"];
 $errors = $arResult["ERRORS"];
 $elements = $arResult["ELEMENTS"];
 $sectionName = $arResult["SECTION_NAME"];
+
+$quantityProp = $component->getParam("QUANTITY_PROP");
 ?>
 
 <?if($exception):?>
@@ -78,7 +80,9 @@ $sectionName = $arResult["SECTION_NAME"];
         >
 
             <?foreach($elements as $element):?>
-
+                <?
+                    $quantity = ($quantityProp) ?  (int)$element->getPropValue($quantityProp) : null;
+                ?>
                 <li>
                     <a class="uk-link-reset uk-display-block uk-position-relative" href="<?=$element->getDetailUrl()?>">
 
@@ -117,13 +121,18 @@ $sectionName = $arResult["SECTION_NAME"];
 
                                 <?include(__DIR__."/include/body.php")?>
 
-                            <?$APPLICATION->IncludeComponent("oip:social.store.cart.button","",[
-                                    "PRODUCT_ID" => $element->getId(),
-                                    "BUTTON_TEXT_ADD" => "В корзину",
-                                    "BUTTON_TEXT_REMOVE" => "В корзине",
-                                    "BUTTON_ICON_ADD" => "cart",
-                                    "BUTTON_ICON_REMOVE" => "close"
-                            ])?>
+                            <?if($quantityProp && !$quantity):?>
+                                <button class="uk-button uk-disabled">Недоступен к заказу</button>
+                                <?// скрываем кнопку при заданном свойстве колиечества товара и 0-вом значении свойства?>
+                           <?else:?>
+                                <?$APPLICATION->IncludeComponent("oip:social.store.cart.button","",[
+                                        "PRODUCT_ID" => $element->getId(),
+                                        "BUTTON_TEXT_ADD" => "В корзину",
+                                        "BUTTON_TEXT_REMOVE" => "В корзине",
+                                        "BUTTON_ICON_ADD" => "cart",
+                                        "BUTTON_ICON_REMOVE" => "close"
+                                ])?>
+                            <?endif?>
 
                                 <?$APPLICATION->IncludeComponent("oip:relevant.products.likes.product.widget","",[
                                     "PRODUCT_ID" => $element->getId()

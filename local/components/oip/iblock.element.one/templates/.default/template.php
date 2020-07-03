@@ -10,6 +10,9 @@ $exception = $arResult["EXCEPTION"];
 $errors = $arResult["ERRORS"];
 $element = $arResult["ELEMENT"];
 $component = $this->getComponent();
+
+$quantityProp = $component->getParam("QUANTITY_PROP");
+$quantity = ($quantityProp) ?  (int)$element->getPropValue($quantityProp) : null;
 ?>
 
 <div class="uk-section uk-section-default">
@@ -58,6 +61,10 @@ $component = $this->getComponent();
                                 </p>
                             <?endif?>
 
+                            <?if(!is_null($quantity)):?>
+                                <p>Количество: <?=$quantity?></p>
+                            <?endif?>
+
                             <p class="uk-margin-medium-top uk-text-large uk-text-nowrap price-detail">15 555&nbsp;₽</p>
                             <?$APPLICATION->IncludeComponent("oip:product_features","", [
                                     "IBLOCK_ID" => (int)$element->getIblockId(),
@@ -69,13 +76,19 @@ $component = $this->getComponent();
                             </p>
 
                             <div class="uk-grid-small uk-child-width-auto uk-flex-middle" uk-grid>
-                                <div>
-                                    <?$APPLICATION->IncludeComponent("oip:social.store.cart.button","",[
-                                        "PRODUCT_ID" => $element->getId(),
-                                        "BUTTON_ICON_ADD" => "cart",
-                                        "BUTTON_ICON_REMOVE" => "close"
-                                    ])?>
-                                </div>
+                               <?if($quantityProp && !$quantity):?>
+                                    <button class="uk-button uk-disabled">Недоступен к заказу</button>
+                                    <?// скрываем кнопку при заданном свойстве колиечества товара и 0-вом значении свойства?>
+                               <?else:?>
+                                    <?// показываем корзину при ненулевом количестве или в режиме без количества ?>
+                                   <div>
+                                       <?$APPLICATION->IncludeComponent("oip:social.store.cart.button","",[
+                                           "PRODUCT_ID" => $element->getId(),
+                                           "BUTTON_ICON_ADD" => "cart",
+                                           "BUTTON_ICON_REMOVE" => "close"
+                                       ])?>
+                                   </div>
+                               <?endif?>
                                 <div>
                                     <?$APPLICATION->IncludeComponent("oip:relevant.products.likes.product.widget","",[
                                         "PRODUCT_ID" => $element->getId()
