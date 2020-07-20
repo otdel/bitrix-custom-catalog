@@ -47,4 +47,3 @@ if (!isset($productInfo)) {
 
     <?endforeach;?>
 </table>
-

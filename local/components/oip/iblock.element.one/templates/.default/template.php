@@ -15,6 +15,14 @@ $quantityProp = $component->getParam("QUANTITY_PROP");
 $quantity = ($quantityProp) ?  (int)$element->getPropValue($quantityProp) : null;
 ?>
 
+$WAREID = null;
+$COLOR = null;
+$res = CIBlockElement::GetProperty($element->getIblockId(), $element->getId(), "sort", "asc", array("CODE" => "WARE_ID"));
+if ($ob = $res->GetNext()) {
+    $WAREID = $ob['VALUE'];
+}
+
+?>
 <div class="uk-section uk-section-default">
 
     <div class="uk-container uk-container-large">
@@ -100,7 +108,7 @@ $quantity = ($quantityProp) ?  (int)$element->getPropValue($quantityProp) : null
                                     ]);?>
                                 </div>
                             </div>
-
+                            
                             <?include_once (__DIR__."/include/bottom.php")?>
 
                             <?include_once (__DIR__."/include/tags.php")?>
@@ -109,6 +117,15 @@ $quantity = ($quantityProp) ?  (int)$element->getPropValue($quantityProp) : null
                     </div>
 
                 </div>
+
+                <div 
+                    id="react-product-properties" 
+                    data-productid="<?=$element->getId()?>" 
+                    data-iblockid="<?=$element->getIblockId()?>"
+                    data-wareid="<?=$WAREID?>"
+                >
+                </div>
+
 
                 <div class="uk-margin-large-top">
                     <?=$element->getDetailText()?>

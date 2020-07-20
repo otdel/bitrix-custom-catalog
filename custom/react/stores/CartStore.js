@@ -11,7 +11,13 @@ class CartStore {
     @observable stateAdding = "pending";    // "pending" / "done" / "error"
     @observable msg = "";
     @observable userId = undefined;
+    @observable productIdByFilter = null;   // устанавливаем ID товара при выборе схлопнутого товара в деталке
 
+    @action.bound
+    setProductIdByFilter(productId) {
+        this.productIdByFilter = productId;
+        console.log(this.productIdByFilter)
+    }
     @computed get count() {
         return this.productsInCart.length;
     }
@@ -43,6 +49,9 @@ class CartStore {
     @action.bound
     async addToCart(productId) {
         this.stateAdding = "pending"
+        if (this.productIdByFilter !== null) {
+            productId = this.productIdByFilter
+        }
         try {
             const response = await this.fetchAddToCart(productId);
             runInAction(() => {

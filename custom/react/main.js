@@ -4,13 +4,13 @@ import { Provider } from 'mobx-react';
 require('es6-object-assign').polyfill(); // для IE11
 
 import cartStore from './stores/CartStore';
-import catalogStore from './stores/CatalogStore';
 import likeStore from './stores/LikeStore';
+import productStore from './stores/ProductStore';
 
 const stores = {
   cartStore,
-  catalogStore,
   likeStore,
+  productStore,
 };
 
 // For easier debugging
@@ -29,15 +29,7 @@ if(document.getElementById("react-counter-widget")) {
   </Provider>, document.querySelector("#react-counter-widget"));
 }
 
-if(document.getElementById("mobx-example")) {
-  const Catalog = require('./components/Catalog').default;
-  ReactDOM.render(
-    <Provider {...stores}>
-      <Catalog />
-    </Provider>
-    , document.querySelector("#mobx-example")
-  );
-}
+
 
 if(document.getElementById("react-cart")) {
   const Cart = require('./components/Cart').default;
@@ -82,4 +74,21 @@ if(document.getElementsByClassName("react-like-button").length) {
       , button
     );
   });
+}
+
+// Добавляем схлопнутые характеристики товара 
+if(document.getElementById("react-product-properties")) {
+  const el = document.getElementById("react-product-properties");
+  const userId = document.getElementById("shopuserid").getAttribute("data-userid");
+  const productId = el.getAttribute("data-productid");
+  const iblockId = el.getAttribute("data-iblockid");
+  const wareId = el.getAttribute("data-wareid");
+  const ProductProperties = require('./components/ProductProperties').default;
+
+  ReactDOM.render(
+    <Provider {...stores}>
+      <ProductProperties userId={userId} productId={productId} iblockId={iblockId} wareId={wareId} />
+    </Provider>
+    , document.querySelector("#react-product-properties")
+  );
 }
