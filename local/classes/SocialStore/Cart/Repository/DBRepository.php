@@ -15,6 +15,8 @@ use Oip\SocialStore\Cart\Exception\ItemsDontExist;
 use Oip\SocialStore\Cart\Exception\ItemDuplicates;
 
 use Oip\Util\Bitrix\Iblock\ElementPath\Helper as ElementPath;
+use Bitrix\Main\Loader;
+use \CIBlockElement;
 
 class DBRepository implements RepositoryInterface
 {
@@ -39,6 +41,7 @@ class DBRepository implements RepositoryInterface
      * @throws Main\Db\SqlQueryException
      * @throws NonUniqueIdCreatingException
      * @throws InvalidSubclassException
+     * @throws Main\LoaderException
      */
     public function getByUserId($userId): Entity\ProductCollection
     {
@@ -46,12 +49,19 @@ class DBRepository implements RepositoryInterface
         $products = [];
         $sql = self::getByUserIdSql($userId);
 
-        foreach($this->db->query($sql)->fetchAll() as $product) {
+        $arProducts = $this->db->query($sql)->fetchAll();
+        $productIds = array_map(function ($product) {
+            return (int)$product["product_id"];
+        }, $arProducts);
+        $productProps = $this->getBXProductProps($productIds);
+
+        foreach($arProducts as $product) {
             $productName = (!is_null($product["name"])) ? $product["name"] : "deleted";
             $productPicture = (!is_null($product["name"])) ? self::getFileStoreRoot().$product["picture"] : null;
 
             $products[] = new Entity\Product(
-                (int)$product["product_id"],
+                $id = (int)$product["product_id"],
+                $productProps[$id]["article"],
                 $productName,
                 $product["code"],
                 $productPicture,
@@ -176,5 +186,31 @@ class DBRepository implements RepositoryInterface
 
     private static function getFileStoreRoot() {
         return "/upload/";
+    }
+
+    /**
+     * @param array $productIDs
+     * @return array
+     * @throws Main\LoaderException
+     */
+    private function getBXProductProps($productIDs) {
+
+        Loader::includeModule("iblock");
+
+        $props = [];
+
+        $dbRes = CIBlockElement::GetList(
+            [],
+            ["IBLOCK_ID" => $this->pathHelper->getIblockId(),"ID" => $productIDs],
+            false,
+            false,
+            ["ID","IBLOCK_ID","PROPERTY_ARTICLE"]
+        );
+
+        while($product = $dbRes->GetNext()) {
+            $props[(int)$product["ID"]]["article"] = $product["PROPERTY_ARTICLE_VALUE"];
+        }
+
+        return $props;
     }
 }

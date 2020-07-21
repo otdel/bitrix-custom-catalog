@@ -17,9 +17,12 @@ class Product
     private $description;
     /** @var string|null $link */
     private $link;
+    /** @var string $article */
+    private $article;
 
     /**
      * @param int $id
+     * @param string $article
      * @param string|null $name
      * @param string|null $code
      * @param string|null $picture
@@ -28,6 +31,7 @@ class Product
      */
     public function __construct(
         int $id,
+        string $article,
         ?string $name = null,
         ?string $code = null,
         ?string $picture = null,
@@ -35,6 +39,7 @@ class Product
         ?string $link = null)
     {
         $this->id = $id;
+        $this->article = $article;
         $this->name = $name;
         $this->code = $code;
         $this->picture = $picture;
@@ -90,7 +95,11 @@ class Product
         return $this->link;
     }
 
-
-
-
+    /**
+     * @return string
+     */
+    public function getArticle(): string
+    {
+        return $this->article;
+    }
 }

@@ -101,4 +101,12 @@ class Helper
         return (string)$this->db->query("SELECT LIST_PAGE_URL FROM b_iblock WHERE ID = $id")
             ->fetch()["LIST_PAGE_URL"];
     }
+
+    /**
+     * @return int
+     */
+    public function getIblockId(): int
+    {
+        return $this->iblockId;
+    }
 }
