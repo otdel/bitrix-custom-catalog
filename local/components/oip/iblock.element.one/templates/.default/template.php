@@ -13,7 +13,6 @@ $component = $this->getComponent();
 
 $quantityProp = $component->getParam("QUANTITY_PROP");
 $quantity = ($quantityProp) ?  (int)$element->getPropValue($quantityProp) : null;
-?>
 
 $WAREID = null;
 $COLOR = null;
