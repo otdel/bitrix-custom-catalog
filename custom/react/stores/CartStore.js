@@ -109,6 +109,9 @@ class CartStore {
     @action
     async removeProduct(product) {
         this.stateRemove = "pending"
+        if (this.productIdByFilter !== null) {
+            product.id = this.productIdByFilter
+        }
         try {
             const response = await this.fetchRemoveProduct(product.id);
             runInAction(() => {
