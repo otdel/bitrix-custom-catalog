@@ -42,7 +42,7 @@ export default class extends React.Component {
     const filter = {...this.state.filter, ...curSelectCondition}
 
     this.setState({filter: filter})
-
+    console.log(filter)
     this.filterData(filter)
   }
 
@@ -74,24 +74,26 @@ export default class extends React.Component {
     Object.entries(data.values).map((value, i) => {
       let id = value[0];
       let deepValues = value[1].values; // перечень свойств каждого товара
-      let pass = true;
+      let arIsFitCondition = []; // сюда записываются результаты соответствия параметрам пользователя
 
         Object.entries(deepValues).map((deepValue, i) => {
           let key = deepValue[1].featureCode // ключ - код свойства, например, kitchenModelName
           // записываем название свойства для пользователя и его значение в формате имя&значение, добавляем в Set
-          Object.entries(filter).map((filterParam) => {
+          Object.entries(filter).map((filterParam) => { // проходим по каждому кастомному свойству и сравниваем с условиями юзера
             if (key === filterParam[0]) {
-              if (deepValue[1].featureValue === filterParam[1]) {
-                pass = true
+              if (deepValue[1].featureValue === filterParam[1]) { 
+                arIsFitCondition.push(true)
               } else {
-                pass = false
+                arIsFitCondition.push(false)
               }
             }
           })
         })
 
-        if (pass) {
+        const isEveryTrue = (currentValue) => currentValue === true;
+        if (arIsFitCondition.every(isEveryTrue)) {
           filteredData.push(deepValues)
+          //console.log(deepValues)
           productIds.push(id)
         }
     })
@@ -143,7 +145,7 @@ export default class extends React.Component {
             let key = deepValue[1].featureCode // ключ - код свойства, например, kitchenModelName
             // записываем название свойства для пользователя и его значение в формате имя&значение, добавляем в Set
             if (key === "outerHoleDiameter") { // TODO: для теста функционала
-              deepValue[1].featureValue = Math.floor(Math.random() * Math.floor(1500)).toString();
+              //deepValue[1].featureValue = Math.floor(Math.random() * Math.floor(1500)).toString();
             }
             displayData[key].add(`${deepValue[1].featureName}&${deepValue[1].featureValue}`) 
 
