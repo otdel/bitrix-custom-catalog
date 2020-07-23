@@ -61,7 +61,7 @@ class DBRepository implements RepositoryInterface
 
             $products[] = new Entity\Product(
                 $id = (int)$product["product_id"],
-                $productProps[$id]["article"],
+                $productProps[$id]["article"] ?? "",
                 $productName,
                 $product["code"],
                 $productPicture,
