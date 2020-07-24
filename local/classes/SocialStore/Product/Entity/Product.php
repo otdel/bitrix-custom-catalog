@@ -20,6 +20,9 @@ class Product
     /** @var string $article */
     private $article;
 
+    /** @var float|null $price */
+    private $price;
+
     /**
      * @param int $id
      * @param string $article
@@ -28,6 +31,7 @@ class Product
      * @param string|null $picture
      * @param string|null $description
      * @param string|null $link
+     * @param float|null $price
      */
     public function __construct(
         int $id,
@@ -36,7 +40,8 @@ class Product
         ?string $code = null,
         ?string $picture = null,
         ?string $description = null,
-        ?string $link = null)
+        ?string $link = null,
+        ?float $price = null)
     {
         $this->id = $id;
         $this->article = $article;
@@ -45,6 +50,7 @@ class Product
         $this->picture = $picture;
         $this->description = $description;
         $this->link = $link;
+        $this->price = $price;
     }
 
     /**
@@ -102,4 +108,22 @@ class Product
     {
         return $this->article;
     }
+
+    /**
+     * @return float|null
+     */
+    public function getPrice(): ?float
+    {
+        return $this->price;
+    }
+
+    /**
+     * @param float $price
+     */
+    public function setPrice(float $price): void
+    {
+        $this->price = $price;
+    }
+
+
 }
