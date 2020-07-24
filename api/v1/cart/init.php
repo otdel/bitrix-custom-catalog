@@ -17,4 +17,4 @@ $pathHelper = new PathHelper($connection, $iblockId);
 $repository = new CartRepository($connection, $pathHelper);
 $user = new CartUser($userId);
 $productCollection = ProductsFactory::createByObjects([], "Oip\SocialStore\Product\Entity\ProductCollection");
-$cart = new Cart($user, $productCollection, $repository);
+$cart = new Cart($user, $productCollection, $repository, Oip\App::getPriceProvider());

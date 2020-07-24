@@ -3,6 +3,7 @@
 namespace Oip\SocialStore\Cart;
 
 use Oip\SocialStore\Product\Entity;
+use Oip\SocialStore\Product\Price\PriceProviderInterface;
 use Oip\SocialStore\User\Entity\User;
 use Oip\SocialStore\Cart\Repository\RepositoryInterface;
 
@@ -22,21 +23,26 @@ class Handler
     private $products;
     /** @var RepositoryInterface $repository */
     private $repository;
+    /** @var PriceProviderInterface $priceProvider */
+    private $priceProvider;
 
     /**
      * @param User $user
      * @param Entity\ProductCollection $products
      * @param RepositoryInterface $repository
+     * @param PriceProviderInterface $priceProvider
      */
     public function __construct(
         User $user,
         Entity\ProductCollection $products,
-        RepositoryInterface $repository
+        RepositoryInterface $repository,
+        PriceProviderInterface $priceProvider
     )
     {
         $this->user = $user;
         $this->products = $products;
         $this->repository = $repository;
+        $this->priceProvider = $priceProvider;
     }
 
     /**
@@ -54,8 +60,23 @@ class Handler
     {
         if($this->products->isEmpty()) {
             $this->products = $this->repository->getByUserId($this->user->getId());
+            $this->fillPrices();
         }
         return $this->products;
+    }
+
+    /* @return void */
+    public function fillPrices() {
+
+        $prices = $this->priceProvider->buildPrices();
+
+        /** @var Entity\Product $product */
+        foreach($this->products as $product) {
+
+            if($price = $prices->getByProductId($product->getId())) {
+                $product->setPrice($price->getValue());
+            }
+        }
     }
 
     /**

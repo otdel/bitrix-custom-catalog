@@ -109,10 +109,11 @@ abstract class COipSocialStoreCart extends \COipComponent {
      *
      * @throws InvalidSubclassException
      * @throws NonUniqueIdCreatingException
+     * @throws Exception
      */
     private function initCart(CartUser $user, RepositoryInterface $repository): Cart {
         $products = ProductsFactory::createByObjects([], "Oip\SocialStore\Product\Entity\ProductCollection");
-        return new Cart($user, $products, $repository);
+        return new Cart($user, $products, $repository, Oip\App::getPriceProvider());
     }
 
     /**
