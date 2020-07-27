@@ -23,7 +23,7 @@ class App
 
         $defaultServices = [
             PriceProviderInterface::class => function() {
-                return new StubPriceProvider();
+                return new StubPriceProvider([]);
             }
         ];
 
