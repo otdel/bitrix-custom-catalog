@@ -67,10 +67,15 @@ class Handler
 
     /* @return void */
     public function fillPrices() {
+        /** @var Entity\Product $product */
+
+        foreach($this->products as $product) {
+            $this->priceProvider->addProduct($product->getId());
+        }
 
         $prices = $this->priceProvider->buildPrices();
 
-        /** @var Entity\Product $product */
+
         foreach($this->products as $product) {
 
             if($price = $prices->getByProductId($product->getId())) {
