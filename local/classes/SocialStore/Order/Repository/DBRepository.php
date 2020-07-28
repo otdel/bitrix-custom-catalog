@@ -190,7 +190,14 @@ class DBRepository implements RepositoryInterface
      * @return string
      */
     private function getAllByUserIdSql(int $userId): string {
-        return $this->getAllSql(). " WHERE t1.user_id = '$userId' ";
+        return $this->getAllSql(). " WHERE t1.user_id = '$userId' " . $this->getSortDateDesc();
+    }
+
+    /**
+     * @return string
+     */
+    private function getSortDateDesc() {
+        return " ORDER BY `date_create` DESC";
     }
 
     /**
