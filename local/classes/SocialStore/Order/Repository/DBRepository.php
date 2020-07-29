@@ -78,15 +78,16 @@ class DBRepository implements RepositoryInterface
 
     /**
      * @param int $userId
+     * @param int $page
+     * @param int|null $onPage
      * @return Entity\OrderCollection
-     * @throws Exception
-     * @throws Main\Db\SqlQueryException
      * @throws InvalidSubclassException
+     * @throws Main\Db\SqlQueryException
      * @throws NonUniqueIdCreatingException
      */
-    public function getAllByUserId(int $userId): Entity\OrderCollection
+    public function getAllByUserId(int $userId, $page = 1, $onPage = null): Entity\OrderCollection
     {
-       $sql = $this->getAllByUserIdSql($userId);
+       $sql = $this->getAllByUserIdSql($userId) . $this->getPageSql($page, $onPage);
        $arOrders = $this->db->query($sql)->fetchAll();
        $objOrders = [];
 
@@ -95,6 +96,15 @@ class DBRepository implements RepositoryInterface
        }
 
         return $this->collectionFactory::createByObjects($objOrders, "Oip\SocialStore\Order\Entity\OrderCollection");
+    }
+
+    /**
+     * @inheritdoc
+     * @throws Main\DB\SqlQueryException
+     */
+    public function getCountByUserId(int $userId): int {
+        $sql = "SELECT count(id) as 'count' from {$this->ordersTableName} WHERE user_id = '$userId'";
+        return (int)$this->db->query($sql)->fetch()["count"];
     }
 
     /**
@@ -198,6 +208,18 @@ class DBRepository implements RepositoryInterface
      */
     private function getSortDateDesc() {
         return " ORDER BY `date_create` DESC";
+    }
+
+    /**
+     * @param int $page
+     * @param null $onPage
+     * @return string
+    */
+    private function getPageSql($page = 1, $onPage = null) {
+        if(!$onPage) return "";
+
+        $offset = $onPage*($page-1);
+        return " LIMIT $offset, $onPage";
     }
 
     /**

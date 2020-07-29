@@ -15,9 +15,17 @@ interface RepositoryInterface
 
     /**
      * @param int $userId
+     * @param int $page
+     * @param int|null $onPage
      * @return Entity\OrderCollection
      */
-    public function getAllByUserId(int $userId): Entity\OrderCollection;
+    public function getAllByUserId(int $userId, $page = 1, $onPage = null): Entity\OrderCollection;
+
+    /**
+     * @param int
+     * @return int
+    */
+    public function getCountByUserId(int $userId): int;
 
     /**
      * @param Entity\Order $order

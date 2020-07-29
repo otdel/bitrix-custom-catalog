@@ -25,8 +25,12 @@ class Handler
     }
 
 
-    public function getAllByUserId(int $userId): OrderCollection {
-        return $this->orderRepository->getAllByUserId($userId);
+    public function getAllByUserId(int $userId, $page = 1, $onPage = null): OrderCollection {
+        return $this->orderRepository->getAllByUserId($userId, $page, $onPage);
+    }
+
+    public function getCountByUserId(int $userId): int {
+        return $this->orderRepository->getCountByUserId($userId);
     }
 
     public function addOrder(Order $order): Order {
