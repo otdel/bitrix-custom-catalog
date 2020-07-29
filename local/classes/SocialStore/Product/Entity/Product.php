@@ -102,9 +102,9 @@ class Product
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getArticle(): string
+    public function getArticle(): ?string
     {
         return $this->article;
     }
