@@ -14,6 +14,7 @@ use Oip\SocialStore\Product\Entity\Product;
 
 $component = $this->getComponent();
 $orders =  $arResult["ORDERS"];
+$count = $arResult["COUNT"];
 $arResult["EXCEPTION"];
 ?>
 
@@ -25,12 +26,12 @@ $arResult["EXCEPTION"];
         <p  style="color:red"><?=$arResult["EXCEPTION"]?></p>
     <?else:?>
 
-        <?if(!$orders->count()):?>
+        <?if(!$count):?>
             <p>У вас нет заказов</p>
         <?else:?>
 
         <table class="uk-table uk-table-divider uk-table-striped">
-            <caption>У вас <?=$orders->count()?> <?=$component->getNumWord($orders->count(),
+            <caption>У вас <?=$count?> <?=$component->getNumWord($count,
                     ["заказ","заказа","заказов"])?></caption>
 
             <thead>
