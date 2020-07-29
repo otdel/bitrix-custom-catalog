@@ -38,6 +38,7 @@ $arResult["EXCEPTION"];
                 <tr>
                     <th>Заказ</th>
                     <th>Состав заказа</th>
+                    <th>Cтоимость</th>
                     <th>Статус заказа</th>
                     <th>Дата заказа</th>
                 </tr>
@@ -62,8 +63,29 @@ $arResult["EXCEPTION"];
                                     <?endif?>
                                     
                                     <h6 class="uk-margin-small-top"><?=$product->getName()?></h6>
+
+                                    <?if($product->getArticle()):?>
+                                        <div>
+                                            Артикул:
+                                            <?=$product->getArticle()?>
+                                        </div>
+                                    <?endif?>
+
+                                    <?if($product->getPrice()):?>
+                                        <div>
+                                            Цена: <?=number_format($product->getPrice(),0, ".", " ")?> ₽
+                                        </div>
+                                    <?endif?>
+
                                 </div>
                             <?endforeach?>
+                        </td>
+                        <td>
+                            <?if($order->getTotalPrice()):?>
+                                <div>
+                                    <?=number_format($order->getTotalPrice(),0, ".", " ")?> ₽
+                                </div>
+                            <?endif?>
                         </td>
                         <td><div class="uk-badge"><?=$order->getStatus()->getLabel()?></div></td>
                         <td><?=$order->getCreated()->format("d.m.Y H:i")?></td>

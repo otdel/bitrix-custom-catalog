@@ -3,6 +3,7 @@
 namespace Oip\SocialStore\Order\Entity;
 
 use DateTime;
+use Oip\SocialStore\Product\Entity\Product;
 use \Oip\SocialStore\User\Entity\User;
 use \Oip\SocialStore\Order\Status\Entity\Status;
 use \Oip\SocialStore\Product\Entity\ProductCollection;
@@ -78,5 +79,14 @@ class Order
         return $this->products;
     }
 
+    /** @return float */
+    public function getTotalPrice() {
+        $totalPrice = 0;
+        /** @var Product $product */
+        foreach($this->products as $product) {
+            $totalPrice += $product->getPrice();
+        }
 
+        return $totalPrice;
+    }
 }
