@@ -18,18 +18,21 @@ class CSystemExceptionViewer extends \COipComponent {
         }
 
         $this->setDefaultBooleanParam($arParams["DEBUG_MODE"]);
+        $this->setDefaultParam($arParams["CUSTOM_MESSAGE"], "");
 
-        try {
-            if(!is_set($arParams["EXCEPTION"])) {
-                throw new ArgumentNullException("EXCEPTION");
-            }
+        if(!$arParams["CUSTOM_MESSAGE"]) {
+            try {
+                if(!is_set($arParams["EXCEPTION"])) {
+                    throw new ArgumentNullException("EXCEPTION");
+                }
 
-            if(!($arParams["EXCEPTION"] instanceof Exception)) {
-                throw new ArgumentTypeException("EXCEPTION");
+                if(!($arParams["EXCEPTION"] instanceof Exception)) {
+                    throw new ArgumentTypeException("EXCEPTION");
+                }
             }
-        }
-        catch(Exception $e) {
-            $this->arResult["EXCEPTION"] = $e;
+            catch(Exception $e) {
+                $this->arResult["EXCEPTION"] = $e;
+            }
         }
 
         return $arParams;
