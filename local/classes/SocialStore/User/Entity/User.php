@@ -7,13 +7,13 @@ class User
     /** @var int $id */
     private $id;
 
-    /** @var string|null $email */
+    /** @var string $email */
     private $email;
 
-    /** @var string|null $phone */
+    /** @var string $phone */
     private $phone;
 
-    /** @var string|null $name */
+    /** @var string $name */
     private $name;
 
     /** @var string|null $surname */
@@ -27,10 +27,10 @@ class User
 
     public function __construct(
         int $id,
-        ?string $email = null,
-        ?string $phone = null,
-        ?int $bxId = null,
-        ?string $name = null,
+        string $email,
+        string $phone,
+        int $bxId,
+        string $name,
         ?string $surname = null,
         ?string $patronymic = null
     )
@@ -53,25 +53,25 @@ class User
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getEmail(): ?string
+    public function getEmail(): string
     {
         return $this->email;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getPhone(): ?string
+    public function getPhone(): string
     {
         return $this->phone;
     }
 
     /**
-     * @return string|null
+     * @return string
      */
-    public function getName(): ?string
+    public function getName(): string
     {
         return $this->name;
     }
