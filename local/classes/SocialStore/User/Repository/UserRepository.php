@@ -23,6 +23,17 @@ class UserRepository
     }
 
     /**
+     * @param int $id
+     * @return User
+     * @throws SqlQueryException
+     */
+    public function getById($id) {
+        $res = $this->db->query("SELECT * FROM {$this->storeUserTable} WHERE id = $id");
+        $users = $this->parseRow($res);
+        return reset($users);
+    }
+
+    /**
      * @param string $phone
      * @return User[]
      * @throws SqlQueryException
@@ -73,7 +84,7 @@ class UserRepository
 
         $this->db->query($sql);
 
-        return $this->db->getInsertedId();
+        return (int)$this->db->getInsertedId();
     }
 
     /**
