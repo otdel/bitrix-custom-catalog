@@ -1,7 +1,7 @@
 $(function() {
     var
         ajaxFormContainer = $("#oip-ajax-filter-form-container"),
-        filterId = $("#data-form-filter-id");
+        filterId = $("#data-form-filter-id").val();
 
     OIP.Store.init(filterId, "BRANDS");
 
