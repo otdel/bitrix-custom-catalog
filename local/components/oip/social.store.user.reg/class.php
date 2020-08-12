@@ -9,6 +9,8 @@ use Oip\SocialStore\User\UseCase\Register\StoreUserRegisterException;
 use Oip\SocialStore\User\UseCase\Register\UserExistByPhoneException;
 use Oip\SocialStore\User\UseCase\Register\UserExistByEmailException;
 use Bitrix\Main\Db\SqlQueryException;
+use Oip\SocialStore\User\Entity\User;
+use Bitrix\Main\Event;
 
 \CBitrixComponent::includeComponentClass("oip:component");
 
@@ -53,10 +55,12 @@ class CSocialStoreUserReg extends \COipComponent {
                 $handler = new Handler($repository);
 
                 try {
-                    $newBxUserId = $handler->handle($regCommand);
+                    $newStoreUser = $handler->handle($regCommand);
+
+                    $this->throwCreateStoreUserEvent($newStoreUser);
 
                     global $USER;
-                   if($USER->Authorize($newBxUserId)) {
+                   if($USER->Authorize($newStoreUser->getBxId())) {
                        LocalRedirect($this->arParams["BACK_URL"]);
                    }
                    else {
@@ -115,6 +119,10 @@ class CSocialStoreUserReg extends \COipComponent {
         $this->includeComponentTemplate();
 
         return $exceptionLog;
+    }
+
+    private function throwCreateStoreUserEvent(User $user) {
+        (new Event("","OnOipSocialStoreUserCreated", ["user" => $user]))->send();
     }
 }
 

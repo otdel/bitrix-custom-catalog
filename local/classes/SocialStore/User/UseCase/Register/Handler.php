@@ -3,6 +3,7 @@
 namespace Oip\SocialStore\User\UseCase\Register;
 
 use Oip\SocialStore\User\Repository\UserRepository;
+use Oip\SocialStore\User\Entity\User;
 use Bitrix\Main\Db\SqlQueryException;
 use CUser;
 
@@ -17,11 +18,10 @@ class Handler
 
     /**
      * @param Command $command
-     * @return int
+     * @return User
      * @throws SqlQueryException
-     * @throws StoreUserRegisterException
      */
-    public function handle(Command $command): int {
+    public function handle(Command $command): User {
 
         $this->validate($command);
 
@@ -38,9 +38,9 @@ class Handler
 
         $bxUserId = $this->addBxUser($command);
 
-        $this->repository->add($command, $bxUserId);
+        $insertedId = $this->repository->add($command, $bxUserId);
 
-        return $bxUserId;
+        return $this->repository->getById($insertedId);
     }
 
     /**
