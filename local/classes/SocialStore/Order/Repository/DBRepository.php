@@ -12,7 +12,6 @@ use Bitrix\Main;
 
 use Oip\SocialStore\Order\Entity;
 use Oip\SocialStore\Order\Status\Entity\Status;
-use Oip\SocialStore\User\Entity\User;
 use Oip\SocialStore\Order\Repository\Exception\NonExsistentOrderId;
 
 use Oip\Util\Serializer\ObjectSerializer\SerializerInterface;
@@ -114,7 +113,7 @@ class DBRepository implements RepositoryInterface
      */
     public function addOrder(Entity\Order $order): int
     {
-        $userId = $order->getUser()->getId();
+        $userId = $order->getUserId();
         $statusId = $order->getStatus()->getId();
         $products = $this->serializer->serialize($order->getProducts());
 
@@ -167,7 +166,7 @@ class DBRepository implements RepositoryInterface
      */
     private function getEntityByRow(array $order): Entity\Order {
         return new Entity\Order(
-            new User((int)$order["user_id"]),
+            (int)$order["user_id"],
             new Status((int)$order["status_id"], $order["status_code"], $order["status_label"]),
             $this->serializer->deserialize($order["products"]),
             (int)$order["id"],

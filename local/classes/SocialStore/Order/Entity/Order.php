@@ -4,7 +4,6 @@ namespace Oip\SocialStore\Order\Entity;
 
 use DateTime;
 use Oip\SocialStore\Product\Entity\Product;
-use \Oip\SocialStore\User\Entity\User;
 use \Oip\SocialStore\Order\Status\Entity\Status;
 use \Oip\SocialStore\Product\Entity\ProductCollection;
 
@@ -14,8 +13,8 @@ class Order
     private $id;
     /** @var DateTime $created */
     private $created;
-    /** @var User $user */
-    private $user;
+    /** @var int $userId */
+    private $userId;
     /** @var Status $status */
     private $status;
     /** @var ProductCollection $products */
@@ -24,16 +23,16 @@ class Order
     /**
      * @param int|null $id
      * @param DateTime|null $created
-     * @param User $user
+     * @param int $userId
      * @param Status $status
      * @param ProductCollection $products
      */
-    public function __construct(User $user, Status $status, ProductCollection $products, ?int $id = null,
+    public function __construct(int $userId, Status $status, ProductCollection $products, ?int $id = null,
                                 ?DateTime $created = null)
     {
         $this->id = $id;
         $this->created = $created;
-        $this->user = $user;
+        $this->userId = $userId;
         $this->status = $status;
         $this->products = $products;
     }
@@ -56,11 +55,11 @@ class Order
     }
 
     /**
-     * @return User
+     * @return int
      */
-    public function getUser(): User
+    public function getUserId(): int
     {
-        return $this->user;
+        return $this->userId;
     }
 
     /**

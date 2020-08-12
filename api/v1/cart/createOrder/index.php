@@ -28,7 +28,7 @@ else {
 
     $handler = new OrderHandler($orderRepository, $statusRepository);
     $startStatus = $statusRepository->getByCode(OrderStatus::START_STATUS_CODE);
-    $order = new Order($user, $startStatus, $products);
+    $order = new Order($userId, $startStatus, $products);
 
     $addedOrder = $handler->addOrder($order);
     if($addedOrder->getId()) {

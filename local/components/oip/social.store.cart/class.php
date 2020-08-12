@@ -9,7 +9,6 @@ use Bitrix\Main\DB\SqlQueryException;
 use Bitrix\Main\SystemException;
 
 use Oip\SocialStore\Cart\Handler as Cart;
-use Oip\SocialStore\User\Entity\User as CartUser;
 use Oip\SocialStore\Cart\Repository\RepositoryInterface;
 use Oip\SocialStore\Cart\Repository\DBRepository as CartRepository;
 
@@ -44,8 +43,8 @@ abstract class COipSocialStoreCart extends \COipComponent {
 
         try {
             $repository = $this->initCartRepository();
-            $user = $this->initCartUser();
-            $cart = $this->initCart($user, $repository);
+            $userId = $this->initCartUser();
+            $cart = $this->initCart($userId, $repository);
             $cart->getProducts();
 
             return $cart;
@@ -75,8 +74,8 @@ abstract class COipSocialStoreCart extends \COipComponent {
         return new CartRepository($connection, $pathHelper);
     }
 
-    /** @return CartUser */
-    private function initCartUser(): CartUser {
+    /** @return int */
+    private function initCartUser(): int {
 
         global $USER;
         global $OipGuestUser;
@@ -99,11 +98,11 @@ abstract class COipSocialStoreCart extends \COipComponent {
 
         }
 
-        return new CartUser((int)$userId);
+        return (int)$userId;
     }
 
     /**
-     * @param CartUser $user
+     * @param int $userId
      * @param RepositoryInterface $repository
      * @return Cart
      *
@@ -111,9 +110,9 @@ abstract class COipSocialStoreCart extends \COipComponent {
      * @throws NonUniqueIdCreatingException
      * @throws Exception
      */
-    private function initCart(CartUser $user, RepositoryInterface $repository): Cart {
+    private function initCart(int $userId, RepositoryInterface $repository): Cart {
         $products = ProductsFactory::createByObjects([], "Oip\SocialStore\Product\Entity\ProductCollection");
-        return new Cart($user, $products, $repository, Oip\App::getPriceProvider());
+        return new Cart($userId, $products, $repository, Oip\App::getPriceProvider());
     }
 
     /**

@@ -69,7 +69,7 @@ class COipSocialStoreProcessor extends \COipSocialStoreCart {
                     try {
                         $resultError = $APPLICATION->IncludeComponent("oip:social.store.order.add","",
                             [
-                                "USER" => $cart->getUser(),
+                                "USER_ID" => $cart->getUserId(),
                                 "PRODUCTS" => $cart->getProducts()
                             ]);
 

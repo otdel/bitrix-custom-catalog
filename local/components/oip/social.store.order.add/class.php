@@ -11,7 +11,6 @@ use Bitrix\Main\ArgumentNullException;
 use Bitrix\Main\ArgumentTypeException;
 use Bitrix\Main\DB\SqlQueryException;
 
-use Oip\SocialStore\User\Entity\User;
 use Oip\SocialStore\Product\Entity\ProductCollection;
 
 use Oip\Util\Serializer\ObjectSerializer\Base64Serializer;
@@ -37,16 +36,12 @@ class COipSocialStoreOrderAdd extends \COipComponent {
     {
         $arParams = parent::initParams($arParams);
 
-        if(!is_set($arParams["USER"])) {
-            throw new ArgumentNullException("USER");
+        if(!is_set($arParams["USER_ID"])) {
+            throw new ArgumentNullException("USER_ID");
         }
 
         if(!is_set($arParams["PRODUCTS"])) {
             throw new ArgumentNullException("PRODUCTS");
-        }
-
-        if(!($arParams["USER"] instanceof User)) {
-            throw new ArgumentTypeException("USER");
         }
 
         if(!($arParams["PRODUCTS"] instanceof ProductCollection)) {
@@ -77,7 +72,7 @@ class COipSocialStoreOrderAdd extends \COipComponent {
             $startStatus = $this->getStartOrderStatus($statusRepository);
 
             $handler = new OrderHandler($orderRepository, $statusRepository);
-            $order = new Order($this->arParams['USER'], $startStatus, $this->arParams['PRODUCTS']);
+            $order = new Order((int)$this->arParams['USER_ID'], $startStatus, $this->arParams['PRODUCTS']);
 
             $addedOrder = $handler->addOrder($order);
             $this->throwOrderCreatedEvent($addedOrder);
