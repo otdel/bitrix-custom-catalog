@@ -1,6 +1,6 @@
 <?php
 
-namespace Oip\SocialStore\User\UseCase\Register;
+namespace Oip\SocialStore\User\UseCase\Register\Request;
 
 class Command
 {

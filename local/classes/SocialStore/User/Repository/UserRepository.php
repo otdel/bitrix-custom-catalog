@@ -4,7 +4,7 @@
 namespace Oip\SocialStore\User\Repository;
 
 use Bitrix\Main\DB\Result;
-use Oip\SocialStore\User\UseCase\Register\Command as RegisterCommand;
+use Oip\SocialStore\User\UseCase\Register\Request\Command as RegisterCommand;
 use Oip\SocialStore\User\Entity\User;
 
 use Bitrix\Main\DB\Connection;
