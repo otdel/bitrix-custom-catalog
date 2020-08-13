@@ -16,3 +16,4 @@ local/dist/
 !jsconfig.json
 !/build/
 !/custom/
+!phpunit.xml.dist
