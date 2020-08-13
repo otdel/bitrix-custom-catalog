@@ -10,7 +10,7 @@ use Oip\SocialStore\User\Entity\User;
 use Bitrix\Main\DB\Connection;
 use Bitrix\Main\Db\SqlQueryException;
 
-class UserRepository
+class UserRepository implements UserRepositoryInterface
 {
     /** @var string $storeUserTable */
     private $storeUserTable = "oip_store_users";
@@ -27,7 +27,7 @@ class UserRepository
      * @return User
      * @throws SqlQueryException
      */
-    public function getById($id) {
+    public function getById($id): User {
         $res = $this->db->query("SELECT * FROM {$this->storeUserTable} WHERE id = $id");
         $users = $this->parseRow($res);
         return reset($users);
@@ -38,7 +38,7 @@ class UserRepository
      * @return User[]
      * @throws SqlQueryException
      */
-    public function getByPhone($phone) {
+    public function getByPhone($phone): array {
         $res = $this->db->query("SELECT * FROM {$this->storeUserTable} WHERE phone = $phone");
         return $this->parseRow($res);
     }
@@ -48,7 +48,7 @@ class UserRepository
      * @return User[]
      * @throws SqlQueryException
      */
-    public function getByEmail($email) {
+    public function getByEmail($email): array {
         $res = $this->db->query("SELECT * FROM {$this->storeUserTable} WHERE phone = $email");
         return $this->parseRow($res);
     }

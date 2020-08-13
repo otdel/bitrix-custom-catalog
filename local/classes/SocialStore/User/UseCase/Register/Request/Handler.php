@@ -4,22 +4,21 @@ namespace Oip\SocialStore\User\UseCase\Register\Request;
 
 use Oip\SocialStore\User\Repository\UserRepository;
 use Oip\SocialStore\User\Entity\User;
-use Bitrix\Main\Db\SqlQueryException;
 use CUser;
+use Oip\SocialStore\User\Repository\UserRepositoryInterface;
 
 class Handler
 {
-    /** @var UserRepository $repository */
+    /** @var UserRepositoryInterface $repository */
     private $repository;
 
-    public function __construct(UserRepository $repository) {
+    public function __construct(UserRepositoryInterface $repository) {
         $this->repository = $repository;
     }
 
     /**
      * @param Command $command
      * @return User
-     * @throws SqlQueryException
      */
     public function handle(Command $command): User {
 
