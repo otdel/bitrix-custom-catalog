@@ -88,6 +88,37 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
+     * @param int $userId
+     * @param string $code
+     * @return int
+     * @throws SqlQueryException
+     */
+    public function addVerification(int $userId, string $code) {
+        $this->db->query("UPDATE {$this->storeUserTable} SET"
+            ." phone_verification_code = '$code',"
+            ." phone_verification_code_expired = DATE_ADD(CURRENT_TIMESTAMP, INTERVAL 1 HOUR)"
+            ." WHERE id = $userId");
+
+        return $this->db->getAffectedRowsCount();
+    }
+
+    /**
+     * @param int $userId
+     * @return int
+     * @throws SqlQueryException
+     */
+    public function verifyUserPhone(int $userId)
+    {
+       $this->db->query("UPDATE {$this->storeUserTable} "
+           ." SET phone_verified = 1, phone_verification_code = NULL, phone_verification_code_expired = NULL"
+           ." WHERE id = $userId ");
+
+
+       return $this->db->getAffectedRowsCount();
+    }
+
+
+    /**
      * @param RegisterCommand $command
      * @param int $bxUserId
      * @return string
