@@ -31,4 +31,17 @@ interface UserRepositoryInterface
      * @return int
      */
     public function add(RegisterCommand $command, int $bxUserId);
+
+    /**
+     * @param int $userId
+     * @param string $code
+     * @return int
+     */
+    public function addVerification(int $userId, string $code);
+
+    /**
+     * @param int $userId
+     * @return int
+     */
+    public function verifyUserPhone(int $userId);
 }

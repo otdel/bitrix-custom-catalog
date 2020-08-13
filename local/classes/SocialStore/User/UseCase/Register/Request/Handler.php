@@ -2,7 +2,6 @@
 
 namespace Oip\SocialStore\User\UseCase\Register\Request;
 
-use Oip\SocialStore\User\Repository\UserRepository;
 use Oip\SocialStore\User\Entity\User;
 use CUser;
 use Oip\SocialStore\User\Repository\UserRepositoryInterface;
@@ -39,9 +38,13 @@ class Handler
 
         $insertedId = $this->repository->add($command, $bxUserId);
 
-        // @todo процедура верификации телефона
+        $newUser = $this->repository->getById($insertedId);
 
-        return $this->repository->getById($insertedId);
+        $code = $newUser->generateVerificationCode();
+
+        $this->repository->addVerification($insertedId, $code);
+
+        return $newUser;
     }
 
     /**
