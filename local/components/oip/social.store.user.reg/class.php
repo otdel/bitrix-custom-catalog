@@ -2,12 +2,12 @@
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 use Bitrix\Main\Application;
-use Oip\SocialStore\User\UseCase\Register\Command;
-use Oip\SocialStore\User\UseCase\Register\Handler;
+use Oip\SocialStore\User\UseCase\Register\Request\Command;
+use Oip\SocialStore\User\UseCase\Register\Request\Handler;
 use Oip\SocialStore\User\Repository\UserRepository;
-use Oip\SocialStore\User\UseCase\Register\StoreUserRegisterException;
-use Oip\SocialStore\User\UseCase\Register\UserExistByPhoneException;
-use Oip\SocialStore\User\UseCase\Register\UserExistByEmailException;
+use Oip\SocialStore\User\UseCase\Register\Request\StoreUserRegisterException;
+use Oip\SocialStore\User\UseCase\Register\Request\UserExistByPhoneException;
+use Oip\SocialStore\User\UseCase\Register\Request\UserExistByEmailException;
 use Bitrix\Main\Db\SqlQueryException;
 use Oip\SocialStore\User\Entity\User;
 use Bitrix\Main\Event;

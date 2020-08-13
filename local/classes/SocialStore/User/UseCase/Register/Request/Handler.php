@@ -1,6 +1,6 @@
 <?php
 
-namespace Oip\SocialStore\User\UseCase\Register;
+namespace Oip\SocialStore\User\UseCase\Register\Request;
 
 use Oip\SocialStore\User\Repository\UserRepository;
 use Oip\SocialStore\User\Entity\User;
@@ -39,6 +39,8 @@ class Handler
         $bxUserId = $this->addBxUser($command);
 
         $insertedId = $this->repository->add($command, $bxUserId);
+
+        // @todo процедура верификации телефона
 
         return $this->repository->getById($insertedId);
     }
