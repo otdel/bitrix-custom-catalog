@@ -8,20 +8,24 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
 
 $debugMode = ($arParams["DEBUG_MODE"] === "N") ? false : true;
 $exception = $arResult["EXCEPTION"];
-$customMessage = $arParams["CUSTOM_MESSAGE"];
 ?>
 
-<?if($customMessage):?>
-<div class="uk-alert-danger" uk-alert>
-    <p><?=htmlspecialcharsback($customMessage)?></p>
-</div>
-<?else:?>
-    <div class="uk-alert-danger" uk-alert>
-        <p><?=$exception->getMessage()?></p>
-    </div>
-    <?if($debugMode):?>
-        <div uk-alert>
-                <pre><?=$exception->getTraceAsString()?></pre>
+<?if($exception):?>
+
+    <?if(is_string($exception)):?>
+        <div class="uk-alert-danger" uk-alert>
+            <p><?=htmlspecialcharsback($exception)?></p>
         </div>
+    <?else:?>
+        <div class="uk-alert-danger" uk-alert>
+            <p><?=$exception->getMessage()?></p>
+        </div>
+        <?if($debugMode):?>
+            <div uk-alert>
+                <em><small>(Это не ошибка, а стек вызовов для локальной профилировки исключений - на проде не будет)</small></em>
+                <pre><?=$exception->getTraceAsString()?></pre>
+            </div>
+        <?endif?>
     <?endif?>
+
 <?endif?>

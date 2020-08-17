@@ -18,14 +18,10 @@ class CSystemExceptionViewer extends \COipComponent {
         }
 
         $this->setDefaultBooleanParam($arParams["DEBUG_MODE"]);
-        $this->setDefaultParam($arParams["CUSTOM_MESSAGE"], "");
+        $this->setDefaultParam($arParams["EXCEPTION"], "");
 
-        if(!$arParams["CUSTOM_MESSAGE"]) {
+        if($arParams["EXCEPTION"] && !is_string($arParams["EXCEPTION"])) {
             try {
-                if(!is_set($arParams["EXCEPTION"])) {
-                    throw new ArgumentNullException("EXCEPTION");
-                }
-
                 if(!($arParams["EXCEPTION"] instanceof Exception)) {
                     throw new ArgumentTypeException("EXCEPTION");
                 }
@@ -35,14 +31,13 @@ class CSystemExceptionViewer extends \COipComponent {
             }
         }
 
+        $this->arResult["EXCEPTION"] = $arParams["EXCEPTION"];
+
         return $arParams;
     }
 
     public function executeComponent()
     {
-        if(!is_set($this->arResult["EXCEPTION"])) {
-            $this->arResult["EXCEPTION"] = $this->arParams["EXCEPTION"];
-        }
         $this->includeComponentTemplate();
     }
 }
