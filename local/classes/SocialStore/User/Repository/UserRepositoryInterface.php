@@ -17,16 +17,16 @@ interface UserRepositoryInterface
     /**
      * @param string $phone
      * @throws NotFoundException
-     * @return User[]
+     * @return User
      */
-    public function getByPhone($phone) : array;
+    public function getByPhone($phone) : User;
 
     /**
      * @param string $phone
      * @throws NotFoundException
-     * @return User[]
+     * @return User
      */
-    public function getByEmail($phone) : array;
+    public function getByEmail($phone) : User;
 
     /**
      * @param RegisterCommand $command

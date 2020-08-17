@@ -43,23 +43,25 @@ class UserRepository implements UserRepositoryInterface
 
     /**
      * @param string $phone
-     * @return User[]
-     * @throws NotFoundException
+     * @return User
      * @throws SqlQueryException
      */
-    public function getByPhone($phone): array {
+    public function getByPhone($phone): User
+    {
         $res = $this->db->query("SELECT * FROM {$this->storeUserTable} WHERE phone = $phone");
-        return $this->parseRow($res);
+        $users = $this->parseRow($res);
+        return reset($users);
     }
 
     /**
      * @param string $email
-     * @return User[]
+     * @return User
      * @throws SqlQueryException
      */
-    public function getByEmail($email): array {
+    public function getByEmail($email): User {
         $res = $this->db->query("SELECT * FROM {$this->storeUserTable} WHERE phone = $email");
-        return $this->parseRow($res);
+        $users = $this->parseRow($res);
+        return reset($users);
     }
 
     /**
