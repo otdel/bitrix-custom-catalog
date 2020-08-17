@@ -30,15 +30,9 @@ $patronymic = $request->getPost("store-user-reg-patronymic");
     <?else:?>
 
         <?foreach($arResult["ERRORS"] as $error):?>
-            <?if(is_string($error)):?>
-                <?$APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
-                    "CUSTOM_MESSAGE" => $error
-                ])?>
-            <?else:?>
-                <?$APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
-                    "EXCEPTION" => $error
-                ])?>
-            <?endif?>
+            <?$APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
+                "EXCEPTION" => $error
+            ])?>
         <?endforeach?>
 
         <form method="post" action="">
@@ -52,7 +46,7 @@ $patronymic = $request->getPost("store-user-reg-patronymic");
                 </div>
 
                 <div class="uk-margin">
-                    <input class="uk-input uk-form-width-medium" type="tel" name="store-user-reg-phone" 
+                    <input class="uk-input uk-form-width-medium" type="tel" name="store-user-reg-phone"
                            placeholder="Телефон" value="<?=$phone?>">
                     <sup style="color:red">*</sup>
                 </div>
@@ -86,7 +80,7 @@ $patronymic = $request->getPost("store-user-reg-patronymic");
                 </div>
 
                 <div class="uk-margin">
-                    <button type="submit" class="uk-button uk-button-primary" name="store-user-reg" value="1">Регистрация</button>
+                    <button type="submit" class="uk-button uk-button-primary" name="reg-request-action" value="1">Зарегистрироваться</button>
                 </div>
 
             </fieldset>
