@@ -9,18 +9,21 @@ interface UserRepositoryInterface
 {
     /**
      * @param int $id
+     * @throws NotFoundException
      * @return User
      */
-    public function getById($id): User;
+    public function getById(int $id): User;
 
     /**
      * @param string $phone
+     * @throws NotFoundException
      * @return User[]
      */
     public function getByPhone($phone) : array;
 
     /**
      * @param string $phone
+     * @throws NotFoundException
      * @return User[]
      */
     public function getByEmail($phone) : array;

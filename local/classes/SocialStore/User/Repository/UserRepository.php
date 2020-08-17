@@ -9,6 +9,8 @@ use Oip\SocialStore\User\Entity\User;
 
 use Bitrix\Main\DB\Connection;
 use Bitrix\Main\Db\SqlQueryException;
+use Oip\Util\Bitrix\DateTimeConverter;
+use Exception;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -18,16 +20,22 @@ class UserRepository implements UserRepositoryInterface
     /** @var Connection $db */
     private $db;
 
-    public function __construct(Connection $db) {
+    /** @var DateTimeConverter $converter */
+    private $converter;
+
+    public function __construct(Connection $db, DateTimeConverter $converter) {
         $this->db = $db;
+        $this->converter = $converter;
     }
 
     /**
      * @param int $id
      * @return User
      * @throws SqlQueryException
+     * @throws NotFoundException
+     * @throws Exception
      */
-    public function getById($id): User {
+    public function getById(int $id): User {
         $res = $this->db->query("SELECT * FROM {$this->storeUserTable} WHERE id = $id");
         $users = $this->parseRow($res);
         return reset($users);
@@ -36,6 +44,7 @@ class UserRepository implements UserRepositoryInterface
     /**
      * @param string $phone
      * @return User[]
+     * @throws NotFoundException
      * @throws SqlQueryException
      */
     public function getByPhone($phone): array {
@@ -55,20 +64,35 @@ class UserRepository implements UserRepositoryInterface
 
     /**
      * @param Result $res
+     * @throws NotFoundException
+     * @throws Exception
      * @return User[]
      */
     private function parseRow(Result $res) {
         $rows = $res->fetchAll();
 
+        if(empty($rows)) {
+            throw new NotFoundException("По данному запросу не найдено пользователей");
+        }
+
         return array_map(function ($userRow) {
+
+            $dateExpired = null;
+            if($userRow["phone_verification_code_expired"]) {
+                $dateExpired = $this->converter->convertBitrixToImmutable($userRow["phone_verification_code_expired"]);
+            }
+
             return new User(
                 (int)$userRow["id"],
                 $userRow["email"],
                 $userRow["phone"],
                 (int)$userRow["bx_id"],
+                (int)$userRow["phone_verified"],
                 $userRow["name"],
                 $userRow["surname"],
                 $userRow["patronymic"],
+                $userRow["phone_verification_code"],
+                $dateExpired
             );
         }, $rows);
     }
