@@ -22,14 +22,35 @@ class UserTest extends  TestCase
         $user->generateVerificationCode();
     }
 
-    public function testCheckVerificationNotStart(): void
+    public function testCheckVerificationNotStartBoth(): void
     {
         $user = UserFactory::create()
             ->buildUser();
 
         $this->expectException(IncorrectVerificationProcessException::class);
-        $user->checkVerification("123456", new DateTimeImmutable());
+        $user->checkVerificationStatus();
     }
+
+    public function testCheckVerificationNotStartWithoutCode(): void
+    {
+        $user = UserFactory::create()
+            ->withActualVerificationDate()
+            ->buildUser();
+
+        $this->expectException(IncorrectVerificationProcessException::class);
+        $user->checkVerificationStatus();
+    }
+
+    public function testCheckVerificationNotStartWithoutDate(): void
+    {
+        $user = UserFactory::create()
+            ->withVerificationCode()
+            ->buildUser();
+
+        $this->expectException(IncorrectVerificationProcessException::class);
+        $user->checkVerificationStatus();
+    }
+
 
     public function testCheckVerificationExpired(): void
     {
@@ -39,7 +60,7 @@ class UserTest extends  TestCase
             ->buildUser();
 
         $this->expectException(VerificationCodeExpiredException::class);
-        $user->checkVerification($user->generateVerificationCode(), new DateTimeImmutable());
+        $user->checkVerification($user->getVerificationCode(), new DateTimeImmutable());
     }
 
     public function testCheckVerificationFailed(): void
@@ -50,6 +71,6 @@ class UserTest extends  TestCase
             ->buildUser();
 
         $this->expectException(VerificationFailedException::class);
-        $user->checkVerification("123456", new DateTimeImmutable());
+        $user->checkVerification($user->generateVerificationCode(), new DateTimeImmutable());
     }
 }

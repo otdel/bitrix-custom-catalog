@@ -71,31 +71,41 @@ class User
      * @throws DomainException
      */
     public function generateVerificationCode(): string {
-        if($this->phoneVerified) {
-            throw new AlreadyVerifiedException("Номер телефона уже верифицирован.");
-        }
+        $this->checkUserPhoneVerified();
 
         return str_pad(rand(0,999999), 6, "0", STR_PAD_LEFT);
+    }
+
+    /** @throws IncorrectVerificationProcessException */
+    public function checkVerificationStatus() {
+        if(!$this->verificationCode || !$this->verificationDateExpired) {
+            throw new IncorrectVerificationProcessException("Процедура верификации была не корректно запущена.");
+        }
+    }
+
+    /**
+     * @throws AlreadyVerifiedException
+    */
+    public function checkUserPhoneVerified(): void {
+        if($this->phoneVerified) {
+            throw new AlreadyVerifiedException("Номер телефона пользователя уже верифицирован.");
+        }
     }
 
     /**
      * @param string $verificationCode
      * @param DateTimeImmutable $verifyingDate
-     * @throws IncorrectVerificationProcessException
      * @throws VerificationCodeExpiredException
      * @throws VerificationFailedException
      */
     public function checkVerification(string $verificationCode, DateTimeImmutable $verifyingDate) {
 
-        if(!$this->verificationCode || !$this->verificationDateExpired) {
-            throw new IncorrectVerificationProcessException("Процедура верификации не была корректно запущена.");
-        }
+        if($verificationCode !== $this->verificationCode)
+            throw new VerificationFailedException("Неверный код верификации.");
 
         if($this->isVerificationCodeExpired($verifyingDate)) {
             throw new VerificationCodeExpiredException("Срок активности текущего кода верификации истек.");
         }
-
-        if($verificationCode !== $this->verificationCode) throw new VerificationFailedException("Неверный код верификации.");
     }
 
     /**
@@ -104,7 +114,7 @@ class User
      */
     public function isVerificationCodeExpired(DateTimeImmutable $verifyingDate) {
         if(!$this->verificationDateExpired) {
-            throw new IncorrectVerificationProcessException("Процедура верификации не была корректно запущена");
+            throw new IncorrectVerificationProcessException("Процедура верификации была не корректно запущена");
         }
 
         return ($verifyingDate->getTimestamp() >= $this->verificationDateExpired->getTimestamp());
