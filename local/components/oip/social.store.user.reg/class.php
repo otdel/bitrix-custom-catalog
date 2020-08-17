@@ -124,7 +124,7 @@ class CSocialStoreUserReg extends COipComponent {
             $this->throwCreateStoreUserEvent($newStoreUser);
 
             global $APPLICATION;
-            LocalRedirect($APPLICATION->GetCurDir() . "?reg-confirm-form=yes&user-id={$newStoreUser->getId()}");
+            LocalRedirect($APPLICATION->GetCurDir() . "?reg-confirm-form=yes&user={$newStoreUser->getPhone()}");
         }
 
         catch (UserExistByEmailException $exception) {
@@ -171,7 +171,7 @@ class CSocialStoreUserReg extends COipComponent {
         $command = new ConfirmCommand;
 
         $command->verificationCode = $request->getPost("store-user-reg-confirm-code");
-        $command->userId = (int)$request->getPost("store-user-reg-confirm-user");
+        $command->userPhone = (int)$request->getPost("store-user-reg-confirm-user");
 
         $user = null;
 
@@ -179,7 +179,7 @@ class CSocialStoreUserReg extends COipComponent {
         $handler = new ConfirmHandler($repository);
 
         try {
-            $user = $repository->getById($command->userId);
+            $user = $repository->getByPhone($command->userPhone);
             $handler->handle($command);
 
             global $USER;
@@ -209,14 +209,12 @@ class CSocialStoreUserReg extends COipComponent {
         }
         catch (VerificationFailedException $exception) {
             $this->arResult["ERRORS"][] = $exception;
-            $this->arResult["USER_ID"] = $user->getId();
             $this->arResult["USER_PHONE"] = $user->getPhone();
 
             $this->includeComponentTemplate("confirm");
         }
         catch (VerificationCodeExpiredException $exception) {
             $this->arResult["ERRORS"][] = $exception;
-            $this->arResult["USER_ID"] = $user->getId();
             $this->arResult["USER_PHONE"] = $user->getPhone();
 
             $this->includeComponentTemplate("confirm");
@@ -243,11 +241,11 @@ class CSocialStoreUserReg extends COipComponent {
 
         $exceptionLog = [];
 
-        $userId = $request->get("user-id");
+        $userPhone = $request->get("user");
 
         try {
             $repository = new UserRepository(Application::getConnection(), new DateTimeConverter());
-            $verifyingUser = $repository->getById((int)$userId);
+            $verifyingUser = $repository->getByPhone($userPhone);
             $codeResend = $request->get("code-resend");
 
             $verifyingUser->checkUserPhoneVerified();
@@ -258,7 +256,6 @@ class CSocialStoreUserReg extends COipComponent {
                 $repository->addVerification($verifyingUser->getId(), $newCode);
             }
 
-            $this->arResult["USER_ID"] = $userId;
             $this->arResult["USER_PHONE"] = $verifyingUser->getPhone();
 
             $this->includeComponentTemplate("confirm");

@@ -6,8 +6,8 @@ namespace Oip\SocialStore\User\UseCase\Register\Confirm;
 
 class Command
 {
-    /** @var int $userId */
-    public $userId;
+    /** @var string $userPhone */
+    public $userPhone;
 
     /** @var string $verificationCode */
     public $verificationCode;

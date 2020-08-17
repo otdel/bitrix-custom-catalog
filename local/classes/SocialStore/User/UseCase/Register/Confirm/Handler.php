@@ -19,10 +19,10 @@ class Handler
      */
     public function handle(Command $command) {
 
-        $verifyingUser = $this->repository->getById($command->userId);
+        $verifyingUser = $this->repository->getByPhone($command->userPhone);
 
         $verifyingUser->checkVerification($command->verificationCode, new DateTimeImmutable());
 
-        $this->repository->verifyUserPhone($command->userId);
+        $this->repository->verifyUserPhone($verifyingUser->getId());
     }
 }

@@ -32,7 +32,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
             <fieldset class="uk-fieldset">
                 <legend class="uk-legend">Подтверждение номера телефона</legend>
 
-                <input type="hidden" name="store-user-reg-confirm-user" value="<?=$arResult["USER_ID"]?>">
+                <input type="hidden" name="store-user-reg-confirm-user" value="<?=$arResult["USER_PHONE"]?>">
 
                 <?if(!$arResult["ERRORS"] || empty($arResult["ERRORS"])):?>
                     <div class="uk-alert-primary" uk-alert>
@@ -53,7 +53,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
                 </div>
 
                 <uk class="margin">
-                    <a href="?reg-confirm-form=yes&user-id=<?=$arResult["USER_ID"]?>&code-resend=yes">Выслать новый код</a>
+                    <a href="?reg-confirm-form=yes&user=<?=$arResult["USER_PHONE"]?>&code-resend=yes">Выслать новый код</a>
                 </uk>
 
             </fieldset>
