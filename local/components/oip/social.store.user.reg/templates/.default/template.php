@@ -27,6 +27,11 @@ $patronymic = $request->getPost("store-user-reg-patronymic");
                 "EXCEPTION" => $exception
             ])?>
         <?endforeach?>
+
+        <div class="uk-margin">
+            <a href='<?=$APPLICATION->GetCurDir()?>'>Назад к регистрации</a>
+        </div>
+
     <?else:?>
 
         <?foreach($arResult["ERRORS"] as $error):?>

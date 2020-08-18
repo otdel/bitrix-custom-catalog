@@ -3,6 +3,8 @@
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 /** @var array $arResult */
+
+global $APPLICATION;
 ?>
 
 <?if($arResult["IS_AUTH"]):?>
@@ -18,6 +20,10 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
                 "EXCEPTION" => $exception
             ])?>
         <?endforeach?>
+
+        <div class="uk-margin">
+            <a href='<?=$APPLICATION->GetCurDir()?>'>Назад к регистрации</a>
+        </div>
     <?else:?>
 
         <?if($arResult["ERRORS"]):?>
@@ -55,6 +61,10 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
                 <uk class="margin">
                     <a href="?reg-confirm-form=yes&user=<?=$arResult["USER_PHONE"]?>&code-resend=yes">Выслать новый код</a>
                 </uk>
+
+                <div class="uk-margin">
+                    <a href='<?=$APPLICATION->GetCurDir()?>'>Назад к регистрации</a>
+                </div>
 
             </fieldset>
         </form>
