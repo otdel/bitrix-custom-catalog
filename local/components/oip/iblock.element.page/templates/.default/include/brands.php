@@ -6,7 +6,7 @@
 /** @var array $brandsFilter */
 ?>
 
-<?if($component->getParam("BRANDS_IBLOCK_ID") && $brandsFilter):?>
+<?if($component->getParam("BRANDS_IBLOCK_ID") && $brandsFilter && count($brandsFilter) > 1):?>
     <?$APPLICATION->IncludeComponent(
         "oip:iblock.element.list","brands-in-filter",
         [

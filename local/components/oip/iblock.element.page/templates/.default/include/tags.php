@@ -4,7 +4,8 @@
 /** @var array $arFilterTemplate */
 /** @var array $tagsFilter */
 ?>
-<?if($component->getParam("TAGS_IBLOCK_ID") && $tagsFilter):?>
+
+<?if($component->getParam("TAGS_IBLOCK_ID") && $tagsFilter && count($tagsFilter) > 1):?>
     <?$APPLICATION->IncludeComponent(
         "oip:iblock.element.list","tags-in-filter",
         [
