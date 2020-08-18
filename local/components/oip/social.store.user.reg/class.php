@@ -67,7 +67,10 @@ class CSocialStoreUserReg extends COipComponent {
 
         }
 
-//        @todo генерить тут событие, в которое передавать логи ошибок регистрации - для внешней среды
+        if(!empty($exceptionLog)) {
+            $this->throwCreateStoreUserErrorsEvent($exceptionLog);
+        }
+
         return $exceptionLog;
     }
 
@@ -319,6 +322,10 @@ class CSocialStoreUserReg extends COipComponent {
 
     private function throwCreateStoreUserEvent(User $user) {
         (new Event("","OnOipSocialStoreUserCreated", ["user" => $user]))->send();
+    }
+
+    private function throwCreateStoreUserErrorsEvent(array $errorLog) {
+        (new Event("","OnOipSocialStoreUserCreateErrors", ["errors" => $errorLog]))->send();
     }
 }
 
