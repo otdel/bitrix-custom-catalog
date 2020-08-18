@@ -83,6 +83,11 @@ $patronymic = $request->getPost("store-user-reg-patronymic");
                     <button type="submit" class="uk-button uk-button-primary" name="reg-request-action" value="1">Зарегистрироваться</button>
                 </div>
 
+                <div class="uk-margin">
+                    Зарегистрировались, но не прошли верификацию?<br>
+                    Перейдите по <a href="?restore-confirm-phone=yes">ссылке</a>, чтобы завершить процедуру верификации номера телефона.
+                </div>
+
             </fieldset>
         </form>
     <?endif?>

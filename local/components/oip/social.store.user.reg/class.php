@@ -21,11 +21,14 @@ use Bitrix\Main\HttpRequest;
 use Oip\Util\Bitrix\DateTimeConverter;
 use Oip\SocialStore\User\Repository;
 use Bitrix\Main\SystemException;
+use Oip\Util\Phone\PhoneNormalizer;
 use Oip\Util\Phone\PhoneNormalizerException;
 
 CBitrixComponent::includeComponentClass("oip:component");
 
 class CSocialStoreUserReg extends COipComponent {
+
+    use PhoneNormalizer;
 
     protected function initParams($arParams)
     {
@@ -75,15 +78,37 @@ class CSocialStoreUserReg extends COipComponent {
         return $exceptionLog;
     }
 
+    /**
+     * @param HttpRequest $request
+     * @return string $action
+     */
+    private function parseAction(HttpRequest $request) {
+
+        if($request->getPost("reg-request-action")) {
+            return "reg-request-action";
+        }
+        elseif($request->getPost("reg-confirm-action")) {
+            return "reg-confirm-action";
+        }
+        elseif($request->getPost("restore-confirm-phone-action")) {
+            return "restore-confirm-phone-action";
+        }
+
+        elseif($request->get("reg-confirm-form")) {
+            return "reg-confirm-form";
+        }
+
+        elseif($request->get("restore-confirm-phone")) {
+            return "restore-confirm-phone";
+        }
+
+        return "";
+    }
+
     private function handleAction(HttpRequest $request) {
         $exceptionLog = [];
 
-        $action = ($request->getPost("reg-request-action"))
-            ? "reg-request-action"
-            : (($request->getPost("reg-confirm-action"))
-                ? "reg-confirm-action"
-                : (($request->get("reg-confirm-form"))
-                    ? "reg-confirm-form"  : ""));
+        $action = $this->parseAction($request);
 
         switch($action) {
             case "reg-request-action":
@@ -94,8 +119,16 @@ class CSocialStoreUserReg extends COipComponent {
                 $exceptionLog = $this->regConfirmAction($request);
             break;
 
+            case "restore-confirm-phone-action":
+                $exceptionLog = $this->restoreConfirmAction($request);
+            break;
+
             case "reg-confirm-form":
                 $exceptionLog = $this->regConfirmForm($request);
+            break;
+
+            case "restore-confirm-phone":
+                $this->includeComponentTemplate("restore-confirm");
             break;
 
             default:
@@ -154,7 +187,7 @@ class CSocialStoreUserReg extends COipComponent {
                 ."&back_url={$this->arParams['BACK_URL']}'>ссылкой</a> для восстановления доступа.";
         }
 
-        catch (Oip\Util\Phone\PhoneNormalizerException $exception) {
+        catch (PhoneNormalizerException $exception) {
             $exceptionLog = [
                 "message" => $exception->getMessage(),
                 "stackTrace" => $exception->getTraceAsString(),
@@ -330,8 +363,79 @@ class CSocialStoreUserReg extends COipComponent {
         return $exceptionLog;
     }
 
+    private function restoreConfirmAction(HttpRequest $request) {
+        $exceptionLog = [];
+
+        try {
+            $phone = $request->getPost("reg-restore-confirm-phone");
+            $normalizedPhone = $this->normalize($phone);
+
+            $repository = new UserRepository(Application::getConnection(), new DateTimeConverter());
+
+            $user = $repository->getByPhone($normalizedPhone);
+
+            $verificationCode = $user->generateVerificationCode();
+            $repository->addVerification($user->getId(), $verificationCode);
+
+            $this->throwStoreUserVerificationInitEvent($user);
+
+            global $APPLICATION;
+            LocalRedirect($APPLICATION->GetCurDir() . "?reg-confirm-form=yes&user={$user->getPhone()}");
+        }
+        catch (Repository\NotFoundException $exception) {
+            $exceptionLog = [
+                "message" => $exception->getMessage(),
+                "stackTrace" => $exception->getTraceAsString(),
+            ];
+
+            $this->arResult["ERRORS"][] =  "По номеру $phone не найдано пользователя." .
+                "<br>Пожалуйста, повторите процедуру региcтрации, либо обратитесь в техподдержку.";
+
+            $this->includeComponentTemplate("restore-confirm");
+        }
+        catch (PhoneNormalizerException $exception) {
+            $exceptionLog = [
+                "message" => $exception->getMessage(),
+                "stackTrace" => $exception->getTraceAsString(),
+            ];
+
+            $this->arResult["ERRORS"][] =  $exception;
+
+            $this->includeComponentTemplate("restore-confirm");
+        }
+        catch (AlreadyVerifiedException $exception) {
+            $exceptionLog = [
+                "message" => $exception->getMessage(),
+                "stackTrace" => $exception->getTraceAsString(),
+            ];
+
+            $this->arResult["ERRORS"][] =  $exception->getMessage() .
+                "<br>Пожалуйста, повторите процедуру региcтрации, либо обратитесь в техподдержку.";
+
+            $this->includeComponentTemplate("restore-confirm");
+        }
+        catch (SqlQueryException $exception) {
+            $exceptionLog = [
+                "message" => $exception->getMessage(),
+                "stackTrace" => $exception->getTraceAsString(),
+                "request" => $request
+            ];
+
+            $this->arResult["ERRORS"][] = "Внутреняя ошибка сервера при попытке регистрации. "
+                ."<br>Пожалуйста, обратитесь в техподдержку или попробуйте повторить действие позже";
+
+            $this->includeComponentTemplate("restore-confirm");
+        }
+
+        return $exceptionLog;
+    }
+
     private function throwCreateStoreUserEvent(User $user) {
         (new Event("","OnOipSocialStoreUserCreated", ["user" => $user]))->send();
+    }
+
+    private function throwStoreUserVerificationInitEvent(User $user) {
+        (new Event("","OnOipSocialStoreUserVerificationInit", ["user" => $user]))->send();
     }
 
     private function throwCreateStoreUserErrorsEvent(array $errorLog) {
