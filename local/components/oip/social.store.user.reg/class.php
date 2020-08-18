@@ -21,6 +21,7 @@ use Bitrix\Main\HttpRequest;
 use Oip\Util\Bitrix\DateTimeConverter;
 use Oip\SocialStore\User\Repository;
 use Bitrix\Main\SystemException;
+use Oip\Util\Phone\PhoneNormalizerException;
 
 CBitrixComponent::includeComponentClass("oip:component");
 
@@ -151,6 +152,15 @@ class CSocialStoreUserReg extends COipComponent {
                 . "<br>Если это вы, воспользуйтесь этой "
                 ."<a href='{$this->arParams['RESTORE_LINK']}?forgot_password=yes&phone={$regCommand->phone}"
                 ."&back_url={$this->arParams['BACK_URL']}'>ссылкой</a> для восстановления доступа.";
+        }
+
+        catch (Oip\Util\Phone\PhoneNormalizerException $exception) {
+            $exceptionLog = [
+                "message" => $exception->getMessage(),
+                "stackTrace" => $exception->getTraceAsString(),
+            ];
+
+            $this->arResult["ERRORS"][] =  $exception;
         }
 
         catch (StoreUserRegisterException $exception) {

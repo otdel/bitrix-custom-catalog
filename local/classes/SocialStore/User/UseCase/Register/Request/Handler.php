@@ -5,9 +5,12 @@ namespace Oip\SocialStore\User\UseCase\Register\Request;
 use Oip\SocialStore\User\Entity\User;
 use CUser;
 use Oip\SocialStore\User\Repository\UserRepositoryInterface;
+use Oip\Util\Phone\PhoneNormalizer;
 
 class Handler
 {
+    use PhoneNormalizer;
+
     /** @var UserRepositoryInterface $repository */
     private $repository;
 
@@ -24,7 +27,7 @@ class Handler
         $this->validate($command);
 
         $inputPhone = $command->phone;
-        $command->phone = $this->normalizePhone($command->phone);
+        $command->phone = $this->normalize($command->phone);
 
         if($this->isUserExistByEmail($command->email)) {
             throw new UserExistByEmailException("Пользователь с email {$command->email} уже существует.");
@@ -74,32 +77,6 @@ class Handler
         elseif($command->password !== $command->confirmPassword) {
             throw new StoreUserRegisterException("Поля 'Пароль' и 'Подтверждение пароля' не совпадают.");
         }
-    }
-
-    /**
-     * @param string $phone
-     * @return string
-     */
-    public function normalizePhone(string $phone) {
-        $normalized = str_replace(["(", ")", "-", " "], "", $phone);
-
-        if ($normalized[0] === '8') {
-            $normalized = '7' . substr($normalized, 1);
-        }
-
-        if (substr($normalized, 0, 2) === "+7") {
-            $normalized = '7' . substr($normalized, 2);
-        }
-
-        if (strlen($normalized) === 10) {
-            $normalized = '7' . $normalized;
-        }
-
-        if (!preg_match('/^7[0-9]{10}$/', $normalized)) {
-            $normalized = "";
-        }
-
-        return $normalized;
     }
 
     /**
