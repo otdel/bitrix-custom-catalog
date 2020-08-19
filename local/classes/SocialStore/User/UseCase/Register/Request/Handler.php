@@ -57,17 +57,17 @@ class Handler
     public function validate(Command $command) {
 
         $validates = [
-            "email"     => "Необходимо заполнить email.",
-            "phone"     => "Необходимо заполнить телефон.",
-            "password"  => "Необходимо заполнить пароль.",
-            "confirmPassword"  => "Необходимо подтверждение пароля.",
-            "name"      => "Необходимо указать имя.",
+            "email"     => "<div class='oip-required oip-required-email'>Необходимо заполнить email.</div>",
+            "phone"     => "<div class='oip-required oip-required-phone'>Необходимо заполнить телефон.</div>",
+            "password"  => "<div class='oip-required oip-required-password'>Необходимо заполнить пароль.</div>",
+            "confirmPassword"  => "<div class='oip-required oip-required-confirm-password'>Необходимо подтверждение пароля.</div>",
+            "name"      => "<div class='oip-required oip-required-name'>Необходимо указать имя.</div>",
         ];
 
         $messages = "";
         foreach ($validates as $field => $message) {
             if(!$command->$field) {
-                $messages .= ($messages) ? "<br/>" . $message : $message;
+                $messages .= $message;
             }
         }
 
@@ -75,7 +75,7 @@ class Handler
             throw new StoreUserRegisterException($messages);
         }
         elseif($command->password !== $command->confirmPassword) {
-            throw new StoreUserRegisterException("Поля 'Пароль' и 'Подтверждение пароля' не совпадают.");
+            throw new StoreUserRegisterException("<div class='oip-required oip-mismatch'>Поля 'Пароль' и 'Подтверждение пароля' не совпадают.</div>");
         }
     }
 

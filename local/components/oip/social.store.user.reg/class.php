@@ -174,6 +174,8 @@ class CSocialStoreUserReg extends COipComponent {
                 . "<br>Если это вы, воспользуйтесь этой "
                 ."<a href='{$this->arParams['RESTORE_LINK']}?forgot_password=yes&email={$regCommand->email}"
                 ."&back_url={$this->arParams['BACK_URL']}'>ссылкой</a> для восстановления доступа.";
+
+            $this->arResult["DANGER_CSS"]["email"] = "uk-form-danger";
         }
         catch (UserExistByPhoneException $exception) {
             $exceptionLog = [
@@ -185,6 +187,8 @@ class CSocialStoreUserReg extends COipComponent {
                 . "<br>Если это вы, воспользуйтесь этой "
                 ."<a href='{$this->arParams['RESTORE_LINK']}?forgot_password=yes&phone={$regCommand->phone}"
                 ."&back_url={$this->arParams['BACK_URL']}'>ссылкой</a> для восстановления доступа.";
+
+            $this->arResult["DANGER_CSS"]["phone"] = "uk-form-danger";
         }
 
         catch (PhoneNormalizerException $exception) {
@@ -194,6 +198,8 @@ class CSocialStoreUserReg extends COipComponent {
             ];
 
             $this->arResult["ERRORS"][] =  $exception;
+
+            $this->arResult["DANGER_CSS"]["phone"] = "uk-form-danger";
         }
 
         catch (StoreUserRegisterException $exception) {
@@ -203,6 +209,8 @@ class CSocialStoreUserReg extends COipComponent {
             ];
 
             $this->arResult["ERRORS"][] = $exception;
+
+            $this->setDangerCss($regCommand);
         }
 
         $this->includeComponentTemplate();
@@ -428,6 +436,27 @@ class CSocialStoreUserReg extends COipComponent {
         }
 
         return $exceptionLog;
+    }
+
+    private function setDangerCss(RequestCommand $command) {
+        $fields = [
+            "email",
+            "phone",
+            "name",
+            "password",
+            "confirmPassword"
+        ];
+
+        foreach($fields as $field) {
+            if(!$command->$field) {
+                $this->arResult["DANGER_CSS"][$field] = "uk-form-danger";
+            }
+        }
+
+        if($command->password !== $command->confirmPassword || strlen($command->password) < 6) {
+            $this->arResult["DANGER_CSS"]["password"] = "uk-form-danger";
+            $this->arResult["DANGER_CSS"]["confirmPassword"] = "uk-form-danger";
+        }
     }
 
     private function throwCreateStoreUserEvent(User $user) {
