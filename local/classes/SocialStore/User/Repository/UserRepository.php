@@ -42,6 +42,26 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
+     * @param int $bxId
+     * @return User
+     * @throws SqlQueryException
+     * @throws NotFoundException
+     * @throws DuplicateFoundException
+     * @throws Exception
+     */
+    public function getByBxId(int $bxId): User {
+        $res = $this->db->query("SELECT * FROM {$this->storeUserTable} WHERE bx_id = $bxId");
+
+        $users = $this->parseRow($res);
+
+        if(count($users) > 1) {
+            throw new DuplicateFoundException("По данному bxId = $bxId обнаружены дубликаты клиентов");
+        }
+
+        return reset($users);
+    }
+
+    /**
      * @param string $phone
      * @return User
      * @throws SqlQueryException

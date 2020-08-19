@@ -15,6 +15,14 @@ interface UserRepositoryInterface
     public function getById(int $id): User;
 
     /**
+     * @param int $id
+     * @throws NotFoundException
+     * @throws DuplicateFoundException
+     * @return User
+     */
+    public function getByBxId(int $id): User;
+
+    /**
      * @param string $phone
      * @throws NotFoundException
      * @return User
