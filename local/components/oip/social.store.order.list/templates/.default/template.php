@@ -16,6 +16,8 @@ $component = $this->getComponent();
 $orders =  $arResult["ORDERS"];
 $count = $arResult["COUNT"];
 $arResult["EXCEPTION"];
+
+global $APPLICATION;
 ?>
 
 
@@ -23,7 +25,9 @@ $arResult["EXCEPTION"];
     <div class="uk-padding">
 
     <?if($arResult["EXCEPTION"]):?>
-        <p  style="color:red"><?=$arResult["EXCEPTION"]?></p>
+        <?$APPLICATION->IncludeComponent("oip:system.exception.viewer","",[
+                "EXCEPTION" => $arResult["EXCEPTION"]
+        ])?>
     <?else:?>
 
         <?if(!$count):?>

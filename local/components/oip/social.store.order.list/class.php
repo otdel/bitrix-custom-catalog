@@ -12,9 +12,15 @@ use Oip\SocialStore\Order\Repository\DBRepository as OrderRepository;
 use Oip\SocialStore\Order\Status\Repository\DBRepository as StatusRepository;
 use Oip\SocialStore\Order\Handler as OrderHandler;
 
+use Oip\SocialStore\User\Repository\DuplicateFoundException;
 use Oip\Util\Serializer\ObjectSerializer\Base64Serializer;
 use Oip\Util\Bitrix\DateTimeConverter;
 use Oip\Util\Collection\Factory\CollectionsFactory;
+
+use Oip\SocialStore\User\Entity\User;
+use Oip\SocialStore\User\Repository\UserRepository;
+use Bitrix\Main\Db\SqlQueryException;
+use Oip\SocialStore\User\Repository\NotFoundException;
 
 \CBitrixComponent::includeComponentClass("oip:component");
 
@@ -24,20 +30,8 @@ class COipSocialStoreOrderList extends \COipComponent {
     {
         parent::initParams($arParams);
 
-        try {
-            if(!is_set($arParams["USER_ID"])) {
-                throw new ArgumentNullException("USER_ID");
-            }
-
-            if(!(int)$arParams["USER_ID"]) {
-                throw new ArgumentTypeException("USER_ID");
-            }
-        }
-        catch (ArgumentException $exception) {
-            $this->arResult["EXCEPTION"] = $exception->getMessage();
-        }
-
         $this->setDefaultParam($arParams["ON_PAGE"],10);
+        $this->setDefaultParam($arParams["REDIRECT_URL"],"/");
         $this->setDefaultBooleanParam($arParams["SHOW_ALL"]);
 
         return $arParams;
@@ -46,28 +40,74 @@ class COipSocialStoreOrderList extends \COipComponent {
     /** @throws SystemException */
     public function executeComponent()
     {
-        $connection = Application::getConnection();
-        $orderRepository = new OrderRepository($connection, new Base64Serializer(),
-            new DateTimeConverter(), new CollectionsFactory());
-        $statusRepository = new StatusRepository($connection);
 
-        $handler = new OrderHandler($orderRepository, $statusRepository);
+        try {
 
-        $pageNumber = $this->getPageNumber($this->componentId);
-        $this->arResult["COUNT"] = $count = $handler->getCountByUserId((int)$this->arParams["USER_ID"]);
+            $storeClient = $this->getStoreClient();
 
-        $this->arResult["ORDERS"] = $handler->getAllByUserId(
-            (int)$this->arParams["USER_ID"],
-            $pageNumber,
-            $onPage = (!$this->isParam("SHOW_ALL")) ? $this->getParam("ON_PAGE") : $count
-        );
+            if(!$storeClient) {
+                LocalRedirect($this->arParams["REDIRECT_URL"]);
+            }
+
+            $connection = Application::getConnection();
+            $orderRepository = new OrderRepository($connection, new Base64Serializer(),
+                new DateTimeConverter(), new CollectionsFactory());
+            $statusRepository = new StatusRepository($connection);
+
+            $handler = new OrderHandler($orderRepository, $statusRepository);
+
+            $pageNumber = $this->getPageNumber($this->componentId);
+            $this->arResult["COUNT"] = $count = $handler->getCountByUserId($storeClient->getId());
+
+            $this->arResult["ORDERS"] = $handler->getAllByUserId(
+                $storeClient->getId(),
+                $pageNumber,
+                $onPage = (!$this->isParam("SHOW_ALL")) ? $this->getParam("ON_PAGE") : $count
+            );
+
+            $pages = ceil($count/$onPage);
+        }
+        catch(NotFoundException $exception) {
+
+            $this->arResult["EXCEPTION"] = "Ваши заказы не найдены. Если это ошибка, обратитесь пожалуйста в техподдержку.";
+
+            $pageNumber = 1;
+            $pages = 1;
+        }
+        catch (DuplicateFoundException $exception) {
+
+            $this->arResult["EXCEPTION"] = "Ваши заказы не найдены. Если это ошибка, обратитесь пожалуйста в техподдержку.";
+
+            $pageNumber = 1;
+            $pages = 1;
+        }
 
         $this->includeComponentTemplate();
+
+
         return [
             "NAV_ID" => $this->componentId,
-            "PAGES" => ceil($count/$onPage),
+            "PAGES" => $pages,
             "PAGE" => $pageNumber
         ];
+    }
+
+    /**
+     * @return User|null
+     * @throws SqlQueryException
+     * @throws DuplicateFoundException
+     * @throws NotFoundException
+     */
+    private function getStoreClient() {
+        global $USER;
+
+        if(!$USER->IsAuthorized()) {
+            return null;
+        }
+        else {
+            $repository = new UserRepository(Application::getConnection(), new DateTimeConverter());
+            return $repository->getByBxId((int)$USER->GetID());
+        }
     }
 
     /**
