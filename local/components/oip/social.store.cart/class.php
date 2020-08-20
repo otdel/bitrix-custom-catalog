@@ -19,6 +19,10 @@ use Oip\Util\Collection\Factory\InvalidSubclass as InvalidSubclassException;
 use Oip\Util\Collection\Factory\NonUniqueIdCreating as NonUniqueIdCreatingException;
 
 use Oip\GuestUser\Handler as GuestUser;
+use Oip\SocialStore\User\Entity\User as StoreUser;
+use Oip\SocialStore\User\Repository\UserRepository;
+use Oip\Util\Bitrix\DateTimeConverter;
+use Oip\SocialStore\User\Repository\NotFoundException;
 
 abstract class COipSocialStoreCart extends \COipComponent {
 
@@ -74,14 +78,18 @@ abstract class COipSocialStoreCart extends \COipComponent {
         return new CartRepository($connection, $pathHelper);
     }
 
-    /** @return int */
+    /**
+     * @return int
+     * @throws SqlQueryException
+     */
     private function initCartUser(): int {
 
         global $USER;
         global $OipGuestUser;
 
         if($USER->IsAuthorized()) {
-            $userId = $USER->GetID();
+            $storeUser = $this->initStoreUser();
+            $userId = $storeUser->getId();
         }
         else {
             /** @var $OipGuestUser GuestUser */
@@ -130,4 +138,34 @@ abstract class COipSocialStoreCart extends \COipComponent {
         }
     }
 
+    /**
+     * @return StoreUser
+     * @throws SqlQueryException
+     */
+    private function initStoreUser(): StoreUser {
+        global $USER;
+        $bxUser  = $USER->GetByID($USER->GetID())->arResult[0];
+
+        $userRepository = new UserRepository(Application::getConnection(), new DateTimeConverter());
+
+        try {
+            $storeUser = $userRepository->getByBxId((int)$USER->GetID());
+        }
+        catch (NotFoundException $exception) {
+            $newStoreUserId = $userRepository->addFromBxUser(
+                $bxUser["EMAIL"],
+                $bxUser["PERSONAL_PHONE"],
+                (int)$USER->GetID(),
+                $bxUser["NAME"],
+                $bxUser["LAST_NAME"],
+                $bxUser["SECOND_NAME"],
+            );
+            $userRepository->verifyUserPhone($newStoreUserId);
+
+            $storeUser = $userRepository->getById($newStoreUserId);
+        }
+        finally {
+            return $storeUser;
+        }
+    }
 }

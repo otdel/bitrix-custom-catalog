@@ -5,7 +5,7 @@ namespace Oip\Event\Handler\Bitrix\DataMover;
 
 use Bitrix\Main\Application;
 use Bitrix\Main\Config\Configuration;
-use Oip\GuestUser\Handler as GuestUser;
+use Bitrix\Main\DB\SqlQueryException;
 
 use Oip\DataMover\Repository\DBRepository as MoverRepository;
 use Oip\DataMover\Handler as Mover;
@@ -13,12 +13,20 @@ use Oip\DataMover\Handler as Mover;
 use Oip\DataMover\Entity\RecordType;
 use Oip\DataMover\Exception\WrongDuplicatesNumber as WrongDuplicatesNumberException;
 
+use Oip\SocialStore\User\Repository\NotFoundException;
+use Oip\SocialStore\User\Repository\UserRepository;
+use Oip\Util\Bitrix\DateTimeConverter;
+use Oip\SocialStore\User\Entity\User;
+
 class DataMover
 {
     public static function onAfterUserAuthorize(array $arUser) {
-        /** @var $OipGuestUser GuestUser */
+
         global $OipGuestUser;
         global $APPLICATION;
+
+        $storeUser = self::initStoreUser($arUser["user_fields"]);
+
 
         $guestId = $OipGuestUser->getUser()->getNegativeId();
         $userId = $arUser["user_fields"]["ID"];
@@ -37,8 +45,13 @@ class DataMover
             $entityName = $category["entityName"];
             $uniqueCols = $category["uniqueCols"];
 
+            $currentUserId = $userId;
+            if($entityName == "oip_carts") {
+                $currentUserId = $storeUser->getId();
+            }
+
             $recordType = new RecordType($entityName, $uniqueCols);
-            $mover = new Mover($moverRepository, $guestId, $userId, $recordType);
+            $mover = new Mover($moverRepository, $guestId, $currentUserId, $recordType);
             $rule = $mover->createHandlingRule();
 
             $records = $mover->getRecords();
@@ -69,5 +82,38 @@ class DataMover
             unset($mover);
             unset($recordType);
         }
+    }
+
+    /**
+     * @param array $bxUserFields
+     * @throws SqlQueryException
+     * @return User
+     */
+    private static function initStoreUser(array $bxUserFields) {
+        $userRepository = new UserRepository(Application::getConnection(), new DateTimeConverter());
+
+        try {
+            $storeUser = $userRepository->getByBxId((int)$bxUserFields["ID"]);
+        }
+        catch (NotFoundException $exception) {
+            $newStoreUserId = $userRepository->addFromBxUser(
+                $bxUserFields["EMAIL"],
+                $bxUserFields["PERSONAL_PHONE"],
+                (int)$bxUserFields["ID"],
+                $bxUserFields["NAME"],
+                $bxUserFields["LAST_NAME"],
+                $bxUserFields["SECOND_NAME"],
+            );
+            $userRepository->verifyUserPhone($newStoreUserId);
+
+            $storeUser =  $userRepository->getById($newStoreUserId);
+        }
+        finally {
+            return  $storeUser;
+        }
+    }
+
+    private static function moveExistUserOrders(int $bxId, User $user) {
+
     }
 }

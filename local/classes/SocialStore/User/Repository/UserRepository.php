@@ -134,6 +134,33 @@ class UserRepository implements UserRepositoryInterface
     }
 
     /**
+     * @param string $email
+     * @param string $phone
+     * @param int $bxUserId
+     * @param string $name
+     * @param string|null $surname
+     * @param string|null $patronymic
+     * @return int
+     * @throws SqlQueryException
+     */
+    public function addFromBxUser(
+        string $email,
+        string $phone,
+        int $bxUserId,
+        string $name,
+        ?string $surname,
+        ?string $patronymic
+    ): int
+    {
+        $sql = $this->addFromBxSql($email, $phone, $bxUserId, $name, $surname, $patronymic);
+
+        $this->db->query($sql);
+
+        return (int)$this->db->getInsertedId();
+    }
+
+
+    /**
      * @param int $userId
      * @param string $code
      * @return int
@@ -173,5 +200,27 @@ class UserRepository implements UserRepositoryInterface
         return "INSERT INTO {$this->storeUserTable} (bx_id, email, phone, name, surname, patronymic) ".
             " VALUES ($bxUserId, '{$command->email}', '{$command->phone}', '{$command->name}',"
             ." '{$command->surname}', '{$command->patronymic}')";
+    }
+
+    /**
+     * @param string $email
+     * @param string $phone
+     * @param int $bxUserId
+     * @param string $name
+     * @param string|null $surname
+     * @param string|null $patronymic
+     * @return string
+     */
+    private function addFromBxSql(
+        string $email,
+        string $phone,
+        int $bxUserId,
+        string $name,
+        ?string $surname,
+        ?string $patronymic
+    ) {
+        return "INSERT INTO {$this->storeUserTable} (bx_id, email, phone, name, surname, patronymic) ".
+            " VALUES ($bxUserId, '{$email}', '{$phone}', '{$name}',"
+            ." '{$surname}', '{$patronymic}')";
     }
 }

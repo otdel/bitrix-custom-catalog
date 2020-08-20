@@ -1,4 +1,8 @@
-<?php if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();?>
+<?php if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
+
+global $OipSocialStoreCart;
+
+?>
 
 <!DOCTYPE html>
 <html xml:lang="<?=LANGUAGE_ID?>" lang="<?=LANGUAGE_ID?>"  prefix="og: http://ogp.me/ns#" xmlns:fb="http://ogp.me/ns/fb#">
@@ -28,7 +32,9 @@
 
 <body>
 
-<?$userId = ($USER->IsAuthorized()) ? $USER->GetID() : "-".$OipGuestUser->getUser()->getId();?>
+<?
+$userId = $OipSocialStoreCart->getUserId();
+?>
 <span id="shopuserid" data-userid="<?=$userId?>"></span>
 
 <nav class="uk-navbar-container" uk-navbar>
