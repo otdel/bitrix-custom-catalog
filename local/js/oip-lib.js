@@ -1,8 +1,8 @@
 var OIP  = (function () {
 
     const oipCatalogFilterName = "oipCatalogFilter";
-    const sessionMode = true;
-    const ajaxMode = true;
+    const sessionMode = false;
+    const ajaxMode = false;
 /* ---------------------------------------------------------------------------------------- */
     var
         data = {},
@@ -135,11 +135,14 @@ var OIP  = (function () {
                     }
                 };
 
-
             for (name in params) {
 
-                paramMap = getParamMap(name);
+                if (name.startsWith("pf")) {
+                    setStoreItem(name, params[name], false);
+                    continue;
+                }
 
+                paramMap = getParamMap(name);
 
                 if(paramNames && typeof paramNames  == "object") {
 
@@ -160,6 +163,7 @@ var OIP  = (function () {
                     }
                 }
             }
+
         },
 
         getStore = function() {
@@ -226,7 +230,9 @@ var OIP  = (function () {
 
         getParams = function() {
            if(ajaxMode || sessionMode) {
-               return getSessionParams();
+               var sessionParams = getSessionParams();
+               var getParams = getGetParams();
+               return {...sessionParams, ...getParams};
            }
            else {
                return getGetParams();
@@ -281,7 +287,7 @@ var OIP  = (function () {
 
             if(!objectIsEmpty(getParams)) {
                 for (var name in  getParams) {
-                    if(getParams.hasOwnProperty(name)) {
+                        if(getParams.hasOwnProperty(name)) {
 
                         if(name in store) {
                             newParams[name] = store[name];
@@ -291,6 +297,12 @@ var OIP  = (function () {
 
                             var paramMap = getParamMap(name);
 
+                            // параметр - фильтр по кастомным характеристикам
+                            // if(name.startsWith("pf")) {
+                            //     // Добавляем в стор
+                            //     OIP.Store.setItem(name, getParams[name], false);
+                            // }
+
                             // параметр не относится к фильтрам вообще - оставить
                             if(objectIsEmpty(paramMap)) {
                                 newParams[name] = getParams[name];
@@ -299,6 +311,7 @@ var OIP  = (function () {
                             else if(paramMap.filterId != filterId) {
                                 newParams[name] = getParams[name];
                             }
+
 
                             // иначе параметр из текущего фильтра, но его нет в сторе - он больше не акутален
                             // - выкинуть из урла
@@ -339,6 +352,10 @@ var OIP  = (function () {
             var map = {};
 
             if(!paramName) {
+                return map;
+            }
+
+            if(!paramName.includes('_')) {
                 return map;
             }
 

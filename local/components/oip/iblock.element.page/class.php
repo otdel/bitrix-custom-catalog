@@ -6,6 +6,18 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 class COipIblockElementPage extends \COipIblockElement {
     public function executeComponent() {
         $this->includeComponentTemplate();
+        // Формируем фильтр
+        $this->arParams["FILTER"] = !empty($this->arParams["FILTER"]) ? array_merge($this->arParams["FILTER"], $this->consistFilter()) : $this->consistFilter();
+    }
+
+    public function getComponentId() {
+        return $this->componentId;
+    }
+
+    public function getPageNumber($navId) {
+        $pageNumber = \Bitrix\Main\Application::getInstance()->getContext()->getRequest()->get("page_".$navId);
+
+        return (int) ($pageNumber) ? $pageNumber : 1;
     }
 
     /**
@@ -44,5 +56,33 @@ class COipIblockElementPage extends \COipIblockElement {
      */
     public  function  isPagerTypeLoadMore() {
         return ($this->getPagerType() === "LOAD_MORE");
+    }
+
+    /** @return array */
+    protected function consistFilter()
+    {
+        $filter = [
+            "CHECK_PERMISSIONS" => $this->getParam("CHECK_PERMISSIONS"),
+            "IBLOCK_ID" => $this->arParams["IBLOCK_ID"]
+        ];
+
+        if (intval($this->arParams["SECTION_ID"])) {
+            $filter["SECTION_ID"] = $this->arParams["SECTION_ID"];
+            $filter["INCLUDE_SUBSECTIONS"] = "Y";
+        }
+
+        if ($this->arParams["SHOW_INACTIVE"] !== "Y") {
+            $filter["ACTIVE"] = "Y";
+        }
+
+        if(!$this->isParam("SHOW_ZERO_QUANTITY") && $this->getParam("QUANTITY_PROP")) {
+            $filter["!PROPERTY_" . $this->getParam("QUANTITY_PROP")] = false;
+        }
+
+        if(!empty($this->arParams["FILTER"])) {
+            $filter = array_merge($filter, $this->arParams["FILTER"]);
+        }
+
+        return $filter;
     }
 }
