@@ -23,7 +23,7 @@ global $APPLICATION;
         <?endforeach?>
 
         <div class="uk-margin">
-            <a href='<?=$APPLICATION->GetCurDir()?>'>Назад к регистрации</a>
+            <a href='<?=$APPLICATION->GetCurDir()?>?back_url=<?=$arParams["BACK_URL"]?>'>Назад к регистрации</a>
         </div>
     <?else:?>
 
@@ -65,7 +65,7 @@ global $APPLICATION;
                 </uk>
 
                 <div class="uk-margin">
-                    <a href='<?=$APPLICATION->GetCurDir()?>'>Назад к регистрации</a>
+                    <a href='<?=$APPLICATION->GetCurDir()?>?back_url=<?=$arParams["BACK_URL"]?>'>Назад к регистрации</a>
                 </div>
 
             </fieldset>

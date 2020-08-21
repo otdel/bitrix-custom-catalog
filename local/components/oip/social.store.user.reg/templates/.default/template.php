@@ -39,7 +39,7 @@ $dangerCssConfirmPassword = ($dangerCss && $dangerCss["confirmPassword"]) ? $dan
         <?endforeach?>
 
         <div class="uk-margin">
-            <a href='<?=$APPLICATION->GetCurDir()?>'>Назад к регистрации</a>
+            <a href='<?=$APPLICATION->GetCurDir()?>?back_url=<?=$arParams["BACK_URL"]?>'>Назад к регистрации</a>
         </div>
 
     <?else:?>
@@ -102,7 +102,7 @@ $dangerCssConfirmPassword = ($dangerCss && $dangerCss["confirmPassword"]) ? $dan
 
                 <div class="uk-margin">
                     Зарегистрировались, но не прошли верификацию?<br>
-                    Перейдите по <a href="?restore-confirm-phone=yes">ссылке</a>, чтобы завершить процедуру верификации номера телефона.
+                    Перейдите по <a href="?restore-confirm-phone=yes&back_url=<?=$arParams["BACK_URL"]?>">ссылке</a>, чтобы завершить процедуру верификации номера телефона.
                 </div>
 
             </fieldset>
