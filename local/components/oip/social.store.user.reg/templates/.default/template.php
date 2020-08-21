@@ -5,6 +5,7 @@ if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 use Bitrix\Main\Application;
 
 /** @var array $arResult */
+/** @var array $arParams */
 
 global $APPLICATION;
 $request = Application::getInstance()->getContext()->getRequest();
@@ -52,6 +53,8 @@ $dangerCssConfirmPassword = ($dangerCss && $dangerCss["confirmPassword"]) ? $dan
         <form method="post" action="">
             <fieldset class="uk-fieldset">
                 <legend class="uk-legend">Регистрация</legend>
+
+                <input type="hidden" name="back_url" value="<?=$arParams["BACK_URL"]?>">
 
                 <div class="uk-margin">
                     <input class="uk-input <?=$dangerCssEmail?> uk-form-width-medium" type="email" name="store-user-reg-email"

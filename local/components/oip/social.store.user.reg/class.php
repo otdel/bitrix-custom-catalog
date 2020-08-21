@@ -161,7 +161,8 @@ class CSocialStoreUserReg extends COipComponent {
             $this->throwCreateStoreUserEvent($newStoreUser);
 
             global $APPLICATION;
-            LocalRedirect($APPLICATION->GetCurDir() . "?reg-confirm-form=yes&user={$newStoreUser->getPhone()}");
+            LocalRedirect($APPLICATION->GetCurDir() .
+                "?reg-confirm-form=yes&user={$newStoreUser->getPhone()}&back_url={$this->arParams["BACK_URL"]}");
         }
 
         catch (UserExistByEmailException $exception) {

@@ -4,6 +4,7 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) die();
 global $APPLICATION;
 
 /** @var array $arResult */
+/** @var array $arParams */
 ?>
 
 <?if($arResult["IS_AUTH"]):?>
@@ -23,6 +24,8 @@ global $APPLICATION;
     <form action="" method="post">
         <fieldset class="uk-fieldset">
             <legend class="uk-legend">Подтвердите номер телефона</legend>
+
+            <input type="hidden" name="back_url" value="<?=$arParams["BACK_URL"]?>">
 
             <div class="uk-margin">
                 <input class="uk-input uk-form-width-medium" type="tel" name="reg-restore-confirm-phone"

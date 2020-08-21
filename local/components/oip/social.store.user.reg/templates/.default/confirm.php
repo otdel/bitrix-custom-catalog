@@ -3,6 +3,7 @@
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true)die();
 
 /** @var array $arResult */
+/** @var array $arParams */
 
 global $APPLICATION;
 ?>
@@ -39,6 +40,7 @@ global $APPLICATION;
                 <legend class="uk-legend">Подтверждение номера телефона</legend>
 
                 <input type="hidden" name="store-user-reg-confirm-user" value="<?=$arResult["USER_PHONE"]?>">
+                <input type="hidden" name="back_url" value="<?=$arParams["BACK_URL"]?>">
 
                 <?if(!$arResult["ERRORS"] || empty($arResult["ERRORS"])):?>
                     <div class="uk-alert-primary" uk-alert>
