@@ -390,7 +390,7 @@ class CSocialStoreUserReg extends COipComponent {
             $this->throwStoreUserVerificationInitEvent($user);
 
             global $APPLICATION;
-            LocalRedirect($APPLICATION->GetCurDir() . "?reg-confirm-form=yes&user={$user->getPhone()}");
+            LocalRedirect($APPLICATION->GetCurDir() . "?reg-confirm-form=yes&user={$user->getPhone()}&back_url={$this->arParams['BACK_URL']}");
         }
         catch (Repository\NotFoundException $exception) {
             $exceptionLog = [
