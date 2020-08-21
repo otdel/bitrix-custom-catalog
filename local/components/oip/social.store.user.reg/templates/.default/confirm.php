@@ -61,7 +61,7 @@ global $APPLICATION;
                 </div>
 
                 <uk class="margin">
-                    <a href="?reg-confirm-form=yes&user=<?=$arResult["USER_PHONE"]?>&code-resend=yes">Выслать новый код</a>
+                    <a href="?reg-confirm-form=yes&user=<?=$arResult["USER_PHONE"]?>&code-resend=yes&back_url=<?=$arParams["BACK_URL"]?>">Выслать новый код</a>
                 </uk>
 
                 <div class="uk-margin">

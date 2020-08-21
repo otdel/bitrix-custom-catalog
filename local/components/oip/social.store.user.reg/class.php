@@ -158,8 +158,6 @@ class CSocialStoreUserReg extends COipComponent {
         try {
             $newStoreUser = $handler->handle($regCommand);
 
-            $this->throwCreateStoreUserEvent($newStoreUser);
-
             global $APPLICATION;
             LocalRedirect($APPLICATION->GetCurDir() .
                 "?reg-confirm-form=yes&user={$newStoreUser->getPhone()}&back_url={$this->arParams["BACK_URL"]}");
@@ -309,7 +307,10 @@ class CSocialStoreUserReg extends COipComponent {
             if($codeResend) {
                 $newCode = $verifyingUser->generateVerificationCode();
                 $repository->addVerification($verifyingUser->getId(), $newCode);
+                $verifyingUser = $repository->getByPhone($userPhone);
             }
+
+            $this->throwCreateStoreUserEvent($verifyingUser);
 
             $this->arResult["USER_PHONE"] = $verifyingUser->getPhone();
 

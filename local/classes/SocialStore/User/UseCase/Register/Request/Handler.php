@@ -113,7 +113,7 @@ class Handler
      * @return boolean
      */
     private function isUserExistByEmail(string $email) {
-        return (bool)(count($this->getBxUsersByFilter(["EMAIL" => $email])));
+        return (bool)(count($this->getBxUsersByFilter(["=EMAIL" => $email])));
     }
 
     /**
