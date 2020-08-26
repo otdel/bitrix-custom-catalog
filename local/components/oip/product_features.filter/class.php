@@ -19,13 +19,13 @@ use Oip\ProductFeature\SectionFeatureOption;
 class CProductFeaturesFilter extends \COipComponent
 {
     /** @var CacheInfo $cacheInfo Информация о кеше внутри компонента */
-    private $cacheInfo;
+    protected $cacheInfo;
     /** @var ProductFeature[] $productFeatures */
-    private $productFeatures;
+    protected $productFeatures;
     /** @var RepositoryInterface $repository Источник данных */
-    private $repository;
+    protected $repository;
     /** @var DataWrapper $dataWrapper Обертка над источником данных */
-    private $dataWrapper;
+    protected $dataWrapper;
 
     public function onPrepareComponentParams($arParams)
     {
@@ -46,6 +46,7 @@ class CProductFeaturesFilter extends \COipComponent
         }
 
         $this->includeComponentTemplate();
+        return $this->arResult;
     }
 
     protected function execute()
@@ -56,19 +57,21 @@ class CProductFeaturesFilter extends \COipComponent
         // Создаем объект-обертку для операций над источником данных
         $this->dataWrapper = new DataWrapper($this->repository);
         // Если набор данных для фильтрации был передан
-        if (isset($_POST["filter"]["action"]) && ($_POST["filter"]["action"] == "doFilter")) {
-            $this->arResult["FILTERED_ELEMENTS"] = $this->filterElements();
+        if (isset($_GET["pf"])) {
+            $filteredElements = $this->filterElements();
+            if (!empty($filteredElements) && is_array($filteredElements)) {
+                $this->arResult["FILTERED_ELEMENTS"] = array_map(function($element) {
+                    return $element["element_id"];
+                }, $filteredElements);
+            }
         }
-        // Если не было передано действия - следует показать форму
-        else {
-            $this->prepareFormData();
-        }
+        $this->prepareFormData();
     }
 
     protected function filterElements() {
-        $limit = isset($_POST["filter"]["limit"]) ? $_POST["filter"]["limit"] : 1000;
-        $offset = isset($_POST["filter"]["offset"]) ? $_POST["filter"]["offset"] : 0;
-        return $this->dataWrapper->getFilteredElements($_POST["filter"]["filters"], $limit, $offset);
+        $limit = isset($_GET["pf"]["limit"]) ? $_GET["pf"]["limit"] : 1000;
+        $offset = isset($_GET["pf"]["offset"]) ? $_GET["pf"]["offset"] : 0;
+        return $this->dataWrapper->getFilteredElements($_GET["pf"], $limit, $offset);
     }
 
     protected function prepareFormData() {
@@ -123,11 +126,23 @@ class CProductFeaturesFilter extends \COipComponent
             return $sectionFeatureOption->isFilter();
         });
 
+        // Получим все дерево разделов относительно текущего (текущий + дочерние)
+        $arSectionIds[] = $section;
+        $rsParentSection = CIBlockSection::GetList([], ['ID' => $section]);
+        if ($arParentSection = $rsParentSection->Fetch()) {
+            $arFilter = array('IBLOCK_ID' => $arParentSection['IBLOCK_ID'],'>LEFT_MARGIN' => $arParentSection['LEFT_MARGIN'],'<RIGHT_MARGIN' => $arParentSection['RIGHT_MARGIN'],'>DEPTH_LEVEL' => $arParentSection['DEPTH_LEVEL']); // выберет потомков без учета активности
+            $rsSect = CIBlockSection::GetList(array('left_margin' => 'asc'),$arFilter);
+            while ($arSect = $rsSect->GetNext())
+            {
+                $arSectionIds[] = $arSect['ID'];
+            }
+        }
+
         // Получив отфильтрованный список, запрашиваем все уникальные значения для каждой характеристики
         $filterSectionFeatureValues = array();
         foreach ($filterSectionFeatures as $filterSectionFeature) {
             // Для каждой характеристики получаем distinct значения
-            $distinctValues = $this->dataWrapper->getFeatureDistinctValues($filterSectionFeature->getFeatureCode());
+            $distinctValues = $this->dataWrapper->getFeatureDistinctValues($filterSectionFeature->getFeatureCode(), $arSectionIds);
             $filterSectionFeatureValues[$filterSectionFeature->getFeatureCode()] = array();
             foreach ($distinctValues as $distinctValue) {
                 $filterSectionFeatureValues[$filterSectionFeature->getFeatureCode()][] = $distinctValue;

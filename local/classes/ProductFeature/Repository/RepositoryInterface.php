@@ -57,9 +57,11 @@ interface RepositoryInterface
      * Получение уникальных значений для характеристики по ее коду
      *
      * @param string $featureCode Код характеристики
+     * @param int[] $arSectionIds Коды разделов, из которых следует учитывать товары
      * @return array | null
+     * @throws \Exception
      */
-    public function getFeatureDistinctValues($featureCode);
+    public function getFeatureDistinctValues($featureCode, $arSectionIds);
 
     /**
      * Получение списка элементов, удовлетворяющих набору фильтров

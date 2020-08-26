@@ -134,11 +134,12 @@ class DataWrapper
      * Получение уникальных значений для характеристики по ее коду
      *
      * @param string $featureCode Код характеристики
+     * @param int[]|null $arSectionIds Массив идентификторов разделов, внутри которых смотреть элементы и их значенияё
      * @return array | null
      * @throws \Exception
      */
-    public function getFeatureDistinctValues($featureCode) {
-        return $this->repository->getFeatureDistinctValues($featureCode);
+    public function getFeatureDistinctValues($featureCode, $arSectionIds = null) {
+        return $this->repository->getFeatureDistinctValues($featureCode, $arSectionIds);
     }
 
     /**

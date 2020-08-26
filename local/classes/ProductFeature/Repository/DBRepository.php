@@ -415,10 +415,11 @@ class DBRepository implements RepositoryInterface
      * Получение уникальных значений для характеристики по ее коду
      *
      * @param string $featureCode Код характеристики
+     * @param int[] $arSectionIds Коды разделов, из которых следует учитывать товары
      * @return array | null
      * @throws \Exception
      */
-    public function getFeatureDistinctValues($featureCode) {
+    public function getFeatureDistinctValues($featureCode, $arSectionIds = []) {
         // Получаем экземпляр класса Cache, формируем ключ кеша для данного запроса
         $cache = Cache::createInstance();
         $cacheKey = $this->cacheInfo->getCacheKey() . ".getFeatureDistinctValues" . md5(serialize(func_get_args()));
@@ -430,11 +431,20 @@ class DBRepository implements RepositoryInterface
         }
         // Если кеша нет или он неактуален (или выключен)
         elseif ($cache->startDataCache()) {
-            // Для каждой карактеристики получаем distinct значения
-            $sql =
-                "SELECT DISTINCT efv.value AS val
+            $sqlSectionsFilter = "";
+            if (!empty($arSectionIds) && is_array($arSectionIds)) {
+                $sqlSectionsFilter = " AND ie.IBLOCK_SECTION_ID IN (" . (implode(',', $arSectionIds)) .") ";
+            }
+            // Для каждой карактеристики получаем distinct значения (только для активных товаров и из нужных категорий)
+            $sql = "
+             SELECT DISTINCT efv.value AS val
              FROM oip_element_feature_value efv 
-             WHERE efv.feature_code = '{$featureCode}'; ";
+             LEFT JOIN b_iblock_element ie ON ie.ID = efv.element_id
+             WHERE 
+                efv.feature_code = '{$featureCode}' 
+                AND ie.ACTIVE = 'Y'
+                {$sqlSectionsFilter}
+            ; ";
 
             // Выполняем запрос
             $query = $this->db->Query($sql);
